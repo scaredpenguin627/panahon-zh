@@ -1,0 +1,15 @@
+{
+  "name": "emb-aqi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "从 EMB（菲律宾环境管理局）的 Power BI 公开报表中取实时空气质量数据，供手机 App 调用",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "collect": "node src/collect.mjs",
+    "capture": "node tools/capture-recipe.mjs"
+  }
+}
