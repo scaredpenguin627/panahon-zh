@@ -2,8 +2,8 @@
 
 use eframe::egui::{self, Align, Color32, CornerRadius, Layout, RichText, Vec2};
 use panahon_core::{
-    fetch_api_version, fetch_public_dashboard, search_places, Dashboard, DataSource, ForecastDay,
-    HourlyForecast, Place,
+    fetch_air_quality, fetch_api_version, fetch_public_dashboard, search_places, AirQuality,
+    Dashboard, DataSource, ForecastDay, HourlyForecast, Place,
 };
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -72,6 +72,8 @@ pub struct PanahonApp {
     search_query: String,
     search_results: Vec<Place>,
     map_layer: MapLayer,
+    air_quality: Option<AirQuality>,
+    aqi_status: String,
 }
 
 impl PanahonApp {
@@ -93,6 +95,8 @@ impl PanahonApp {
             search_query: String::new(),
             search_results: Vec::new(),
             map_layer: MapLayer::Radar,
+            air_quality: None,
+            aqi_status: "尚未加载空气质量".into(),
         }
     }
 
@@ -358,6 +362,40 @@ impl PanahonApp {
     fn services_page(&mut self, ui: &mut egui::Ui) {
         ui.heading("服务");
         ui.label("这些模块已预留界面边界。实时数据需要独立来源和许可。");
+        ui.add_space(8.0);
+        ui.group(|ui| {
+            ui.horizontal(|ui| {
+                ui.label(RichText::new("空气质量").strong());
+                if ui.button("刷新空气质量").clicked() {
+                    match fetch_air_quality() {
+                        Ok(data) => {
+                            self.aqi_status = format!(
+                                "{} 个站点，平均 AQI {}，最差：{}",
+                                data.summary.station_count,
+                                data.summary
+                                    .avg_aqi
+                                    .map_or("暂无".into(), |value| value.to_string()),
+                                data.summary.max_station.as_deref().unwrap_or("暂无")
+                            );
+                            self.air_quality = Some(data);
+                        }
+                        Err(error) => self.aqi_status = error,
+                    }
+                }
+            });
+            ui.label(&self.aqi_status);
+            if let Some(data) = &self.air_quality {
+                ui.label(format!(
+                    "数据时间：{} · 来源：{}",
+                    data.data_clock
+                        .as_deref()
+                        .or(data.updated_at.as_deref())
+                        .unwrap_or("未知"),
+                    data.source.provider
+                ));
+                ui.label("空气质量数据仅作信息参考，站点质量状态和更新时间以官方页面为准。");
+            }
+        });
         ui.add_space(8.0);
         let services = [
             (
