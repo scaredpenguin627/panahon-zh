@@ -7,6 +7,10 @@ use std::time::Duration;
 
 pub const API_ROOT: &str = "https://api.mobile.panahon.gov.ph/api/v1";
 pub const OFFICIAL_MAP_URL: &str = "https://panahon.gov.ph/?embed=panahon-mobile";
+pub const AQI_ENDPOINT: &str = match option_env!("PANAHON_AQI_ENDPOINT") {
+    Some(value) => value,
+    None => "https://aqi.example.invalid/api/aqi",
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Place {
@@ -53,6 +57,53 @@ pub struct Alert {
     pub issued_at: String,
     pub detail: String,
     pub defense: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct AirQualityStation {
+    #[serde(rename = "nameZh")]
+    pub name_zh: String,
+    pub pm10: Option<f32>,
+    #[serde(rename = "pm25")]
+    pub pm25: Option<f32>,
+    pub aqi: Option<u16>,
+    pub pollutant: Option<String>,
+    pub category: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct AirQualitySummary {
+    #[serde(rename = "stationCount")]
+    pub station_count: u16,
+    #[serde(rename = "avgAqi")]
+    pub avg_aqi: Option<u16>,
+    #[serde(rename = "maxAqi")]
+    pub max_aqi: Option<u16>,
+    #[serde(rename = "maxStation")]
+    pub max_station: Option<String>,
+    pub category: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct AirQuality {
+    pub source: AirQualitySource,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: Option<String>,
+    #[serde(rename = "dataClock")]
+    pub data_clock: Option<String>,
+    #[serde(rename = "fetchedAt")]
+    pub fetched_at: Option<String>,
+    pub summary: AirQualitySummary,
+    pub stations: Vec<AirQualityStation>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct AirQualitySource {
+    pub provider: String,
+    pub report: Option<String>,
+    pub report_id: Option<u64>,
+    pub page: String,
+    pub note: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -168,6 +219,22 @@ pub fn fetch_api_version() -> Result<ApiVersion, String> {
 
 #[cfg(not(feature = "network"))]
 pub fn fetch_api_version() -> Result<ApiVersion, String> {
+    Err("网络适配器未启用".into())
+}
+
+#[cfg(feature = "network")]
+pub fn fetch_air_quality() -> Result<AirQuality, String> {
+    ureq::get(AQI_ENDPOINT)
+        .timeout(Duration::from_secs(15))
+        .set("User-Agent", "PanahonZh/0.1 (Rust client)")
+        .call()
+        .map_err(|err| format!("空气质量服务请求失败：{err}"))?
+        .into_json::<AirQuality>()
+        .map_err(|err| format!("空气质量响应无法解析：{err}"))
+}
+
+#[cfg(not(feature = "network"))]
+pub fn fetch_air_quality() -> Result<AirQuality, String> {
     Err("网络适配器未启用".into())
 }
 
