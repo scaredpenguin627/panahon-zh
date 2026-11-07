@@ -85,6 +85,8 @@ adb shell monkey -p org.panahon.zh -c android.intent.category.LAUNCHER 1
 
 代码使用 MIT 或 Apache-2.0 双许可证。PAGASA、PANaHON 和原应用中的其他名称、图像及商标不属于本项目。
 
+界面使用 Noto Sans CJK SC 字体显示中文。字体采用 SIL Open Font License 1.1，来源和许可证文件位于 `assets/`。
+
 项目目前没有完成真实 GrapheneOS 设备测试，也没有实现本地通知、雷达图像、观测历史和桌面小组件。接入更多公开数据前，请确认服务条款、速率限制和字段格式。
 
 

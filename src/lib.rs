@@ -38,6 +38,7 @@ pub struct PanahonApp {
 
 impl PanahonApp {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        install_cjk_font(&cc.egui_ctx);
         let mut style = (*cc.egui_ctx.style()).clone();
         style.spacing.item_spacing = Vec2::new(10.0, 8.0);
         style.visuals.window_corner_radius = CornerRadius::same(18);
@@ -256,6 +257,22 @@ impl PanahonApp {
         }
         ui.label("通知默认关闭。后续可使用 Android 本地通知，不依赖 FCM。");
     }
+}
+
+fn install_cjk_font(ctx: &egui::Context) {
+    let mut fonts = egui::FontDefinitions::default();
+    fonts.font_data.insert(
+        "noto_sans_cjk".into(),
+        egui::FontData::from_static(include_bytes!("../assets/NotoSansCJKsc-Regular.otf")).into(),
+    );
+    for family in [egui::FontFamily::Proportional, egui::FontFamily::Monospace] {
+        fonts
+            .families
+            .entry(family)
+            .or_default()
+            .insert(0, "noto_sans_cjk".into());
+    }
+    ctx.set_fonts(fonts);
 }
 
 impl eframe::App for PanahonApp {
