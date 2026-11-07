@@ -121,7 +121,7 @@ impl PanahonApp {
     }
 
     fn tab_bar(&mut self, ui: &mut egui::Ui) {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             for tab in Tab::ALL {
                 let selected = self.tab == tab;
                 let label = if selected {
