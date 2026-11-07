@@ -181,6 +181,7 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
         wind_direction: text(obs, "wd").unwrap_or_else(|| "未知".into()),
         condition: text(obs, "desc")
             .or_else(|| text(now, "desc"))
+            .map(translate_condition)
             .unwrap_or_else(|| "暂无描述".into()),
         updated_at: text(obs, "observed_at").unwrap_or_else(|| "公开接口".into()),
     };
@@ -201,8 +202,12 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
             days.iter()
                 .take(5)
                 .map(|day| ForecastDay {
-                    date: text(Some(day), "d").unwrap_or_else(|| "未知日期".into()),
-                    summary: text(Some(day), "desc").unwrap_or_else(|| "暂无描述".into()),
+                    date: text(Some(day), "d")
+                        .map(translate_day)
+                        .unwrap_or_else(|| "未知日期".into()),
+                    summary: text(Some(day), "desc")
+                        .map(translate_condition)
+                        .unwrap_or_else(|| "暂无描述".into()),
                     low_c: number(Some(day), "tmin").unwrap_or(0.0) as f32,
                     high_c: number(Some(day), "tmax").unwrap_or(0.0) as f32,
                     rain_probability: number(Some(day), "rain").unwrap_or(0.0).clamp(0.0, 100.0)
@@ -217,8 +222,12 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
                     .map(|row| {
                         let temp = number(Some(row), "tmp").unwrap_or(0.0) as f32;
                         ForecastDay {
-                            date: text(Some(row), "time").unwrap_or_else(|| "未知时间".into()),
-                            summary: text(Some(row), "desc").unwrap_or_else(|| "暂无描述".into()),
+                            date: text(Some(row), "time")
+                                .map(translate_day)
+                                .unwrap_or_else(|| "未知时间".into()),
+                            summary: text(Some(row), "desc")
+                                .map(translate_condition)
+                                .unwrap_or_else(|| "暂无描述".into()),
                             low_c: temp,
                             high_c: temp,
                             rain_probability: number(Some(row), "rain")
@@ -325,6 +334,9 @@ fn number(value: Option<&serde_json::Value>, key: &str) -> Option<f64> {
 #[cfg(feature = "network")]
 fn text(value: Option<&serde_json::Value>, key: &str) -> Option<String> {
     let item = value?.get(key)?;
+    if item.is_null() {
+        return None;
+    }
     item.as_str()
         .map(str::to_owned)
         .or_else(|| {
@@ -367,6 +379,41 @@ fn percent_encode(value: &str) -> String {
             _ => format!("%{byte:02X}"),
         })
         .collect()
+}
+
+#[cfg(feature = "network")]
+fn translate_condition(value: String) -> String {
+    let lower = value.to_ascii_lowercase();
+    if lower.contains("clear") {
+        "晴朗".into()
+    } else if lower.contains("partly cloudy") {
+        "局部多云".into()
+    } else if lower.contains("cloudy") || lower.contains("overcast") {
+        "多云".into()
+    } else if lower.contains("thunder") || lower.contains("storm") {
+        "雷雨".into()
+    } else if lower.contains("shower") || lower.contains("rain") {
+        "阵雨".into()
+    } else if lower.contains("fair") {
+        "晴间多云".into()
+    } else {
+        value
+    }
+}
+
+#[cfg(feature = "network")]
+fn translate_day(value: String) -> String {
+    match value.to_ascii_lowercase().as_str() {
+        "today" => "今天".into(),
+        "sun" | "sunday" => "周日".into(),
+        "mon" | "monday" => "周一".into(),
+        "tue" | "tuesday" => "周二".into(),
+        "wed" | "wednesday" => "周三".into(),
+        "thu" | "thursday" => "周四".into(),
+        "fri" | "friday" => "周五".into(),
+        "sat" | "saturday" => "周六".into(),
+        _ => value,
+    }
 }
 #[cfg(test)]
 mod tests {
