@@ -38,12 +38,21 @@ pub struct ForecastDay {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct HourlyForecast {
+    pub time: String,
+    pub summary: String,
+    pub temperature_c: f32,
+    pub rain_probability: u8,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Alert {
     pub title: String,
     pub severity: String,
     pub area: String,
     pub issued_at: String,
     pub detail: String,
+    pub defense: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -51,6 +60,7 @@ pub struct Dashboard {
     pub place: Place,
     pub current: CurrentWeather,
     pub forecast: Vec<ForecastDay>,
+    pub hourly: Vec<HourlyForecast>,
     pub alerts: Vec<Alert>,
     pub source: DataSource,
 }
@@ -117,12 +127,21 @@ impl Dashboard {
                     rain_probability: 40,
                 },
             ],
+            hourly: vec![
+                HourlyForecast { time: "现在".into(), summary: "局部多云".into(), temperature_c: 30.0, rain_probability: 20 },
+                HourlyForecast { time: "1 小时后".into(), summary: "局部多云".into(), temperature_c: 30.0, rain_probability: 25 },
+                HourlyForecast { time: "2 小时后".into(), summary: "短时阵雨".into(), temperature_c: 29.0, rain_probability: 45 },
+                HourlyForecast { time: "3 小时后".into(), summary: "短时阵雨".into(), temperature_c: 29.0, rain_probability: 50 },
+                HourlyForecast { time: "4 小时后".into(), summary: "多云".into(), temperature_c: 29.0, rain_probability: 35 },
+                HourlyForecast { time: "5 小时后".into(), summary: "多云".into(), temperature_c: 28.0, rain_probability: 30 },
+            ],
             alerts: vec![Alert {
                 title: "示例：强降雨提醒".into(),
                 severity: "一般".into(),
                 area: "马尼拉大都会".into(),
                 issued_at: "离线示例".into(),
                 detail: "联网后将从公开天气服务加载官方预警。".into(),
+                defense: "联网并确认数据来源后，再按官方防御指南行动。".into(),
             }],
             source: DataSource::OfflineSample,
         }
@@ -196,6 +215,25 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
     let hourly = nowcast
         .pointer("/data/hc")
         .and_then(serde_json::Value::as_array);
+    let hourly_items = hourly
+        .map(|rows| {
+            rows.iter()
+                .take(24)
+                .map(|row| HourlyForecast {
+                    time: text(Some(row), "time")
+                        .map(translate_day)
+                        .unwrap_or_else(|| "未知时间".into()),
+                    summary: text(Some(row), "desc")
+                        .map(translate_condition)
+                        .unwrap_or_else(|| "暂无描述".into()),
+                    temperature_c: number(Some(row), "tmp").unwrap_or(0.0) as f32,
+                    rain_probability: number(Some(row), "rain")
+                        .unwrap_or(0.0)
+                        .clamp(0.0, 100.0) as u8,
+                })
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
     let forecast = daily
         .filter(|rows| !rows.is_empty())
         .map(|days| {
@@ -254,6 +292,7 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
                     area: text(Some(item), "locations").unwrap_or_else(|| "未注明区域".into()),
                     issued_at: text(Some(item), "issued_at").unwrap_or_else(|| "未知时间".into()),
                     detail: text(Some(item), "message").unwrap_or_else(|| "请查看官方详情".into()),
+                    defense: "请以官方预警和当地部门指引为准。".into(),
                 })
                 .collect::<Vec<_>>()
         })
@@ -263,6 +302,7 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
         place: place.clone(),
         current,
         forecast,
+        hourly: hourly_items,
         alerts: alert_items,
         source: DataSource::PublicApi,
     })
