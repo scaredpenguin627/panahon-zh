@@ -1,0 +1,51 @@
+[workspace]
+members = ["core"]
+resolver = "2"
+
+[package]
+name = "panahon-zh"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+description = "A clean-room Chinese Rust weather client for public Philippine weather data"
+license = "MIT OR Apache-2.0"
+autobins = false
+
+[features]
+default = []
+network = ["panahon-core/network"]
+desktop = []
+
+[dependencies]
+eframe = { version = "0.33", default-features = false, features = ["android-native-activity", "glow", "default_fonts"] }
+winit = { version = "0.30", features = ["android-native-activity"] }
+egui = "0.33"
+panahon-core = { path = "core" }
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[package.metadata.android]
+package = "org.panahon.zh"
+apk_name = "panahon-zh"
+build_targets = ["aarch64-linux-android", "x86_64-linux-android"]
+
+[package.metadata.android.application]
+label = "菲律宾天气（中文）"
+
+[package.metadata.android.sdk]
+min_sdk_version = 29
+target_sdk_version = 35
+
+[[package.metadata.android.permission]]
+name = "android.permission.INTERNET"
+
+[[package.metadata.android.permission]]
+name = "android.permission.ACCESS_COARSE_LOCATION"
+
+[[package.metadata.android.permission]]
+name = "android.permission.ACCESS_FINE_LOCATION"
+
+[[package.metadata.android.permission]]
+name = "android.permission.POST_NOTIFICATIONS"
+
