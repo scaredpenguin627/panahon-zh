@@ -1,5 +1,5 @@
 # Rust and Android build output
-target/
+/target/
 target-*/
 **/target/
 .gradle/
@@ -25,7 +25,7 @@ Thumbs.db
 .env
 .env.*
 
-# Local Craft Anything evidence exports may contain absolute workstation paths
+# Local analysis exports may contain absolute workstation paths
 docs/craft-anything-evidence/*.json
 docs/ida-first-pass.json
 docs/ida-first-pass.log

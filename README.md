@@ -33,10 +33,12 @@
 cargo install cargo-apk
 $env:ANDROID_HOME = "C:\Android\Sdk"
 $env:ANDROID_NDK_HOME = "C:\Android\Sdk\ndk\<版本>"
+$env:CARGO_APK_RELEASE_KEYSTORE = "<签名文件路径>"
+$env:CARGO_APK_RELEASE_KEYSTORE_PASSWORD = "<签名文件密码>"
 cargo apk build --release --target aarch64-linux-android
 ```
 
-APK 位于 `target\android-artifacts\release\`。启用公开接口适配器：
+APK 位于 `target\release\apk\`。启用公开接口适配器：
 
 ```powershell
 cargo apk build --release --features network --target aarch64-linux-android
