@@ -394,15 +394,25 @@ impl PanahonApp {
                     data.source.provider
                 ));
                 ui.label("空气质量数据仅作信息参考，站点质量状态和更新时间以官方页面为准。");
+                ui.collapsing("监测站明细（按 AQI 从高到低）", |ui| {
+                    for station in data.stations.iter().take(8) {
+                        ui.horizontal(|ui| {
+                            ui.add_sized([150.0, 20.0], egui::Label::new(&station.name_zh));
+                            ui.add_sized(
+                                [72.0, 20.0],
+                                egui::Label::new(format!(
+                                    "AQI {}",
+                                    station.aqi.map_or("暂无".into(), |value| value.to_string())
+                                )),
+                            );
+                            ui.label(&station.category);
+                        });
+                    }
+                });
             }
         });
         ui.add_space(8.0);
         let services = [
-            (
-                "空气质量",
-                "DENR-EMB 授权接口优先，OpenAQ 作为可选适配器。",
-                "需要数据许可",
-            ),
             ("旅游天气", "旅游区未来一周天气。", "公开接口待接入"),
             ("生活指数", "紫外线、穿衣、出行和户外活动建议。", "规则样例"),
         ];
