@@ -1,0 +1,32 @@
+# Rust and Android build output
+/target/
+target-*/
+**/target/
+.gradle/
+
+# Local IDE and OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Decompiled or device-local databases
+*.i64
+*.idb
+*.sqlite
+
+# Local packages and signing material
+*.apk
+*.aab
+*.xapk
+*.keystore
+*.jks
+.env
+.env.*
+
+# Local analysis exports may contain absolute workstation paths
+docs/craft-anything-evidence/*.json
+docs/ida-first-pass.json
+docs/ida-first-pass.log
+
