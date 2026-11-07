@@ -263,7 +263,7 @@ fn install_cjk_font(ctx: &egui::Context) {
     let mut fonts = egui::FontDefinitions::default();
     fonts.font_data.insert(
         "noto_sans_cjk".into(),
-        egui::FontData::from_static(include_bytes!("../assets/NotoSansCJKsc-Regular.otf")).into(),
+        egui::FontData::from_static(include_bytes!("../assets/NotoSansCJKsc-Subset.otf")).into(),
     );
     for family in [egui::FontFamily::Proportional, egui::FontFamily::Monospace] {
         fonts
