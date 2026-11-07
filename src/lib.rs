@@ -3,7 +3,7 @@
 use eframe::egui::{self, Align, Color32, CornerRadius, Layout, RichText, Vec2};
 use panahon_core::{
     fetch_api_version, fetch_public_dashboard, search_places, Dashboard, DataSource, ForecastDay,
-    Place,
+    HourlyForecast, Place,
 };
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -12,10 +12,17 @@ enum Tab {
     Forecast,
     Map,
     Alerts,
+    Services,
 }
 
 impl Tab {
-    const ALL: [Self; 4] = [Self::Places, Self::Forecast, Self::Map, Self::Alerts];
+    const ALL: [Self; 5] = [
+        Self::Places,
+        Self::Forecast,
+        Self::Map,
+        Self::Alerts,
+        Self::Services,
+    ];
 
     fn title(self) -> &'static str {
         match self {
@@ -23,6 +30,36 @@ impl Tab {
             Self::Forecast => "预报",
             Self::Map => "地图",
             Self::Alerts => "预警",
+            Self::Services => "服务",
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum MapLayer {
+    Radar,
+    Satellite,
+    Lightning,
+    Typhoon,
+    Hazard,
+}
+
+impl MapLayer {
+    const ALL: [Self; 5] = [
+        Self::Radar,
+        Self::Satellite,
+        Self::Lightning,
+        Self::Typhoon,
+        Self::Hazard,
+    ];
+
+    fn title(self) -> &'static str {
+        match self {
+            Self::Radar => "雷达",
+            Self::Satellite => "卫星",
+            Self::Lightning => "闪电",
+            Self::Typhoon => "台风",
+            Self::Hazard => "灾害风险",
         }
     }
 }
@@ -34,6 +71,7 @@ pub struct PanahonApp {
     last_version: Option<String>,
     search_query: String,
     search_results: Vec<Place>,
+    map_layer: MapLayer,
 }
 
 impl PanahonApp {
@@ -54,6 +92,7 @@ impl PanahonApp {
             last_version: None,
             search_query: String::new(),
             search_results: Vec::new(),
+            map_layer: MapLayer::Radar,
         }
     }
 
@@ -150,6 +189,15 @@ impl PanahonApp {
             forecast_row(ui, day);
         }
         ui.add_space(8.0);
+        ui.label(RichText::new("逐小时预报").size(18.0).strong());
+        if self.dashboard.hourly.is_empty() {
+            ui.label("当前接口没有返回逐小时数据。");
+        } else {
+            for hour in &self.dashboard.hourly {
+                hourly_row(ui, hour);
+            }
+        }
+        ui.add_space(8.0);
         if ui.button("刷新天气数据").clicked() {
             self.refresh_data();
         }
@@ -225,15 +273,46 @@ impl PanahonApp {
 
     fn map_page(&mut self, ui: &mut egui::Ui) {
         ui.heading("天气地图");
-        ui.label("地图数据来自公开服务。联网后可加载 PAGASA 雷达和观测图层。");
+        ui.label("选择图层后，应用会显示数据来源和接入状态。");
         ui.add_space(8.0);
+        ui.horizontal_wrapped(|ui| {
+            for layer in MapLayer::ALL {
+                let selected = self.map_layer == layer;
+                let fill = if selected {
+                    Color32::from_rgb(12, 112, 145)
+                } else {
+                    Color32::from_rgb(225, 239, 243)
+                };
+                let color = if selected {
+                    Color32::WHITE
+                } else {
+                    Color32::from_rgb(40, 61, 73)
+                };
+                if ui
+                    .add(egui::Button::new(RichText::new(layer.title()).color(color)).fill(fill))
+                    .clicked()
+                {
+                    self.map_layer = layer;
+                }
+            }
+        });
+        ui.add_space(8.0);
+        let layer_status = match self.map_layer {
+            MapLayer::Radar => ("雷达图层", "PAGASA 公开雷达图层待接入。"),
+            MapLayer::Satellite => ("卫星图层", "PAGASA Himawari/GK2A 图层待接入。"),
+            MapLayer::Lightning => ("闪电图层", "实时闪电和 10 分钟闪电图层待接入。"),
+            MapLayer::Typhoon => ("台风图层", "台风路径和风圈图层待接入。"),
+            MapLayer::Hazard => ("灾害风险图层", "洪水、风暴潮和灾害风险图层待接入。"),
+        };
+        ui.label(RichText::new(layer_status.0).strong());
+        ui.label(layer_status.1);
         ui.group(|ui| {
             ui.allocate_ui_with_layout(
                 Vec2::new(ui.available_width(), 170.0),
                 Layout::centered_and_justified(egui::Direction::TopDown),
                 |ui| {
                     ui.label(
-                        RichText::new("雷达图层\n\n离线时不加载远程地图")
+                        RichText::new("交互地图\n\n当前只展示图层状态，不虚构远程数据")
                             .size(20.0)
                             .color(Color32::from_rgb(76, 106, 121)),
                     );
@@ -241,7 +320,7 @@ impl PanahonApp {
             );
         });
         ui.add_space(8.0);
-        ui.label("数据源：PAGASA 官方公开页面。项目不内置 Google Play 或私有 SDK。");
+        ui.label("数据源：PAGASA 官方公开页面。联网和许可确认后再加载远程图层。");
     }
 
     fn alerts_page(&mut self, ui: &mut egui::Ui) {
@@ -261,11 +340,66 @@ impl PanahonApp {
                 });
                 ui.label(&alert.area);
                 ui.label(&alert.detail);
+                ui.label(
+                    RichText::new(format!("防御建议：{}", alert.defense))
+                        .color(Color32::from_rgb(192, 155, 96)),
+                );
                 ui.label(RichText::new(&alert.issued_at).small().color(Color32::GRAY));
             });
             ui.add_space(6.0);
         }
-        ui.label("通知默认关闭。后续可使用 Android 本地通知，不依赖 FCM。");
+        ui.group(|ui| {
+            ui.label(RichText::new("本地通知").strong());
+            ui.label("当前状态：未启用");
+            ui.label("后续可由 Android 本地调度器发送，不依赖 FCM。需要用户主动允许通知权限。");
+        });
+    }
+
+    fn services_page(&mut self, ui: &mut egui::Ui) {
+        ui.heading("服务");
+        ui.label("这些模块已预留界面边界。实时数据需要独立来源和许可。");
+        ui.add_space(8.0);
+        let services = [
+            (
+                "空气质量",
+                "DENR-EMB 授权接口优先，OpenAQ 作为可选适配器。",
+                "需要数据许可",
+            ),
+            ("旅游天气", "旅游区未来一周天气。", "公开接口待接入"),
+            ("生活指数", "紫外线、穿衣、出行和户外活动建议。", "规则样例"),
+            (
+                "海洋天气",
+                "海域风、浪高、水温和海上预警。",
+                "公开数据待接入",
+            ),
+            (
+                "农业天气",
+                "降雨、热害、干旱和农业气象提示。",
+                "公开数据待接入",
+            ),
+            ("交通天气", "能见度、降雨和道路风险提示。", "公开数据待接入"),
+            (
+                "水利汛情",
+                "河流水位、洪水风险和防汛信息。",
+                "公开数据待接入",
+            ),
+        ];
+        for (title, summary, status) in services {
+            ui.group(|ui| {
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new(title).strong());
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        ui.label(
+                            RichText::new(status)
+                                .small()
+                                .color(Color32::from_rgb(183, 141, 71)),
+                        );
+                    });
+                });
+                ui.label(summary);
+            });
+            ui.add_space(5.0);
+        }
     }
 }
 
@@ -295,6 +429,7 @@ impl eframe::App for PanahonApp {
                 Tab::Forecast => self.forecast_page(ui),
                 Tab::Map => self.map_page(ui),
                 Tab::Alerts => self.alerts_page(ui),
+                Tab::Services => self.services_page(ui),
             }
             ui.with_layout(Layout::bottom_up(Align::Center), |ui| {
                 ui.add_space(4.0);
@@ -320,6 +455,21 @@ fn forecast_row(ui: &mut egui::Ui, day: &ForecastDay) {
             egui::Label::new(format!("{:.0} °C / {:.0} °C", day.low_c, day.high_c)),
         );
         ui.label(format!("降雨 {}%", day.rain_probability));
+    });
+}
+
+fn hourly_row(ui: &mut egui::Ui, hour: &HourlyForecast) {
+    ui.horizontal(|ui| {
+        ui.add_sized(
+            [84.0, 20.0],
+            egui::Label::new(RichText::new(&hour.time).strong()),
+        );
+        ui.add_sized([130.0, 20.0], egui::Label::new(&hour.summary));
+        ui.add_sized(
+            [70.0, 20.0],
+            egui::Label::new(format!("{:.0} °C", hour.temperature_c)),
+        );
+        ui.label(format!("降雨 {}%", hour.rain_probability));
     });
 }
 
