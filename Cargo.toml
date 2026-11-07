@@ -37,15 +37,15 @@ label = "菲律宾天气（中文）"
 min_sdk_version = 29
 target_sdk_version = 35
 
-[[package.metadata.android.permission]]
+[[package.metadata.android.uses_permission]]
 name = "android.permission.INTERNET"
 
-[[package.metadata.android.permission]]
+[[package.metadata.android.uses_permission]]
 name = "android.permission.ACCESS_COARSE_LOCATION"
 
-[[package.metadata.android.permission]]
+[[package.metadata.android.uses_permission]]
 name = "android.permission.ACCESS_FINE_LOCATION"
 
-[[package.metadata.android.permission]]
+[[package.metadata.android.uses_permission]]
 name = "android.permission.POST_NOTIFICATIONS"
 
