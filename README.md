@@ -78,6 +78,7 @@ adb shell monkey -p org.panahon.zh -c android.intent.category.LAUNCHER 1
 - `docs/evidence.md`：清洁室重建的证据边界和已知限制。
 - `docs/ida-first-pass.md`：IDA Pro 第一轮分析和命令。
 - `docs/feature-roadmap.md`：参考“知天气”和 PAGASA 公开功能整理的扩展路线。
+- `services/emb-aqi/`：服务端读取 DENR-EMB Power BI 空气质量报表，给 App 提供 `/api/aqi`。
 - `docs/craft-anything-evidence/`：Craft Anything 的分析说明。原始 JSON 只在本地生成，默认不纳入版本库。
 - `build.ps1`：Android APK 构建脚本。
 - `install-ida-mcp.ps1`：安装 IDA MCP 用户插件的脚本。
