@@ -77,6 +77,7 @@ adb shell monkey -p org.panahon.zh -c android.intent.category.LAUNCHER 1
 - `core/`：数据模型、公开接口适配器和单元测试。
 - `docs/evidence.md`：清洁室重建的证据边界和已知限制。
 - `docs/ida-first-pass.md`：IDA Pro 第一轮分析和命令。
+- `docs/feature-roadmap.md`：参考“知天气”和 PAGASA 公开功能整理的扩展路线。
 - `docs/craft-anything-evidence/`：Craft Anything 的分析说明。原始 JSON 只在本地生成，默认不纳入版本库。
 - `build.ps1`：Android APK 构建脚本。
 - `install-ida-mcp.ps1`：安装 IDA MCP 用户插件的脚本。
