@@ -99,7 +99,7 @@ impl PanahonApp {
     fn header(&mut self, ui: &mut egui::Ui) {
         #[cfg(target_os = "android")]
         ui.add_space(28.0);
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label(
                 RichText::new("PANaHON")
                     .size(26.0)
