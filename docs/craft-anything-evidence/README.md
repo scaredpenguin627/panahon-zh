@@ -5,8 +5,8 @@
 ## 使用的命令
 
 ```powershell
-craft-anything-cli --deep android-package-show --path "D:\IDA PRO 9.5\com.dostpagasa.panahon.apk" --output-format json
-craft-anything-cli --deep android-flutter-identify --path "D:\IDA PRO 9.5\config.arm64_v8a.apk" --output-format json
+craft-anything-cli --deep android-package-show --path "<base-apk>" --output-format json
+craft-anything-cli --deep android-flutter-identify --path "<arm64-split-apk>" --output-format json
 ```
 
 ## 关键结果
@@ -18,3 +18,4 @@ craft-anything-cli --deep android-flutter-identify --path "D:\IDA PRO 9.5\config
 - 原清单包含 Firebase 和 Google Play 组件。Rust 重建没有加入 FCM、GSF、Play License 和设备注册依赖。
 
 这些结果只用于确定功能范围和兼容性要求。Rust 工程没有复制原应用的 Flutter 二进制或打包资源。
+

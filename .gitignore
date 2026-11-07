@@ -27,3 +27,5 @@ Thumbs.db
 
 # Local Craft Anything evidence exports may contain absolute workstation paths
 docs/craft-anything-evidence/*.json
+docs/ida-first-pass.json
+docs/ida-first-pass.log

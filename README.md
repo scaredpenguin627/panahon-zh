@@ -69,7 +69,8 @@ adb shell monkey -p org.panahon.zh -c android.intent.category.LAUNCHER 1
 
 - `src/`：egui 界面和 Android 入口。
 - `core/`：数据模型、公开接口适配器和单元测试。
-- `docs/evidence.md`：清洁室重建的证据边界和已知限制。\n- `docs/ida-first-pass.md`：IDA Pro 第一轮分析和命令。
+- `docs/evidence.md`：清洁室重建的证据边界和已知限制。
+- `docs/ida-first-pass.md`：IDA Pro 第一轮分析和命令。
 - `docs/craft-anything-evidence/`：Craft Anything 的分析说明。原始 JSON 只在本地生成，默认不纳入版本库。
 - `build.ps1`：Android APK 构建脚本。
 - `install-ida-mcp.ps1`：安装 IDA MCP 用户插件的脚本。
@@ -79,4 +80,5 @@ adb shell monkey -p org.panahon.zh -c android.intent.category.LAUNCHER 1
 代码使用 MIT 或 Apache-2.0 双许可证。PAGASA、PANaHON 和原应用中的其他名称、图像及商标不属于本项目。
 
 项目目前没有完成真实 GrapheneOS 设备测试，也没有实现本地通知、雷达图像、观测历史和桌面小组件。接入更多公开数据前，请确认服务条款、速率限制和字段格式。
+
 
