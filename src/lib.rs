@@ -58,6 +58,8 @@ impl PanahonApp {
     }
 
     fn header(&mut self, ui: &mut egui::Ui) {
+        #[cfg(target_os = "android")]
+        ui.add_space(28.0);
         ui.horizontal(|ui| {
             ui.label(
                 RichText::new("PANaHON")
@@ -72,17 +74,7 @@ impl PanahonApp {
             );
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 if ui.button("刷新").clicked() {
-                    let place = self.dashboard.place.clone();
-                    if let Ok(version) = fetch_api_version() {
-                        self.last_version = Some(version.latest_version);
-                    }
-                    match fetch_public_dashboard(&place) {
-                        Ok(dashboard) => {
-                            self.dashboard = dashboard;
-                            self.status = "已更新公开天气数据".into();
-                        }
-                        Err(error) => self.status = format!("刷新失败，继续显示当前数据：{error}"),
-                    }
+                    self.refresh_data();
                 }
             });
         });
@@ -158,12 +150,30 @@ impl PanahonApp {
             forecast_row(ui, day);
         }
         ui.add_space(8.0);
+        if ui.button("刷新天气数据").clicked() {
+            self.refresh_data();
+        }
+        ui.add_space(8.0);
         source_badge(
             ui,
             &self.dashboard.source,
             &self.status,
             self.last_version.as_deref(),
         );
+    }
+
+    fn refresh_data(&mut self) {
+        let place = self.dashboard.place.clone();
+        if let Ok(version) = fetch_api_version() {
+            self.last_version = Some(version.latest_version);
+        }
+        match fetch_public_dashboard(&place) {
+            Ok(dashboard) => {
+                self.dashboard = dashboard;
+                self.status = "已更新公开天气数据".into();
+            }
+            Err(error) => self.status = format!("刷新失败，继续显示当前数据：{error}"),
+        }
     }
 
     fn places_page(&mut self, ui: &mut egui::Ui) {
