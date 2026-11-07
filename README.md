@@ -38,7 +38,11 @@ $env:CARGO_APK_RELEASE_KEYSTORE_PASSWORD = "<签名文件密码>"
 cargo apk build --release --target aarch64-linux-android
 ```
 
-APK 位于 `target\release\apk\`。启用公开接口适配器：
+APK 位于 `target\release\apk\`。
+
+本机已生成 `target\release\apk\panahon-zh.apk`。APK 使用 `org.panahon.zh` 包名，最低 SDK 为 29，目标 SDK 为 35。签名和 `zipalign` 检查已通过。
+
+启用公开接口适配器：
 
 ```powershell
 cargo apk build --release --features network --target aarch64-linux-android
