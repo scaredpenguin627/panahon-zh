@@ -48,6 +48,15 @@ APK 位于 `target\release\apk\`。
 cargo apk build --release --features network --target aarch64-linux-android
 ```
 
+空气质量中间服务的本地测试可以这样启动：
+
+```powershell
+cd services\emb-aqi
+node server.mjs
+```
+
+如果 Pixel 10a 和电脑处在同一个局域网，构建 App 时把 `PANAHON_AQI_ENDPOINT` 设为 `http://<电脑局域网地址>:8787/api/aqi`。公网部署必须使用 HTTPS，并在服务端确认 DENR-EMB 的数据使用范围。
+
 没有 Android SDK 时，可以先检查 Rust 代码和 Android 目标：
 
 ```powershell
