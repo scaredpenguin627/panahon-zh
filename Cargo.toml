@@ -20,6 +20,7 @@ desktop = []
 eframe = { version = "0.33", default-features = false, features = ["android-native-activity", "glow", "default_fonts"] }
 winit = { version = "0.30", features = ["android-native-activity"] }
 egui = "0.33"
+image = { version = "0.25", default-features = false, features = ["png"] }
 panahon-core = { path = "core" }
 
 [target.'cfg(target_os = "android")'.dependencies]

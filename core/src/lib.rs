@@ -3,14 +3,31 @@
 
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "network")]
+use std::io::Read;
+#[cfg(feature = "network")]
 use std::time::Duration;
 
 pub const API_ROOT: &str = "https://api.mobile.panahon.gov.ph/api/v1";
+pub const MAP_ROOT: &str = "https://origin.panahon.gov.ph";
 pub const OFFICIAL_MAP_URL: &str = "https://panahon.gov.ph/?embed=panahon-mobile";
 pub const AQI_ENDPOINT: &str = match option_env!("PANAHON_AQI_ENDPOINT") {
     Some(value) => value,
     None => "https://aqi.example.invalid/api/aqi",
 };
+
+/// A read-only snapshot of one public PANaHON map layer.
+///
+/// The image is the latest frame for radar or satellite. Point and warning
+/// layers expose a count instead because their official endpoint returns
+/// vector data rather than a single raster image.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RemoteMapSnapshot {
+    pub layer: String,
+    pub latest_at: Option<String>,
+    pub frame_count: Option<u32>,
+    pub item_count: Option<u32>,
+    pub image: Option<Vec<u8>>,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Place {
@@ -179,12 +196,42 @@ impl Dashboard {
                 },
             ],
             hourly: vec![
-                HourlyForecast { time: "现在".into(), summary: "局部多云".into(), temperature_c: 30.0, rain_probability: 20 },
-                HourlyForecast { time: "1 小时后".into(), summary: "局部多云".into(), temperature_c: 30.0, rain_probability: 25 },
-                HourlyForecast { time: "2 小时后".into(), summary: "短时阵雨".into(), temperature_c: 29.0, rain_probability: 45 },
-                HourlyForecast { time: "3 小时后".into(), summary: "短时阵雨".into(), temperature_c: 29.0, rain_probability: 50 },
-                HourlyForecast { time: "4 小时后".into(), summary: "多云".into(), temperature_c: 29.0, rain_probability: 35 },
-                HourlyForecast { time: "5 小时后".into(), summary: "多云".into(), temperature_c: 28.0, rain_probability: 30 },
+                HourlyForecast {
+                    time: "现在".into(),
+                    summary: "局部多云".into(),
+                    temperature_c: 30.0,
+                    rain_probability: 20,
+                },
+                HourlyForecast {
+                    time: "1 小时后".into(),
+                    summary: "局部多云".into(),
+                    temperature_c: 30.0,
+                    rain_probability: 25,
+                },
+                HourlyForecast {
+                    time: "2 小时后".into(),
+                    summary: "短时阵雨".into(),
+                    temperature_c: 29.0,
+                    rain_probability: 45,
+                },
+                HourlyForecast {
+                    time: "3 小时后".into(),
+                    summary: "短时阵雨".into(),
+                    temperature_c: 29.0,
+                    rain_probability: 50,
+                },
+                HourlyForecast {
+                    time: "4 小时后".into(),
+                    summary: "多云".into(),
+                    temperature_c: 29.0,
+                    rain_probability: 35,
+                },
+                HourlyForecast {
+                    time: "5 小时后".into(),
+                    summary: "多云".into(),
+                    temperature_c: 28.0,
+                    rain_probability: 30,
+                },
             ],
             alerts: vec![Alert {
                 title: "示例：强降雨提醒".into(),
@@ -236,6 +283,211 @@ pub fn fetch_air_quality() -> Result<AirQuality, String> {
 #[cfg(not(feature = "network"))]
 pub fn fetch_air_quality() -> Result<AirQuality, String> {
     Err("网络适配器未启用".into())
+}
+
+#[cfg(feature = "network")]
+pub fn fetch_remote_map_layer(layer: &str) -> Result<RemoteMapSnapshot, String> {
+    let token = fetch_map_token()?;
+    match layer {
+        "radar" => fetch_radar_snapshot(&token),
+        "satellite" => fetch_satellite_snapshot(&token),
+        "lightning" => {
+            let value = map_json(&format!(
+                "{MAP_ROOT}/api/v1/lightning?token={token}&parameter=ten_minute_frequency"
+            ))?;
+            let rows = value
+                .pointer("/data")
+                .and_then(serde_json::Value::as_array)
+                .ok_or_else(|| "闪电图层响应格式无法解析".to_owned())?;
+            Ok(RemoteMapSnapshot {
+                layer: layer.to_owned(),
+                latest_at: rows
+                    .iter()
+                    .rev()
+                    .find_map(|row| row.get("observed_at").and_then(serde_json::Value::as_str))
+                    .map(str::to_owned),
+                frame_count: None,
+                item_count: Some(rows.len() as u32),
+                image: None,
+            })
+        }
+        "typhoon" => {
+            let value = map_json(&format!("{MAP_ROOT}/api/v1/cyclone-track?token={token}"))?;
+            let rows = value
+                .as_array()
+                .ok_or_else(|| "台风图层响应格式无法解析".to_owned())?;
+            let latest_at = rows
+                .iter()
+                .filter_map(|row| row.get("info").and_then(serde_json::Value::as_object))
+                .flat_map(|info| info.keys())
+                .max()
+                .cloned();
+            Ok(RemoteMapSnapshot {
+                layer: layer.to_owned(),
+                latest_at,
+                frame_count: None,
+                item_count: Some(rows.len() as u32),
+                image: None,
+            })
+        }
+        "hazard" => {
+            let value = map_json(&format!("{MAP_ROOT}/api/v1/cap-alerts?token={token}"))?;
+            let rows = value
+                .pointer("/data/alert_data")
+                .and_then(serde_json::Value::as_array)
+                .ok_or_else(|| "灾害预警图层响应格式无法解析".to_owned())?;
+            Ok(RemoteMapSnapshot {
+                layer: layer.to_owned(),
+                latest_at: rows
+                    .iter()
+                    .filter_map(|row| row.get("issued_date").and_then(serde_json::Value::as_str))
+                    .max()
+                    .map(str::to_owned),
+                frame_count: None,
+                item_count: Some(
+                    value
+                        .pointer("/data/alert_count")
+                        .and_then(serde_json::Value::as_u64)
+                        .unwrap_or(rows.len() as u64) as u32,
+                ),
+                image: None,
+            })
+        }
+        _ => Err(format!("未知地图图层：{layer}")),
+    }
+}
+
+#[cfg(not(feature = "network"))]
+pub fn fetch_remote_map_layer(_layer: &str) -> Result<RemoteMapSnapshot, String> {
+    Err("网络适配器未启用".into())
+}
+
+#[cfg(feature = "network")]
+fn fetch_map_token() -> Result<String, String> {
+    let html = ureq::get(MAP_ROOT)
+        .timeout(Duration::from_secs(10))
+        .set("User-Agent", "PanahonZh/0.1 (Rust client)")
+        .call()
+        .map_err(|err| format!("PAGASA 地图首页请求失败：{err}"))?
+        .into_string()
+        .map_err(|err| format!("PAGASA 地图首页无法读取：{err}"))?;
+    let marker = r#"name="csrf-token" content=""#;
+    let start = html
+        .find(marker)
+        .map(|index| index + marker.len())
+        .ok_or_else(|| "PAGASA 地图首页没有返回 CSRF 令牌".to_owned())?;
+    let token = html[start..].split('"').next().unwrap_or_default().trim();
+    if token.is_empty() {
+        return Err("PAGASA 地图首页返回了空 CSRF 令牌".into());
+    }
+    Ok(token.to_owned())
+}
+
+#[cfg(feature = "network")]
+fn fetch_radar_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
+    let sublayer = "mosaic-rainrate";
+    let value = map_json(&format!(
+        "{MAP_ROOT}/api/v1/radar/timeline?token={token}&sublayer={sublayer}"
+    ))?;
+    let rows = value
+        .pointer("/data/timeline")
+        .and_then(serde_json::Value::as_array)
+        .ok_or_else(|| "雷达图层响应格式无法解析".to_owned())?;
+    let latest = rows
+        .last()
+        .ok_or_else(|| "雷达图层没有可用时间帧".to_owned())?;
+    let timestamp = latest
+        .get("observed_at_unix")
+        .and_then(serde_json::Value::as_i64)
+        .ok_or_else(|| "雷达图层缺少时间戳".to_owned())?;
+    let observed_at = latest
+        .get("observed_at")
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_owned);
+    let version = value
+        .pointer("/data/tile_version")
+        .and_then(serde_json::Value::as_u64)
+        .unwrap_or(1);
+    let mode = value
+        .pointer("/data/scale/mode")
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or("rain");
+    let image_url = format!(
+        "{MAP_ROOT}/api/v1/radar-data-image?token={token}&sublayer={sublayer}&t={timestamp}&mode={mode}&size=1024&v={version}"
+    );
+    Ok(RemoteMapSnapshot {
+        layer: "radar".into(),
+        latest_at: observed_at,
+        frame_count: Some(rows.len() as u32),
+        item_count: None,
+        image: Some(map_bytes(&image_url)?),
+    })
+}
+
+#[cfg(feature = "network")]
+fn fetch_satellite_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
+    let value = map_json(&format!(
+        "{MAP_ROOT}/api/v1/himawari/timeline?token={token}"
+    ))?;
+    let rows = value
+        .pointer("/data/timeline")
+        .and_then(serde_json::Value::as_array)
+        .ok_or_else(|| "卫星图层响应格式无法解析".to_owned())?;
+    let latest = rows
+        .last()
+        .ok_or_else(|| "卫星图层没有可用时间帧".to_owned())?;
+    let index = rows.len().saturating_sub(1);
+    let revision = latest
+        .get("revision")
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or("0");
+    let version = value
+        .pointer("/data/tile_version")
+        .and_then(serde_json::Value::as_u64)
+        .unwrap_or(1);
+    let image_url = format!(
+        "{MAP_ROOT}/api/v1/himawari-data?index={index}&size=1024&v={version}-{revision}&token={token}&parameter=himawari_ir_ext_smooth"
+    );
+    Ok(RemoteMapSnapshot {
+        layer: "satellite".into(),
+        latest_at: latest
+            .get("observed_at")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_owned),
+        frame_count: Some(rows.len() as u32),
+        item_count: None,
+        image: Some(map_bytes(&image_url)?),
+    })
+}
+
+#[cfg(feature = "network")]
+fn map_json(url: &str) -> Result<serde_json::Value, String> {
+    ureq::get(url)
+        .timeout(Duration::from_secs(20))
+        .set("User-Agent", "PanahonZh/0.1 (Rust client)")
+        .set("Accept", "application/json")
+        .call()
+        .map_err(|err| format!("PAGASA 地图接口请求失败：{err}"))?
+        .into_json::<serde_json::Value>()
+        .map_err(|err| format!("PAGASA 地图响应无法解析：{err}"))
+}
+
+#[cfg(feature = "network")]
+fn map_bytes(url: &str) -> Result<Vec<u8>, String> {
+    let mut bytes = Vec::new();
+    ureq::get(url)
+        .timeout(Duration::from_secs(30))
+        .set("User-Agent", "PanahonZh/0.1 (Rust client)")
+        .set("Accept", "image/png")
+        .call()
+        .map_err(|err| format!("PAGASA 地图图像请求失败：{err}"))?
+        .into_reader()
+        .read_to_end(&mut bytes)
+        .map_err(|err| format!("PAGASA 地图图像读取失败：{err}"))?;
+    if bytes.is_empty() {
+        return Err("PAGASA 地图图像为空".into());
+    }
+    Ok(bytes)
 }
 
 #[cfg(feature = "network")]
@@ -294,9 +546,8 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
                         .map(translate_condition)
                         .unwrap_or_else(|| "暂无描述".into()),
                     temperature_c: number(Some(row), "tmp").unwrap_or(0.0) as f32,
-                    rain_probability: number(Some(row), "rain")
-                        .unwrap_or(0.0)
-                        .clamp(0.0, 100.0) as u8,
+                    rain_probability: number(Some(row), "rain").unwrap_or(0.0).clamp(0.0, 100.0)
+                        as u8,
                 })
                 .collect::<Vec<_>>()
         })

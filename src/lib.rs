@@ -2,15 +2,27 @@
 
 use eframe::egui::{self, Align, Color32, CornerRadius, Layout, RichText, Vec2};
 use panahon_core::{
-    fetch_air_quality, fetch_api_version, fetch_public_dashboard, search_places, AirQuality,
-    Dashboard, DataSource, ForecastDay, HourlyForecast, Place,
+    fetch_air_quality, fetch_api_version, fetch_public_dashboard, fetch_remote_map_layer,
+    search_places, AirQuality, Dashboard, DataSource, ForecastDay, HourlyForecast, Place,
 };
 
 #[cfg(target_os = "android")]
-use std::sync::OnceLock;
+use std::sync::atomic::{AtomicBool, Ordering};
+#[cfg(target_os = "android")]
+use std::sync::{Arc, Mutex, OnceLock};
+#[cfg(target_os = "android")]
+use std::thread;
+#[cfg(target_os = "android")]
+use std::time::Duration;
 
 #[cfg(target_os = "android")]
 static ANDROID_APP: OnceLock<winit::platform::android::activity::AndroidApp> = OnceLock::new();
+
+#[cfg(target_os = "android")]
+static NOTIFICATION_PERIODIC_STOP: OnceLock<Mutex<Option<Arc<AtomicBool>>>> = OnceLock::new();
+
+#[cfg(target_os = "android")]
+static NOTIFICATION_ONESHOT_STOP: OnceLock<Mutex<Option<Arc<AtomicBool>>>> = OnceLock::new();
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Tab {
@@ -68,6 +80,26 @@ impl MapLayer {
             Self::Hazard => "灾害风险",
         }
     }
+
+    fn api_key(self) -> &'static str {
+        match self {
+            Self::Radar => "radar",
+            Self::Satellite => "satellite",
+            Self::Lightning => "lightning",
+            Self::Typhoon => "typhoon",
+            Self::Hazard => "hazard",
+        }
+    }
+
+    #[cfg(target_os = "android")]
+    fn official_url(self) -> &'static str {
+        match self {
+            Self::Radar => "https://panahon.gov.ph/?trg=iframe&req=radar.rain-rate",
+            Self::Satellite | Self::Lightning | Self::Typhoon | Self::Hazard => {
+                panahon_core::OFFICIAL_MAP_URL
+            }
+        }
+    }
 }
 
 pub struct PanahonApp {
@@ -78,6 +110,9 @@ pub struct PanahonApp {
     search_query: String,
     search_results: Vec<Place>,
     map_layer: MapLayer,
+    map_status: String,
+    map_texture: Option<egui::TextureHandle>,
+    map_texture_size: Option<[usize; 2]>,
     air_quality: Option<AirQuality>,
     aqi_status: String,
     notification_status: String,
@@ -102,6 +137,9 @@ impl PanahonApp {
             search_query: String::new(),
             search_results: Vec::new(),
             map_layer: MapLayer::Radar,
+            map_status: "尚未加载远程图层".into(),
+            map_texture: None,
+            map_texture_size: None,
             air_quality: None,
             aqi_status: "尚未加载空气质量".into(),
             notification_status: "未启用".into(),
@@ -283,9 +321,54 @@ impl PanahonApp {
         }
     }
 
+    fn refresh_map_layer(&mut self, ctx: &egui::Context) {
+        let layer = self.map_layer;
+        self.map_status = format!("正在读取 {} 远程图层……", layer.title());
+        match fetch_remote_map_layer(layer.api_key()) {
+            Ok(snapshot) => {
+                let latest = snapshot.latest_at.as_deref().unwrap_or("未知时间");
+                let count = snapshot
+                    .frame_count
+                    .map(|value| format!("{} 帧", value))
+                    .or_else(|| snapshot.item_count.map(|value| format!("{} 条", value)))
+                    .unwrap_or_else(|| "已返回".into());
+                self.map_status = format!("{}：{}，最新 {}", layer.title(), count, latest);
+                self.map_texture = None;
+                self.map_texture_size = None;
+                if let Some(bytes) = snapshot.image {
+                    match image::load_from_memory(&bytes) {
+                        Ok(decoded) => {
+                            let rgba = decoded.to_rgba8();
+                            let size = [rgba.width() as usize, rgba.height() as usize];
+                            let color_image = egui::ColorImage::from_rgba_unmultiplied(
+                                size,
+                                rgba.as_flat_samples().as_slice(),
+                            );
+                            self.map_texture = Some(ctx.load_texture(
+                                format!("panahon-map-{}", layer.api_key()),
+                                color_image,
+                                egui::TextureOptions::LINEAR,
+                            ));
+                            self.map_texture_size = Some(size);
+                        }
+                        Err(error) => {
+                            self.map_status =
+                                format!("{} 元数据已更新，但图像无法解码：{error}", layer.title());
+                        }
+                    }
+                }
+            }
+            Err(error) => {
+                self.map_texture = None;
+                self.map_texture_size = None;
+                self.map_status = format!("远程图层读取失败：{error}");
+            }
+        }
+    }
+
     fn map_page(&mut self, ui: &mut egui::Ui) {
         ui.heading("天气地图");
-        ui.label("选择图层后，应用会显示数据来源和接入状态。");
+        ui.label("选择图层后，应用会读取 PAGASA 的最新公开数据。");
         ui.add_space(8.0);
         ui.horizontal_wrapped(|ui| {
             for layer in MapLayer::ALL {
@@ -305,34 +388,66 @@ impl PanahonApp {
                     .clicked()
                 {
                     self.map_layer = layer;
+                    self.map_status = "尚未加载远程图层".into();
+                    self.map_texture = None;
+                    self.map_texture_size = None;
                 }
             }
         });
         ui.add_space(8.0);
         let layer_status = match self.map_layer {
-            MapLayer::Radar => ("雷达图层", "PAGASA 公开雷达图层待接入。"),
-            MapLayer::Satellite => ("卫星图层", "PAGASA Himawari/GK2A 图层待接入。"),
-            MapLayer::Lightning => ("闪电图层", "实时闪电和 10 分钟闪电图层待接入。"),
-            MapLayer::Typhoon => ("台风图层", "台风路径和风圈图层待接入。"),
-            MapLayer::Hazard => ("灾害风险图层", "洪水、风暴潮和灾害风险图层待接入。"),
+            MapLayer::Radar => ("雷达图层", "读取 PAGASA 雷达降雨率时间轴和最新图像。"),
+            MapLayer::Satellite => ("卫星图层", "读取 Himawari 红外卫星时间轴和最新图像。"),
+            MapLayer::Lightning => ("闪电图层", "读取 PAGASA 最近 10 分钟的闪电点数据。"),
+            MapLayer::Typhoon => ("台风图层", "读取当前台风轨迹和最新观测时间。"),
+            MapLayer::Hazard => ("灾害风险图层", "读取 PAGASA 当前公开灾害预警数量。"),
         };
         ui.label(RichText::new(layer_status.0).strong());
         ui.label(layer_status.1);
+        ui.horizontal_wrapped(|ui| {
+            if ui.button("刷新远程图层").clicked() {
+                self.refresh_map_layer(ui.ctx());
+            }
+            if ui.button("打开 PAGASA 官方交互地图").clicked() {
+                #[cfg(target_os = "android")]
+                open_official_map(self.map_layer.official_url());
+                #[cfg(not(target_os = "android"))]
+                ui.label("仅 Android 可用");
+            }
+        });
+        ui.label(
+            RichText::new(&self.map_status)
+                .small()
+                .color(Color32::from_rgb(58, 108, 83)),
+        );
+        if let (Some(texture), Some(size)) = (&self.map_texture, self.map_texture_size) {
+            let width = ui.available_width().max(240.0);
+            let aspect = size[1] as f32 / size[0].max(1) as f32;
+            let height = (width * aspect).clamp(120.0, 260.0);
+            ui.image((texture.id(), Vec2::new(width, height)));
+            ui.label(
+                RichText::new("图像来自 PAGASA 公开图层，颜色和时间以官方地图为准。")
+                    .small()
+                    .color(Color32::GRAY),
+            );
+        }
         ui.group(|ui| {
             ui.allocate_ui_with_layout(
                 Vec2::new(ui.available_width(), 170.0),
                 Layout::centered_and_justified(egui::Direction::TopDown),
                 |ui| {
                     ui.label(
-                        RichText::new("交互地图\n\n当前只展示图层状态，不虚构远程数据")
-                            .size(20.0)
-                            .color(Color32::from_rgb(76, 106, 121)),
+                        RichText::new(
+                            "交互地图\n\n雷达和卫星显示最新远程图像，其他图层显示数据数量",
+                        )
+                        .size(20.0)
+                        .color(Color32::from_rgb(76, 106, 121)),
                     );
                 },
             );
         });
         ui.add_space(8.0);
-        ui.label("数据源：PAGASA 官方公开页面。联网和许可确认后再加载远程图层。");
+        ui.label("数据源：PAGASA 官方公开页面。应用只读取公开接口，不保存访问令牌。");
     }
 
     fn alerts_page(&mut self, ui: &mut egui::Ui) {
@@ -384,6 +499,43 @@ impl PanahonApp {
                     ui.label("仅 Android 可用");
                 }
             });
+            ui.horizontal_wrapped(|ui| {
+                if ui.button("启动本地调度").clicked() {
+                    #[cfg(target_os = "android")]
+                    {
+                        if start_local_notification_scheduler() {
+                            self.notification_status = "已启动，每 30 分钟发送一次本地提醒".into();
+                        } else {
+                            self.notification_status = "本地调度已经在运行".into();
+                        }
+                    }
+                    #[cfg(not(target_os = "android"))]
+                    ui.label("仅 Android 可用");
+                }
+                if ui.button("安排 1 分钟测试").clicked() {
+                    #[cfg(target_os = "android")]
+                    {
+                        schedule_one_shot_notification();
+                        self.notification_status = "已安排 1 分钟后发送本地通知".into();
+                    }
+                    #[cfg(not(target_os = "android"))]
+                    ui.label("仅 Android 可用");
+                }
+                if ui.button("停止本地调度").clicked() {
+                    #[cfg(target_os = "android")]
+                    {
+                        stop_local_notification_scheduler();
+                        self.notification_status = "已停止本地调度".into();
+                    }
+                    #[cfg(not(target_os = "android"))]
+                    ui.label("仅 Android 可用");
+                }
+            });
+            ui.label(
+                RichText::new("调度器在应用进程存活时运行；系统回收进程后，需要再次打开应用。")
+                    .small()
+                    .color(Color32::GRAY),
+            );
         });
     }
 
@@ -600,10 +752,111 @@ fn request_notification_permission() {
 }
 
 #[cfg(target_os = "android")]
+fn start_local_notification_scheduler() -> bool {
+    let Some(app) = ANDROID_APP.get().cloned() else {
+        return false;
+    };
+    let slot = NOTIFICATION_PERIODIC_STOP.get_or_init(|| Mutex::new(None));
+    let mut guard = slot.lock().expect("notification scheduler mutex poisoned");
+    if guard.is_some() {
+        return false;
+    }
+    let stop = Arc::new(AtomicBool::new(false));
+    *guard = Some(stop.clone());
+    thread::spawn(move || {
+        while !stop.load(Ordering::Relaxed) {
+            if wait_for_notification(&stop, Duration::from_secs(30 * 60)) {
+                break;
+            }
+            post_notification_with_app(
+                app.clone(),
+                "PANaHON 预警".into(),
+                "本地调度已触发，请打开应用刷新 PAGASA 公开预警。".into(),
+                2001,
+            );
+        }
+    });
+    true
+}
+
+#[cfg(target_os = "android")]
+fn schedule_one_shot_notification() {
+    let Some(app) = ANDROID_APP.get().cloned() else {
+        return;
+    };
+    let slot = NOTIFICATION_ONESHOT_STOP.get_or_init(|| Mutex::new(None));
+    let mut guard = slot.lock().expect("notification timer mutex poisoned");
+    if let Some(previous) = guard.replace(Arc::new(AtomicBool::new(false))) {
+        previous.store(true, Ordering::Relaxed);
+    }
+    let stop = guard.as_ref().expect("timer was just stored").clone();
+    thread::spawn(move || {
+        if !wait_for_notification(&stop, Duration::from_secs(60)) {
+            post_notification_with_app(
+                app,
+                "PANaHON 预警".into(),
+                "这是 1 分钟本地调度测试通知。".into(),
+                2002,
+            );
+        }
+    });
+}
+
+#[cfg(target_os = "android")]
+fn stop_local_notification_scheduler() {
+    if let Some(slot) = NOTIFICATION_PERIODIC_STOP.get() {
+        if let Some(stop) = slot
+            .lock()
+            .expect("notification scheduler mutex poisoned")
+            .take()
+        {
+            stop.store(true, Ordering::Relaxed);
+        }
+    }
+    if let Some(slot) = NOTIFICATION_ONESHOT_STOP.get() {
+        if let Some(stop) = slot
+            .lock()
+            .expect("notification timer mutex poisoned")
+            .take()
+        {
+            stop.store(true, Ordering::Relaxed);
+        }
+    }
+}
+
+#[cfg(target_os = "android")]
+fn wait_for_notification(stop: &AtomicBool, duration: Duration) -> bool {
+    let mut elapsed = Duration::ZERO;
+    while elapsed < duration {
+        if stop.load(Ordering::Relaxed) {
+            return true;
+        }
+        thread::sleep(Duration::from_secs(1));
+        elapsed += Duration::from_secs(1);
+    }
+    stop.load(Ordering::Relaxed)
+}
+
+#[cfg(target_os = "android")]
 fn post_test_notification() {
     let Some(app) = ANDROID_APP.get().cloned() else {
         return;
     };
+    post_notification_with_app(
+        app,
+        "PANaHON 预警".into(),
+        "这是本地通知测试。".into(),
+        1001,
+    );
+}
+
+#[cfg(target_os = "android")]
+fn post_notification_with_app(
+    app: winit::platform::android::activity::AndroidApp,
+    title: String,
+    body: String,
+    notification_id: i32,
+) {
     app.clone().run_on_java_main_thread(Box::new(move || {
         let vm = unsafe { jni::JavaVM::from_raw(app.vm_as_ptr() as _) };
         let _ = vm.attach_current_thread(|env| -> jni::errors::Result<()> {
@@ -645,8 +898,8 @@ fn post_test_notification() {
                     jni::objects::JValue::Object(&channel_id),
                 ],
             )?;
-            let title = env.new_string("PANaHON 预警")?;
-            let body = env.new_string("这是本地通知测试。")?;
+            let title = env.new_string(title)?;
+            let body = env.new_string(body)?;
             env.call_method(
                 &builder,
                 jni::jni_str!("setContentTitle"),
@@ -685,9 +938,54 @@ fn post_test_notification() {
                 jni::jni_str!("notify"),
                 jni::jni_sig!("(ILandroid/app/Notification;)V"),
                 &[
-                    jni::objects::JValue::Int(1001),
+                    jni::objects::JValue::Int(notification_id),
                     jni::objects::JValue::Object(&notification),
                 ],
+            )?;
+            Ok(())
+        });
+    }));
+}
+
+#[cfg(target_os = "android")]
+fn open_official_map(url: &str) {
+    let Some(app) = ANDROID_APP.get().cloned() else {
+        return;
+    };
+    let url = url.to_owned();
+    app.clone().run_on_java_main_thread(Box::new(move || {
+        let vm = unsafe { jni::JavaVM::from_raw(app.vm_as_ptr() as _) };
+        let _ = vm.attach_current_thread(|env| -> jni::errors::Result<()> {
+            let raw_activity = app.activity_as_ptr() as jni::sys::jobject;
+            let activity = unsafe {
+                env.as_cast_raw::<jni::refs::Global<jni::objects::JObject>>(&raw_activity)?
+            };
+            let action = env.new_string("android.intent.action.VIEW")?;
+            let intent = env.new_object(
+                jni::jni_str!("android/content/Intent"),
+                jni::jni_sig!("(Ljava/lang/String;)V"),
+                &[jni::objects::JValue::Object(&action)],
+            )?;
+            let url = env.new_string(url)?;
+            let uri = env
+                .call_static_method(
+                    jni::jni_str!("android/net/Uri"),
+                    jni::jni_str!("parse"),
+                    jni::jni_sig!("(Ljava/lang/String;)Landroid/net/Uri;"),
+                    &[jni::objects::JValue::Object(&url)],
+                )?
+                .l()?;
+            env.call_method(
+                &intent,
+                jni::jni_str!("setData"),
+                jni::jni_sig!("(Landroid/net/Uri;)Landroid/content/Intent;"),
+                &[jni::objects::JValue::Object(&uri)],
+            )?;
+            env.call_method(
+                activity.as_ref(),
+                jni::jni_str!("startActivity"),
+                jni::jni_sig!("(Landroid/content/Intent;)V"),
+                &[jni::objects::JValue::Object(&intent)],
             )?;
             Ok(())
         });
