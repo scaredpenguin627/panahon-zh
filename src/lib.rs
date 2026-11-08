@@ -2,7 +2,7 @@
 
 use eframe::egui::{self, Align, Color32, CornerRadius, Layout, RichText, Vec2};
 use panahon_core::{
-    fetch_air_quality, fetch_api_version, fetch_public_dashboard, fetch_remote_map_layer,
+    fetch_air_quality_at, fetch_api_version, fetch_public_dashboard, fetch_remote_map_layer,
     search_places, AirQuality, Dashboard, DataSource, ForecastDay, HourlyForecast, Place,
 };
 
@@ -547,7 +547,10 @@ impl PanahonApp {
             ui.horizontal(|ui| {
                 ui.label(RichText::new("空气质量").strong());
                 if ui.button("刷新空气质量").clicked() {
-                    match fetch_air_quality() {
+                    match fetch_air_quality_at(
+                        self.dashboard.place.latitude,
+                        self.dashboard.place.longitude,
+                    ) {
                         Ok(data) => {
                             self.aqi_status = format!(
                                 "{} 个站点，平均 AQI {}，最差：{}",
@@ -573,6 +576,7 @@ impl PanahonApp {
                         .unwrap_or("未知"),
                     data.source.provider
                 ));
+                ui.label(format!("说明：{}", data.source.note));
                 ui.label("空气质量数据仅作信息参考，站点质量状态和更新时间以官方页面为准。");
                 ui.collapsing("监测站明细（按 AQI 从高到低）", |ui| {
                     for station in data.stations.iter().take(8) {
