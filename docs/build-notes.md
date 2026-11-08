@@ -16,6 +16,6 @@ $env:ANDROID_NDK_HOME = "C:\Android\Sdk\ndk\<版本>"
 
 脚本默认生成 arm64 APK。需要网络接口适配器时，运行 `.\build.ps1 -Network`。
 
-GrapheneOS 验证已在 Pixel 10a 上完成。测试包括安装、启动、Network 权限、实时天气刷新、地点搜索、AQI 服务页、PAGASA 远程地图接口和 Android 本地通知。应用提供 1 分钟测试调度和每 30 分钟的进程内提醒；系统回收应用进程后，调度需要重新启动。
+GrapheneOS 验证已在 Pixel 10a 上完成。测试包括安装、启动、Network 权限、实时天气刷新、地点搜索、AQI 服务页、PAGASA 远程地图接口和 Android 本地通知。没有配置电脑局域网 AQI 服务时，App 使用 Open-Meteo 的 CAMS 位置级预测。应用提供 1 分钟测试调度和每 30 分钟的进程内提醒；系统回收应用进程后，调度需要重新启动。
 
 

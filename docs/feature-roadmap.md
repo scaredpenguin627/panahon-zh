@@ -38,4 +38,6 @@ PANaHON 已经提供地点、实时天气、逐小时和五日预报、地图入
 
 当前空气质量中间服务位于 `services/emb-aqi/`。它读取 DENR-EMB 的公开 Power BI 报表，默认缓存 5 分钟。部署前仍需确认 DENR-EMB 对接口调用、缓存和再分发的授权范围，并为公网部署配置 HTTPS。
 
+App 未配置 `PANAHON_AQI_ENDPOINT` 时，会调用 Open-Meteo 的 Air Quality API。这个备用接口返回 CAMS 预测数据，页面会显示“Open-Meteo / CAMS”，并保留数据来源链接和归因说明。
+
 地图服务读取 PAGASA 首页返回的短期 CSRF 令牌，再调用公开的雷达、Himawari、闪电、台风和 CAP 预警接口。令牌只在内存中使用，不写入 APK 或日志。接口字段变化时，地图页保留官方交互地图入口。
