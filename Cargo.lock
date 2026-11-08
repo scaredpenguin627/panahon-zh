@@ -1526,6 +1526,7 @@ dependencies = [
  "android-activity",
  "eframe",
  "egui",
+ "image",
  "jni",
  "panahon-core",
  "winit",
