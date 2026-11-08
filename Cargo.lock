@@ -1523,8 +1523,10 @@ dependencies = [
 name = "panahon-zh"
 version = "0.1.0"
 dependencies = [
+ "android-activity",
  "eframe",
  "egui",
+ "jni",
  "panahon-core",
  "winit",
 ]
