@@ -16,6 +16,6 @@ $env:ANDROID_NDK_HOME = "C:\Android\Sdk\ndk\<版本>"
 
 脚本默认生成 arm64 APK。需要网络接口适配器时，运行 `.\build.ps1 -Network`。
 
-GrapheneOS 验证还需要一台开启 USB 调试的设备。当前没有连接设备，因此尚未执行 `adb install`、启动和权限测试。连接设备后运行 `adb devices`，再安装 APK。
+GrapheneOS 验证已在 Pixel 10a 上完成。测试包括安装、启动、Network 权限、实时天气刷新、地点搜索、AQI 服务页和 Android 本地通知。远程雷达图像和后台定时通知仍需后续接入。
 
 
