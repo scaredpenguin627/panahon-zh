@@ -12,7 +12,7 @@ pub const MAP_ROOT: &str = "https://origin.panahon.gov.ph";
 pub const OFFICIAL_MAP_URL: &str = "https://panahon.gov.ph/?embed=panahon-mobile";
 pub const AQI_ENDPOINT: &str = match option_env!("PANAHON_AQI_ENDPOINT") {
     Some(value) => value,
-    None => "https://aqi.example.invalid/api/aqi",
+    None => "",
 };
 
 /// A read-only snapshot of one public PANaHON map layer.
@@ -271,17 +271,68 @@ pub fn fetch_api_version() -> Result<ApiVersion, String> {
 
 #[cfg(feature = "network")]
 pub fn fetch_air_quality() -> Result<AirQuality, String> {
-    ureq::get(AQI_ENDPOINT)
-        .timeout(Duration::from_secs(15))
-        .set("User-Agent", "PanahonZh/0.1 (Rust client)")
-        .call()
-        .map_err(|err| format!("空气质量服务请求失败：{err}"))?
-        .into_json::<AirQuality>()
-        .map_err(|err| format!("空气质量响应无法解析：{err}"))
+    fetch_air_quality_at(14.5995, 120.9842)
+}
+
+#[cfg(feature = "network")]
+pub fn fetch_air_quality_at(latitude: f64, longitude: f64) -> Result<AirQuality, String> {
+    if !AQI_ENDPOINT.is_empty() {
+        return ureq::get(AQI_ENDPOINT)
+            .timeout(Duration::from_secs(15))
+            .set("User-Agent", "PanahonZh/0.1 (Rust client)")
+            .call()
+            .map_err(|err| format!("空气质量服务请求失败：{err}"))?
+            .into_json::<AirQuality>()
+            .map_err(|err| format!("空气质量响应无法解析：{err}"));
+    }
+
+    let url = format!(
+        "https://air-quality-api.open-meteo.com/v1/air-quality?latitude={latitude:.4}&longitude={longitude:.4}&current=pm10,pm2_5,us_aqi&timezone=auto"
+    );
+    let value = get_json(&url)?;
+    let current = value
+        .pointer("/current")
+        .ok_or_else(|| "Open-Meteo 空气质量响应缺少 current".to_owned())?;
+    let aqi = number(Some(current), "us_aqi").map(|value| value.round().clamp(0.0, 500.0) as u16);
+    let category = aqi.map(aqi_category).unwrap_or_else(|| "暂无".into());
+    let data_clock = text(Some(current), "time");
+    let station = AirQualityStation {
+        name_zh: "当前位置（CAMS 预测）".into(),
+        pm10: number(Some(current), "pm10").map(|value| value as f32),
+        pm25: number(Some(current), "pm2_5").map(|value| value as f32),
+        aqi,
+        pollutant: None,
+        category: category.clone(),
+    };
+    Ok(AirQuality {
+        source: AirQualitySource {
+            provider: "Open-Meteo / CAMS".into(),
+            report: Some("CAMS 全球空气质量预测".into()),
+            report_id: None,
+            page: "https://open-meteo.com/en/docs/air-quality-api".into(),
+            note: "位置级预测，用作无 DENR-EMB 中间服务时的备用数据。".into(),
+        },
+        updated_at: data_clock.clone(),
+        data_clock,
+        fetched_at: None,
+        summary: AirQualitySummary {
+            station_count: 1,
+            avg_aqi: aqi,
+            max_aqi: aqi,
+            max_station: Some(station.name_zh.clone()),
+            category: Some(category),
+        },
+        stations: vec![station],
+    })
 }
 
 #[cfg(not(feature = "network"))]
 pub fn fetch_air_quality() -> Result<AirQuality, String> {
+    Err("网络适配器未启用".into())
+}
+
+#[cfg(not(feature = "network"))]
+pub fn fetch_air_quality_at(_latitude: f64, _longitude: f64) -> Result<AirQuality, String> {
     Err("网络适配器未启用".into())
 }
 
@@ -723,6 +774,18 @@ fn parse_number(value: &str) -> Option<f64> {
         .next()
         .unwrap_or(tail.len());
     tail[..end].parse().ok()
+}
+
+#[cfg(feature = "network")]
+fn aqi_category(aqi: u16) -> String {
+    match aqi {
+        0..=50 => "优".into(),
+        51..=100 => "良".into(),
+        101..=150 => "敏感人群注意".into(),
+        151..=200 => "不健康".into(),
+        201..=300 => "非常不健康".into(),
+        _ => "危险".into(),
+    }
 }
 
 #[cfg(feature = "network")]
