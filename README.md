@@ -1,103 +1,150 @@
-# PANaHON 中文版（Rust）
+# 菲律宾天气（中文）
 
-这是一个面向 GrapheneOS 的中文天气应用原型。项目使用 Rust 和 egui 编写，打包为普通 Android APK。用户关闭网络权限后，应用仍能显示离线数据。
+面向 GrapheneOS 的中文天气应用。用 Rust 和 egui 编写，打包成普通 Android APK，数据来自 PAGASA 与 DENR-EMB 的公开接口。
 
-项目参考了 PANaHON 1.1.4 XAPK 的公开功能。原应用是 Flutter 发布包，没有附带源码。我们只记录包信息、组件和用户可见功能，再独立实现数据模型和界面。项目不复制原包的 Flutter 二进制、商标、图片、文案、认证流程或私有令牌。
+界面参考小米天气：一屏看完当前天气，往下依次是逐小时、五日预报、空气质量和观测详情。
 
-## 分析流程
+## 界面
 
-第一步使用 IDA Pro 9.5 和 Hex-Rays IDA MCP 分析 APK 与 arm64 原生库。分析结果保存在 `docs/craft-anything-evidence/`。第二步使用 Craft Anything 保存证据，并根据证据编写 Rust 工程。Craft Anything 用于整理和复现分析结果，不替代 IDA Pro 的第一步。
+五个页面，底部导航切换：
 
-## 功能
+- **天气**：当前温度、体感、最高最低、24 小时滚动预报、五日预报、空气质量摘要、观测详情、生活指数、最新预警。
+- **空气**：DENR-EMB 的 16 个国控站，按 AQI 从高到低排列，标明首要污染物和 PM10/PM2.5 数值。
+- **地图**：PAGASA 雷达、卫星、闪电、台风、灾害五个图层。
+- **预警**：PAGASA 公开预警全文，附防御建议和本地提醒开关。
+- **我的**：地点搜索与切换、数据来源清单、版本信息。
 
-- 地点：搜索并切换常用地点。
-- 预报：显示当前天气和五日预报。
-- 地图：读取雷达和 Himawari 卫星最新图像，读取闪电、台风和灾害预警数量，并提供 PAGASA 官方交互地图入口。
-- 预警：显示公开服务返回的天气预警。
-- 离线模式：没有网络时使用内置样例数据。
-- 网络模式：启用 `network` feature 后读取公开版本、观测、nowcast 和预警接口。
+视觉上做了三件事：
 
-网络适配器不包含任何令牌。接口字段发生变化或请求失败时，应用会继续显示当前数据。
+1. 背景是随天气和昼夜变化的天空渐变，晴天偏蓝、雨天偏灰、夜间更深。
+2. 天气图标全部用矢量绘制，不打包任何图片资源。
+3. 卡片是半透明白色，圆角 22，间距统一。
 
-## 构建
+真机截图见 `pixel10a-ui-home.png`、`pixel10a-ui-aqi.png`、`pixel10a-ui-offline.png`。
 
-主机需要以下工具：
+## 数据来源
 
-- Rust 1.80 或更高版本。
-- Android SDK、NDK 和 JDK 17 或更高版本。
-- `cargo-apk`。
+| 模块 | 来源 | 接入方式 |
+| --- | --- | --- |
+| 实时天气、逐小时、五日 | PAGASA PANaHON 公开接口 | `api.mobile.panahon.gov.ph` JSON |
+| 空气质量 | DENR-EMB 实时空气质量报表 | 直连 Power BI 公开报表 |
+| 雷达、卫星 | PAGASA 公开图层 | 读取时间轴后取最新一帧 |
+| 闪电、台风、灾害 | PAGASA 公开接口 | 只读摘要计数 |
+| 预警 | PAGASA `/alerts` | JSON |
+| 离线 | 应用内置样例 | 无网络时自动使用 |
 
-在 PowerShell 中执行：
+空气质量有三级回退：先读 DENR-EMB 报表，读不到再用 Open-Meteo 的 CAMS 位置预测，都失败则保留上一次数据。界面上会标明实际来源。
+
+EMB 的数据不在页面 HTML 里，藏在 Power BI 的「发布到 Web」报表中。`core/src/emb.rs` 按匿名嵌入协议取数：
+
+1. 请求 `app.powerbi.com/view?r=…`，拿到报表所在集群。
+2. 请求 `modelsAndExploration`，拿到 `modelId`。
+3. 用 `recipes/` 里的查询体重放 `querydata`，得到 DSR 格式的行数据。
+
+配方是从浏览器里抓下来的固定 JSON。EMB 改报表结构时需要重新抓，见文末。
+
+## 运行
+
+### 桌面预览
 
 ```powershell
-cargo install cargo-apk
+cargo run --features "desktop network"
+```
+
+桌面窗口按 Pixel 10a 的逻辑分辨率开，方便对照真机。用 `PANAHON_TAB=1..4` 可以直接打开指定页面截图。
+
+### Android
+
+```powershell
 $env:ANDROID_HOME = "C:\Android\Sdk"
 $env:ANDROID_NDK_HOME = "C:\Android\Sdk\ndk\<版本>"
-$env:CARGO_APK_RELEASE_KEYSTORE = "<签名文件路径>"
-$env:CARGO_APK_RELEASE_KEYSTORE_PASSWORD = "<签名文件密码>"
-cargo apk build --release --target aarch64-linux-android
+$env:CARGO_APK_RELEASE_KEYSTORE = "<签名文件>"
+$env:CARGO_APK_RELEASE_KEYSTORE_PASSWORD = "<密码>"
+.\build.ps1 -Network
 ```
 
-APK 位于 `target\release\apk\`。
+产物在 `target\release\apk\panahon-zh.apk`，包名 `org.panahon.zh`，最低 SDK 29，目标 SDK 35。
 
-本机已生成 `target\release\apk\panahon-zh.apk`。APK 使用 `org.panahon.zh` 包名，最低 SDK 为 29，目标 SDK 为 35。签名和 `zipalign` 检查已通过。
-
-启用公开接口适配器：
+首次出包需要先准备签名文件：
 
 ```powershell
-cargo apk build --release --features network --target aarch64-linux-android
+keytool -genkeypair -v -keystore keystore\panahon-release.jks -alias panahon `
+  -keyalg RSA -keysize 2048 -validity 10000 `
+  -storepass <密码> -keypass <密码> `
+  -dname "CN=Panahon Zh, O=Panahon, C=PH"
 ```
 
-空气质量中间服务的本地测试可以这样启动：
+`keystore/` 已在 `.gitignore` 中，不会进版本库。
+
+### 中文字体
+
+APK 内置 Noto Sans CJK SC 的子集，只保留代码里出现过的字符。改了界面文案要重新生成：
 
 ```powershell
-cd services\emb-aqi
-node server.mjs
+python tools\subset-font.py --source <NotoSansCJKsc-Regular.otf>
 ```
 
-如果 Pixel 10a 和电脑处在同一个局域网，构建 App 时把 `PANAHON_AQI_ENDPOINT` 设为 `http://<电脑局域网地址>:8787/api/aqi`。公网部署必须使用 HTTPS，并在服务端确认 DENR-EMB 的数据使用范围。
+脚本会扫描 `src/` 和 `core/src/`，把用到的字符写进 `assets/ui-font-chars.txt`，再调用 `pyftsubset` 输出 `assets/NotoSansCJKsc-Subset.otf`。漏字的表现是界面上出现方框。
 
-没有 Android SDK 时，可以先检查 Rust 代码和 Android 目标：
+## 代码结构
+
+```
+src/
+  app.rs      应用状态、五个页面、后台请求与消息循环
+  theme.rs    配色、天空渐变、卡片与文字样式
+  widgets.rs  卡片、逐小时条、五日预报、AQI 徽章、底部导航
+  icons.rs    矢量天气图标
+  lib.rs      库入口、Android 入口、通知与安全区 JNI
+  main.rs     桌面预览入口
+core/
+  src/lib.rs  数据模型、PAGASA 接口适配、生活指数
+  src/emb.rs  DENR-EMB Power BI 读取与 DSR 解码
+  recipes/    三个查询配方
+  examples/live.rs  联网冒烟测试
+tools/
+  subset-font.py     字体子集生成
+  screenshot.ps1     窗口截图（带 DPI 处理）
+```
+
+## 行为约定
+
+- 所有网络请求在后台线程执行，界面不阻塞；结果通过 channel 回到主线程。
+- 请求失败时保留当前数据，页面顶部状态行显示失败原因。
+- 断网时显示内置样例，温度、预报、预警页面都能打开。
+- 状态栏和手势条高度从 Android `WindowInsets` 读取，不写死数值。
+- 地点切换后自动刷新天气和空气质量。
+
+## 测试
 
 ```powershell
-cargo check --target aarch64-linux-android --workspace
+cargo test -p panahon-core --features network
+cargo run -p panahon-core --example live --features network
 ```
 
-## 在 GrapheneOS 上验证
+第一条跑单元测试，覆盖数据解析、图标映射、AQI 分级、DSR 解码和时间换算。第二条真的打网络，打印当前天气与空气质量，用来确认上游没变。
 
-使用自己的签名密钥安装 APK。不要复用原应用的签名。
+## 已知限制
+
+- **EMB 改报表就得重抓配方。** 配方里写死了 `CAMS.Station`、`CAMS.PM10AQI` 这些字段名。
+- **三个历史嵌入已失效。** `air.emb.gov.ph` 页面上的 Batangas、Antipolo 报表返回 401，本项目只用 NCR 主报表。
+- **预警正文仍是英文。** 只翻译了标题和防御建议，正文保留 PAGASA 原文，便于和官网对照。
+- **通知是进程内调度。** 系统回收进程后，30 分钟提醒需要重新打开应用才会继续。
+- **地图只有最新一帧。** 时间轴播放还没做。
+
+## 重新抓配方
+
+EMB 换了报表结构时：
 
 ```powershell
-adb install -r <apk>
-adb shell monkey -p org.panahon.zh -c android.intent.category.LAUNCHER 1
+node tools\capture-recipe.mjs <resourceKey>
 ```
 
-按下面的顺序检查：
+脚本用无头 Chrome 打开报表，把首屏所有 `querydata` 请求体存到 `captured/`，每个文件都标注了查询的字段。挑出需要的改名为 `recipes/` 下的文件，再把 `modelId` 置为 `null`。
 
-1. 关闭网络权限，确认地点、预报和预警页面仍能打开。
-2. 打开网络权限，点击“刷新”，确认请求失败时应用不会退出。
-3. 只在选择定位功能时授予位置权限。
-4. 在 Android 13 或更高版本上，确认通知权限由用户主动授予。
-5. 使用 arm64-v8a APK 在 Pixel 或其他 GrapheneOS 设备上测试。
+## 许可
 
-## 目录说明
+代码使用 MIT 或 Apache-2.0 双许可证。PAGASA、PANaHON、DENR-EMB 及其他名称、图像和商标不属于本项目。
 
-- `src/`：egui 界面和 Android 入口。
-- `core/`：数据模型、公开接口适配器和单元测试。
-- `docs/evidence.md`：清洁室重建的证据边界和已知限制。
-- `docs/ida-first-pass.md`：IDA Pro 第一轮分析和命令。
-- `docs/feature-roadmap.md`：参考“知天气”和 PAGASA 公开功能整理的扩展路线。
-- `services/emb-aqi/`：服务端读取 DENR-EMB Power BI 空气质量报表，给 App 提供 `/api/aqi`。
-- `docs/craft-anything-evidence/`：Craft Anything 的分析说明。原始 JSON 只在本地生成，默认不纳入版本库。
-- `build.ps1`：Android APK 构建脚本。
-- `install-ida-mcp.ps1`：安装 IDA MCP 用户插件的脚本。
+界面字体使用 Noto Sans CJK SC，遵循 SIL Open Font License 1.1，许可证见 `assets/OFL.txt`。
 
-## 许可证和限制
-
-代码使用 MIT 或 Apache-2.0 双许可证。PAGASA、PANaHON 和原应用中的其他名称、图像及商标不属于本项目。
-
-界面使用 Noto Sans CJK SC 字体显示中文。字体采用 SIL Open Font License 1.1，来源和许可证文件位于 `assets/`。
-
-项目已在 Pixel 10a GrapheneOS 上完成安装、网络刷新、地点搜索、服务页、远程地图接口和本地通知测试。空气质量优先读取 `PANAHON_AQI_ENDPOINT` 指向的 DENR-EMB 中间服务；未配置时使用 Open-Meteo 的 CAMS 位置级预测，并在界面中标明来源。通知调度器每 30 分钟发送一次本地提醒，应用进程被系统回收后需要重新打开应用。地图时间轴播放、观测历史和桌面小组件仍未接入。接入更多公开数据前，请确认服务条款、速率限制和字段格式。
-
-
+天气与空气质量数据版权归 PAGASA 和 DENR-EMB 所有。接入或再分发前请确认各自的使用条款。

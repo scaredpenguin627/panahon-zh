@@ -30,6 +30,12 @@ jni = "0.22.4"
 [lib]
 crate-type = ["cdylib", "lib"]
 
+# 桌面预览用：cargo run --features "desktop network"
+[[bin]]
+name = "panahon-zh"
+path = "src/main.rs"
+required-features = ["desktop"]
+
 [package.metadata.android]
 package = "org.panahon.zh"
 apk_name = "panahon-zh"
