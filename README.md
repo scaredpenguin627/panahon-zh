@@ -123,8 +123,6 @@ cargo run -p panahon-core --example live --features network
 
 第一条跑单元测试，覆盖数据解析、图标映射、AQI 分级、DSR 解码和时间换算。第二条真的打网络，打印当前天气与空气质量，用来确认上游没变。
 
-在 ChatGPT 的云端工作区跑这两条，见 `docs/cloud-environment.md`。那里有安装脚本、域名白名单和验证命令。
-
 ## 已知限制
 
 - **EMB 改报表就得重抓配方。** 配方里写死了 `CAMS.Station`、`CAMS.PM10AQI` 这些字段名。
