@@ -6,6 +6,12 @@ use panahon_core::{
     Dashboard, DataSource, ForecastDay, HourlyForecast, Place,
 };
 
+#[cfg(target_os = "android")]
+use std::sync::OnceLock;
+
+#[cfg(target_os = "android")]
+static ANDROID_APP: OnceLock<winit::platform::android::activity::AndroidApp> = OnceLock::new();
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Tab {
     Places,
@@ -74,6 +80,7 @@ pub struct PanahonApp {
     map_layer: MapLayer,
     air_quality: Option<AirQuality>,
     aqi_status: String,
+    notification_status: String,
 }
 
 impl PanahonApp {
@@ -97,6 +104,7 @@ impl PanahonApp {
             map_layer: MapLayer::Radar,
             air_quality: None,
             aqi_status: "尚未加载空气质量".into(),
+            notification_status: "未启用".into(),
         }
     }
 
@@ -354,8 +362,28 @@ impl PanahonApp {
         }
         ui.group(|ui| {
             ui.label(RichText::new("本地通知").strong());
-            ui.label("当前状态：未启用");
-            ui.label("后续可由 Android 本地调度器发送，不依赖 FCM。需要用户主动允许通知权限。");
+            ui.label(format!("当前状态：{}", self.notification_status));
+            ui.label("通知使用 Android 本地通道，不依赖 FCM。首次使用需要允许通知权限。");
+            ui.horizontal(|ui| {
+                if ui.button("请求通知权限").clicked() {
+                    #[cfg(target_os = "android")]
+                    {
+                        request_notification_permission();
+                        self.notification_status = "已发起权限请求".into();
+                    }
+                    #[cfg(not(target_os = "android"))]
+                    ui.label("仅 Android 可用");
+                }
+                if ui.button("发送测试通知").clicked() {
+                    #[cfg(target_os = "android")]
+                    {
+                        post_test_notification();
+                        self.notification_status = "已发送测试通知".into();
+                    }
+                    #[cfg(not(target_os = "android"))]
+                    ui.label("仅 Android 可用");
+                }
+            });
         });
     }
 
@@ -525,6 +553,7 @@ fn source_badge(ui: &mut egui::Ui, source: &DataSource, status: &str, version: O
 #[cfg(target_os = "android")]
 #[no_mangle]
 pub fn android_main(app: winit::platform::android::activity::AndroidApp) {
+    let _ = ANDROID_APP.set(app.clone());
     let options = eframe::NativeOptions {
         android_app: Some(app),
         ..Default::default()
@@ -537,5 +566,131 @@ pub fn android_main(app: winit::platform::android::activity::AndroidApp) {
     if let Err(error) = result {
         eprintln!("Android UI failed to start: {error}");
     }
+}
+
+#[cfg(target_os = "android")]
+fn request_notification_permission() {
+    let Some(app) = ANDROID_APP.get().cloned() else {
+        return;
+    };
+    app.clone().run_on_java_main_thread(Box::new(move || {
+        let vm = unsafe { jni::JavaVM::from_raw(app.vm_as_ptr() as _) };
+        let _ = vm.attach_current_thread(|env| -> jni::errors::Result<()> {
+            let raw_activity = app.activity_as_ptr() as jni::sys::jobject;
+            let activity = unsafe {
+                env.as_cast_raw::<jni::refs::Global<jni::objects::JObject>>(&raw_activity)?
+            };
+            let permission = env.new_string("android.permission.POST_NOTIFICATIONS")?;
+            let string_class = env.find_class(jni::jni_str!("java/lang/String"))?;
+            let permissions =
+                env.new_object_array(1, string_class, jni::objects::JObject::null())?;
+            permissions.set_element(&env, 0, &permission)?;
+            env.call_method(
+                activity.as_ref(),
+                jni::jni_str!("requestPermissions"),
+                jni::jni_sig!("([Ljava/lang/String;I)V"),
+                &[
+                    jni::objects::JValue::Object(&permissions),
+                    jni::objects::JValue::Int(1001),
+                ],
+            )?;
+            Ok(())
+        });
+    }));
+}
+
+#[cfg(target_os = "android")]
+fn post_test_notification() {
+    let Some(app) = ANDROID_APP.get().cloned() else {
+        return;
+    };
+    app.clone().run_on_java_main_thread(Box::new(move || {
+        let vm = unsafe { jni::JavaVM::from_raw(app.vm_as_ptr() as _) };
+        let _ = vm.attach_current_thread(|env| -> jni::errors::Result<()> {
+            let raw_activity = app.activity_as_ptr() as jni::sys::jobject;
+            let activity = unsafe {
+                env.as_cast_raw::<jni::refs::Global<jni::objects::JObject>>(&raw_activity)?
+            };
+            let service_name = env.new_string("notification")?;
+            let manager = env
+                .call_method(
+                    activity.as_ref(),
+                    jni::jni_str!("getSystemService"),
+                    jni::jni_sig!("(Ljava/lang/String;)Ljava/lang/Object;"),
+                    &[jni::objects::JValue::Object(&service_name)],
+                )?
+                .l()?;
+            let channel_id = env.new_string("panahon_alerts")?;
+            let channel_name = env.new_string("PANaHON 预警")?;
+            let channel = env.new_object(
+                jni::jni_str!("android/app/NotificationChannel"),
+                jni::jni_sig!("(Ljava/lang/String;Ljava/lang/CharSequence;I)V"),
+                &[
+                    jni::objects::JValue::Object(&channel_id),
+                    jni::objects::JValue::Object(&channel_name),
+                    jni::objects::JValue::Int(3),
+                ],
+            )?;
+            env.call_method(
+                &manager,
+                jni::jni_str!("createNotificationChannel"),
+                jni::jni_sig!("(Landroid/app/NotificationChannel;)V"),
+                &[jni::objects::JValue::Object(&channel)],
+            )?;
+            let builder = env.new_object(
+                jni::jni_str!("android/app/Notification$Builder"),
+                jni::jni_sig!("(Landroid/content/Context;Ljava/lang/String;)V"),
+                &[
+                    jni::objects::JValue::Object(activity.as_ref()),
+                    jni::objects::JValue::Object(&channel_id),
+                ],
+            )?;
+            let title = env.new_string("PANaHON 预警")?;
+            let body = env.new_string("这是本地通知测试。")?;
+            env.call_method(
+                &builder,
+                jni::jni_str!("setContentTitle"),
+                jni::jni_sig!("(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;"),
+                &[jni::objects::JValue::Object(&title)],
+            )?;
+            env.call_method(
+                &builder,
+                jni::jni_str!("setContentText"),
+                jni::jni_sig!("(Ljava/lang/CharSequence;)Landroid/app/Notification$Builder;"),
+                &[jni::objects::JValue::Object(&body)],
+            )?;
+            let icon = env
+                .get_static_field(
+                    jni::jni_str!("android/R$drawable"),
+                    jni::jni_str!("sym_def_app_icon"),
+                    jni::jni_sig!("I"),
+                )?
+                .i()?;
+            env.call_method(
+                &builder,
+                jni::jni_str!("setSmallIcon"),
+                jni::jni_sig!("(I)Landroid/app/Notification$Builder;"),
+                &[jni::objects::JValue::Int(icon)],
+            )?;
+            let notification = env
+                .call_method(
+                    &builder,
+                    jni::jni_str!("build"),
+                    jni::jni_sig!("()Landroid/app/Notification;"),
+                    &[],
+                )?
+                .l()?;
+            env.call_method(
+                &manager,
+                jni::jni_str!("notify"),
+                jni::jni_sig!("(ILandroid/app/Notification;)V"),
+                &[
+                    jni::objects::JValue::Int(1001),
+                    jni::objects::JValue::Object(&notification),
+                ],
+            )?;
+            Ok(())
+        });
+    }));
 }
 
