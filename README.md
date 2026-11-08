@@ -98,7 +98,7 @@ adb shell monkey -p org.panahon.zh -c android.intent.category.LAUNCHER 1
 
 界面使用 Noto Sans CJK SC 字体显示中文。字体采用 SIL Open Font License 1.1，来源和许可证文件位于 `assets/`。
 
-项目已在 Pixel 10a GrapheneOS 上完成安装、网络刷新、地点搜索、服务页、远程地图接口和本地通知测试。通知调度器每 30 分钟发送一次本地提醒，应用进程被系统回收后需要重新打开应用。地图时间轴播放、观测历史和桌面小组件仍未接入。接入更多公开数据前，请确认服务条款、速率限制和字段格式。
+项目已在 Pixel 10a GrapheneOS 上完成安装、网络刷新、地点搜索、服务页、远程地图接口和本地通知测试。空气质量优先读取 `PANAHON_AQI_ENDPOINT` 指向的 DENR-EMB 中间服务；未配置时使用 Open-Meteo 的 CAMS 位置级预测，并在界面中标明来源。通知调度器每 30 分钟发送一次本地提醒，应用进程被系统回收后需要重新打开应用。地图时间轴播放、观测历史和桌面小组件仍未接入。接入更多公开数据前，请确认服务条款、速率限制和字段格式。
 
 
 
