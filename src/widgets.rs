@@ -278,6 +278,11 @@ pub fn hero(
     ui.label(RichText::new(line).size(15.0).color(palette.text));
 
 }
+/// 供 app.rs 复用的卡片标题行。
+pub fn card_header_public(ui: &mut egui::Ui, palette: &Palette, title: &str, source: &str) {
+    card_header(ui, palette, title, source);
+}
+
 /// 卡片标题行：左侧标题，右侧来源标签。
 fn card_header(ui: &mut egui::Ui, palette: &Palette, title: &str, source: &str) {
     ui.horizontal(|ui| {
@@ -994,6 +999,36 @@ pub fn detail_grid(ui: &mut egui::Ui, current: &CurrentWeather, palette: &Palett
     let is_english = english(ui);
     theme::card().show(ui, |ui| {
         ui.set_min_width(ui.available_width());
+        let source = match current.temperature_quality {
+            DataQuality::Official => {
+                if is_english {
+                    "Official observation"
+                } else {
+                    "官方观测"
+                }
+            }
+            DataQuality::Forecast => {
+                if is_english {
+                    "Official forecast"
+                } else {
+                    "官方预报"
+                }
+            }
+            DataQuality::Estimated => {
+                if is_english {
+                    "Local estimate"
+                } else {
+                    "本地估算"
+                }
+            }
+            DataQuality::Unavailable => {
+                if is_english {
+                    "No data"
+                } else {
+                    "暂无数据"
+                }
+            }
+        };
         card_header(
             ui,
             palette,
@@ -1002,11 +1037,7 @@ pub fn detail_grid(ui: &mut egui::Ui, current: &CurrentWeather, palette: &Palett
             } else {
                 "当前观测"
             },
-            if is_english {
-                "Official observation"
-            } else {
-                "官方观测"
-            },
+            source,
         );
         ui.add_space(10.0);
         ui.columns(2, |columns| {
@@ -1085,9 +1116,9 @@ pub fn detail_grid(ui: &mut egui::Ui, current: &CurrentWeather, palette: &Palett
                 if is_english { "Pressure" } else { "气压" },
                 &pressure,
                 if is_english {
-                    "Sea-level pressure"
+                    "Measured at the station"
                 } else {
-                    "海平面气压"
+                    "观测站测得"
                 },
             );
         });

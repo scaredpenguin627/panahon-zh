@@ -76,17 +76,12 @@ The default configuration reports these useful baseline dimensions:
 
 These values explain the visual rhythm more precisely than a screenshot alone: 16dp page margins, 16dp cards, 60dp hourly cells, and a larger 28dp daily-forecast inset.
 
-## Live-device screenshot evidence
+## 关于"真机截图"的更正
 
-The original APK was installed on the connected Pixel 10a as package
-`com.huawei.android.totemweather` and launched successfully. A live screenshot
-was captured at `D:\\IDA PRO 9.5\\huawei-weather-home.png`. The observed home
-screen confirms the resource analysis:
+早期版本曾把 `huawei-weather-home.png` 记为华为真机截图。核对该图后确认，它其实是本项目自己的界面
+（顶部是当时的五个标签），不是华为天气。
 
-- A five-tab top navigation (`天气`, `空气`, `地图`, `预警`, `我的`) uses a rounded selected tab and a small yellow indicator.
-- The city header and refresh control sit below the navigation.
-- The hero centers a large temperature, weather icon, condition, feels-like value, and high/low summary.
-- The hourly forecast is a translucent rounded card with six visible columns and horizontal scrolling.
-- The five-day forecast is a separate translucent rounded card with date, icon, condition, rain amount and low/high range bars.
-
-This live screenshot is the primary visual reference for the next Rust/egui comparison pass; the public Huawei website is only a secondary reference.
+华为天气 APK 在本机装不上：启动即抛
+`ClassNotFoundException: com.huawei.android.os.SystemPropertiesEx`，因为它依赖 EMUI 框架类。
+因此华为侧没有可用的真机截图，界面证据全部来自资源表与布局文件，整理在
+`docs/huawei-design-spec.md`。

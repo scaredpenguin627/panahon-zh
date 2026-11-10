@@ -6,7 +6,7 @@
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::{Duration, Instant};
 
-use eframe::egui::{self, Align, Align2, Color32, FontId, Layout, Pos2, Rect, RichText, Sense, Vec2};
+use eframe::egui::{self, Align, Align2, Color32, FontId, Layout, Pos2, RichText, Sense, Vec2};
 use panahon_core::{
     fetch_air_quality_at, fetch_api_version, fetch_public_dashboard, fetch_remote_map_layer,
     fetch_remote_map_layer_frame, search_places, AirQuality, ApiVersion, Dashboard, DataSource,
@@ -650,15 +650,6 @@ impl PanahonApp {
 
     fn air_page(&mut self, ui: &mut egui::Ui, palette: &Palette) {
         ui.horizontal(|ui| {
-            ui.label(
-                RichText::new(if self.language.is_english() {
-                    "Air quality detail"
-                } else {
-                    "空气质量详情"
-                })
-                .size(12.0)
-                .color(palette.dim),
-            );
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 if widgets::pill_button(
                     ui,
@@ -804,127 +795,192 @@ impl PanahonApp {
 
     // -------------------------------------------------------------------- map
 
+    /// 地图页：华为把地图放进一张圆角卡片，顶部是图层分页，下面是图像视口。
     fn map_page(&mut self, ui: &mut egui::Ui, palette: &Palette) {
-        ui.label(
-            RichText::new(if self.language.is_english() {
-                "PAGASA public layers, loaded on demand"
-            } else {
-                "PAGASA 公开图层，按需加载"
-            })
-            .size(11.0)
-            .color(palette.faint),
-        );
-        ui.add_space(10.0);
+        let is_english = self.language.is_english();
 
-        ui.horizontal_wrapped(|ui| {
-            for (index, (_, title)) in MAP_LAYERS.iter().enumerate() {
-                let active = index == self.map_layer;
-                let fill = if active {
-                    Color32::from_rgba_unmultiplied(255, 255, 255, 210)
-                } else {
-                    Color32::from_rgba_unmultiplied(255, 255, 255, 26)
-                };
-                let color = if active { palette.bottom } else { palette.text };
-                if ui
-                    .add(
-                        egui::Button::new(
-                            RichText::new(if self.language.is_english() {
-                                ["Radar", "Satellite", "Lightning", "Typhoon", "Hazard"][index]
-                            } else {
-                                *title
-                            })
-                            .size(13.0)
-                            .color(color),
-                        )
-                        .fill(fill)
-                        .min_size(Vec2::new(62.0, 30.0)),
-                    )
-                    .clicked()
-                {
-                    self.map_layer = index;
-                    self.map_texture = None;
-                    self.map_size = None;
-                    self.map_frame_count = None;
-                    self.map_frame_index = 0;
-                    self.map_detail = None;
-                    self.map_track.clear();
-                    self.map_playing = false;
-                    self.map_next_frame_at = None;
-                    self.map_status = if self.language.is_english() {
-                        "Tap Refresh layer to load".into()
+        theme::card().show(ui, |ui| {
+            ui.set_min_width(ui.available_width());
+            widgets::card_header_public(
+                ui,
+                palette,
+                if is_english { "Weather map" } else { "天气地图" },
+                "PAGASA",
+            );
+            ui.add_space(8.0);
+
+            ui.horizontal_wrapped(|ui| {
+                for (index, (_, title)) in MAP_LAYERS.iter().enumerate() {
+                    let active = index == self.map_layer;
+                    let fill = if active {
+                        Color32::from_rgba_unmultiplied(255, 255, 255, 210)
                     } else {
-                        "点「刷新图层」加载".into()
+                        Color32::from_rgba_unmultiplied(255, 255, 255, 26)
                     };
-                }
-            }
-        });
-        ui.add_space(8.0);
-
-        ui.horizontal(|ui| {
-            if widgets::pill_button(
-                ui,
-                if self.language.is_english() {
-                    "Refresh layer"
-                } else {
-                    "刷新图层"
-                },
-                palette,
-            )
-            .clicked()
-            {
-                let ctx = ui.ctx().clone();
-                self.refresh_map(&ctx);
-            }
-            #[cfg(target_os = "android")]
-            if widgets::pill_button(
-                ui,
-                if self.language.is_english() {
-                    "Open official map"
-                } else {
-                    "打开官方地图"
-                },
-                palette,
-            )
-            .clicked()
-            {
-                crate::open_official_map(OFFICIAL_MAP_URL);
-            }
-            if self.map_frame_count.is_some_and(|count| count > 1) {
-                let label = if self.map_playing {
-                    if self.language.is_english() {
-                        "Pause"
-                    } else {
-                        "暂停"
+                    let color = if active { palette.bottom } else { palette.text };
+                    if ui
+                        .add(
+                            egui::Button::new(
+                                RichText::new(if is_english {
+                                    ["Radar", "Satellite", "Lightning", "Typhoon", "Hazard"][index]
+                                } else {
+                                    *title
+                                })
+                                .size(12.0)
+                                .color(color),
+                            )
+                            .fill(fill)
+                            .corner_radius(egui::CornerRadius::same(12))
+                            .min_size(Vec2::new(58.0, 28.0)),
+                        )
+                        .clicked()
+                    {
+                        self.map_layer = index;
+                        self.map_texture = None;
+                        self.map_size = None;
+                        self.map_frame_count = None;
+                        self.map_frame_index = 0;
+                        self.map_detail = None;
+                        self.map_track.clear();
+                        self.map_playing = false;
+                        self.map_next_frame_at = None;
+                        self.map_status = if is_english {
+                            "Tap Refresh layer to load".into()
+                        } else {
+                            "点「刷新图层」加载".into()
+                        };
                     }
-                } else if self.language.is_english() {
-                    "Play timeline"
-                } else {
-                    "播放时间轴"
-                };
-                if widgets::pill_button(ui, label, palette).clicked() {
-                    self.map_playing = !self.map_playing;
-                    self.map_next_frame_at = Some(Instant::now());
+                }
+            });
+            ui.add_space(8.0);
+
+            if let (Some(texture), Some(size)) = (&self.map_texture, self.map_size) {
+                let width = ui.available_width();
+                let aspect = size[1] as f32 / size[0].max(1) as f32;
+                let (rect, _) = ui
+                    .allocate_exact_size(Vec2::new(width, width * aspect), egui::Sense::hover());
+                // 雷达和卫星图是带透明通道的叠加层，铺一层深色底衬才看得清
+                ui.painter().rect_filled(
+                    rect,
+                    egui::CornerRadius::same(12),
+                    Color32::from_rgba_unmultiplied(8, 18, 28, 200),
+                );
+                ui.painter().image(
+                    texture.id(),
+                    rect.shrink(3.0),
+                    egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                    Color32::WHITE,
+                );
+            } else {
+                ui.allocate_ui_with_layout(
+                    Vec2::new(ui.available_width(), 132.0),
+                    Layout::centered_and_justified(egui::Direction::TopDown),
+                    |ui| {
+                        ui.label(
+                            RichText::new(if is_english {
+                                "Radar and satellite layers\nshow the latest PAGASA frame"
+                            } else {
+                                "雷达与卫星图层\n显示 PAGASA 最新一帧"
+                            })
+                            .size(12.0)
+                            .color(palette.faint),
+                        );
+                    },
+                );
+            }
+
+            if let Some(count) = self.map_frame_count.filter(|count| *count > 1) {
+                ui.add_space(6.0);
+                let max = count.saturating_sub(1) as f32;
+                let mut selected = self.map_frame_index as f32;
+                let mut changed = false;
+                ui.horizontal(|ui| {
+                    ui.label(
+                        RichText::new(if is_english { "Timeline" } else { "时间轴" })
+                            .size(11.0)
+                            .color(palette.faint),
+                    );
+                    changed = ui
+                        .add(egui::Slider::new(&mut selected, 0.0..=max).show_value(false))
+                        .changed();
+                    ui.label(
+                        RichText::new(format!("{}/{}", selected.round() as u32 + 1, count))
+                            .size(11.0)
+                            .color(palette.dim),
+                    );
+                });
+                if changed {
+                    self.map_frame_index = selected.round().clamp(0.0, max) as u32;
+                    let ctx = ui.ctx().clone();
+                    self.refresh_map(&ctx);
                 }
             }
+
+            ui.add_space(8.0);
+            ui.horizontal_wrapped(|ui| {
+                if widgets::pill_button(
+                    ui,
+                    if is_english { "Refresh" } else { "刷新图层" },
+                    palette,
+                )
+                .clicked()
+                {
+                    let ctx = ui.ctx().clone();
+                    self.refresh_map(&ctx);
+                }
+                if self.map_frame_count.is_some_and(|count| count > 1) {
+                    let label = if self.map_playing {
+                        if is_english { "Pause" } else { "暂停" }
+                    } else if is_english {
+                        "Play"
+                    } else {
+                        "播放"
+                    };
+                    if widgets::pill_button(ui, label, palette).clicked() {
+                        self.map_playing = !self.map_playing;
+                        self.map_next_frame_at = Some(Instant::now());
+                    }
+                }
+                #[cfg(target_os = "android")]
+                if widgets::pill_button(
+                    ui,
+                    if is_english {
+                        "Official map"
+                    } else {
+                        "官方地图"
+                    },
+                    palette,
+                )
+                .clicked()
+                {
+                    crate::open_official_map(OFFICIAL_MAP_URL);
+                }
+            });
+
+            ui.add_space(4.0);
+            ui.label(
+                RichText::new(&self.map_status)
+                    .size(11.0)
+                    .color(palette.dim),
+            );
         });
-        ui.label(
-            RichText::new(&self.map_status)
-                .size(11.0)
-                .color(palette.dim),
-        );
+
         if let Some(detail) = &self.map_detail {
+            ui.add_space(10.0);
             theme::card().show(ui, |ui| {
                 ui.set_min_width(ui.available_width());
-                theme::section_title(
+                widgets::card_header_public(
                     ui,
-                    if self.language.is_english() {
+                    palette,
+                    if is_english {
                         "Typhoon detail"
                     } else {
                         "台风路径摘要"
                     },
-                    palette,
+                    "PAGASA",
                 );
-                let text = if self.language.is_english() {
+                ui.add_space(4.0);
+                let text = if is_english {
                     detail.clone()
                 } else if let Some(rest) = detail.strip_prefix("Cyclone ") {
                     format!("台风 {rest}")
@@ -933,102 +989,13 @@ impl PanahonApp {
                 };
                 ui.label(RichText::new(text).size(12.0).color(palette.text));
             });
-            ui.add_space(6.0);
         }
+
         if !self.map_track.is_empty() {
-            widgets::typhoon_track(ui, &self.map_track, palette, self.language.is_english());
-            ui.add_space(6.0);
+            ui.add_space(10.0);
+            widgets::typhoon_track(ui, &self.map_track, palette, is_english);
         }
-        if let Some(count) = self.map_frame_count.filter(|count| *count > 1) {
-            ui.add_space(4.0);
-            let max = count.saturating_sub(1) as f32;
-            let mut selected = self.map_frame_index as f32;
-            let mut changed = false;
-            ui.horizontal(|ui| {
-                ui.label(
-                    RichText::new(if self.language.is_english() {
-                        "Timeline"
-                    } else {
-                        "时间轴"
-                    })
-                    .size(11.0)
-                    .color(palette.faint),
-                );
-                changed = ui
-                    .add(
-                        egui::Slider::new(&mut selected, 0.0..=max)
-                            .show_value(false)
-                            .text(if self.language.is_english() {
-                                "frame"
-                            } else {
-                                "帧"
-                            }),
-                    )
-                    .changed();
-                ui.label(
-                    RichText::new(format!("{}/{}", selected.round() as u32 + 1, count))
-                        .size(11.0)
-                        .color(palette.dim),
-                );
-            });
-            if changed {
-                self.map_frame_index = selected.round().clamp(0.0, max) as u32;
-                let ctx = ui.ctx().clone();
-                self.refresh_map(&ctx);
-            }
-        }
-        ui.add_space(8.0);
-
-        if let (Some(texture), Some(size)) = (&self.map_texture, self.map_size) {
-            let width = ui.available_width();
-            let aspect = size[1] as f32 / size[0].max(1) as f32;
-            let (rect, _) =
-                ui.allocate_exact_size(Vec2::new(width, width * aspect), egui::Sense::hover());
-            // 雷达和卫星图是带透明通道的叠加层，铺一层深色底衬才看得清
-            ui.painter().rect_filled(
-                rect,
-                egui::CornerRadius::same(18),
-                Color32::from_rgba_unmultiplied(8, 18, 28, 200),
-            );
-            ui.painter().image(
-                texture.id(),
-                rect.shrink(4.0),
-                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
-                Color32::WHITE,
-            );
-        } else {
-            theme::card().show(ui, |ui| {
-                ui.set_min_width(ui.available_width());
-                ui.allocate_ui_with_layout(
-                    Vec2::new(ui.available_width(), 120.0),
-                    Layout::centered_and_justified(egui::Direction::TopDown),
-                    |ui| {
-                        ui.label(
-                            RichText::new(if self.language.is_english() {
-                                "Radar and satellite layers\nshow the latest PAGASA frame"
-                            } else {
-                                "雷达与卫星图层\n显示 PAGASA 最新一帧"
-                            })
-                            .size(13.0)
-                            .color(palette.faint),
-                        );
-                    },
-                );
-            });
-        }
-        ui.add_space(8.0);
-        ui.label(
-            RichText::new(if self.language.is_english() {
-                "Imagery comes from PAGASA public layers; color and time follow the official map."
-            } else {
-                "图像来自 PAGASA 公开图层，颜色和时间以官方地图为准。"
-            })
-            .size(10.0)
-            .color(palette.faint),
-        );
     }
-
-    // ----------------------------------------------------------------- alerts
 
     fn alerts_page(&mut self, ui: &mut egui::Ui, palette: &Palette) {
         ui.horizontal(|ui| {

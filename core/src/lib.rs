@@ -1048,6 +1048,95 @@ fn map_bytes(url: &str) -> Result<Vec<u8>, String> {
     Ok(bytes)
 }
 
+/// 从自动站列表里挑出与地点对应的观测。
+///
+/// PAGASA 的 `/observation/automatic` 不看经纬度，任何坐标都返回同一批站点。
+/// 这里按站名匹配城市或所在的都市圈；匹配不到就返回 `None`，让调用方退回官方预报。
+#[cfg(feature = "network")]
+fn pick_station<'a>(
+    observation: &'a serde_json::Value,
+    place: &Place,
+) -> Option<&'a serde_json::Value> {
+    let rows = observation.pointer("/data")?.as_array()?;
+    let city = place_key(&place.name);
+    let region = place_key(&place.region);
+    let metro = metro_tokens(&place.region);
+
+    let mut best: Option<(u32, &serde_json::Value)> = None;
+    for row in rows {
+        let Some(obs) = row.get("obs") else {
+            continue;
+        };
+        let Some(loc) = obs.get("loc").and_then(|value| value.as_str()) else {
+            continue;
+        };
+        let key = station_key(loc);
+
+        let mut score = 0u32;
+        if !city.is_empty() && key.split_whitespace().any(|word| word == city.as_str()) {
+            score = 100;
+        } else if !city.is_empty() && !key.is_empty() && key.contains(&city) {
+            score = 80;
+        } else if !region.is_empty() && !key.is_empty() && key.contains(&region) {
+            score = 60;
+        } else if metro.iter().any(|token| key.contains(token)) {
+            score = 50;
+        }
+
+        if score > 0 && best.is_none_or(|(best_score, _)| score > best_score) {
+            best = Some((score, obs));
+        }
+    }
+    best.map(|(_, obs)| obs)
+}
+
+/// 站名归一化：小写、去标点、压空格。保留 "city" 等词，供短语匹配使用。
+#[cfg(feature = "network")]
+fn station_key(value: &str) -> String {
+    let lowered = value.to_ascii_lowercase();
+    let cleaned: String = lowered
+        .chars()
+        .map(|ch| if ch.is_alphanumeric() { ch } else { ' ' })
+        .collect();
+    cleaned.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// 地点名归一化：去掉末尾的 "city"，"Cebu City" 和 "Mactan, Cebu" 才能对上。
+#[cfg(feature = "network")]
+fn place_key(value: &str) -> String {
+    let key = station_key(value);
+    key.strip_suffix(" city").map(str::to_owned).unwrap_or(key)
+}
+
+/// 马尼拉大都会的自动站分布在各个市，单独给一组关键词。
+#[cfg(feature = "network")]
+fn metro_tokens(region: &str) -> Vec<&'static str> {
+    let region = region.to_ascii_lowercase();
+    if !region.contains("manila") {
+        return Vec::new();
+    }
+    // 必须用短语："quezon" 会同时命中 Quezon 省，而省站的观测往往更旧
+    vec![
+        "quezon city",
+        "city of manila",
+        "manila",
+        "makati",
+        "pasay",
+        "caloocan",
+        "pasig",
+        "taguig",
+        "marikina",
+        "muntinlupa",
+        "paranaque",
+        "valenzuela",
+        "navotas",
+        "malabon",
+        "mandaluyong",
+        "san juan",
+        "las pinas",
+        "pateros",
+    ]
+}
 #[cfg(feature = "network")]
 pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
     let query = format!(
@@ -1061,7 +1150,8 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
     let now = nowcast
         .pointer("/data/nc")
         .or_else(|| nowcast.pointer("/data"));
-    let obs = observation.pointer("/data/0/obs");
+    // 观测接口忽略坐标，固定返回全国 112 个站，必须按地名自己挑
+    let obs = pick_station(&observation, place);
 
     let icon_source = text(obs, "icon").or_else(|| text(now, "icon"));
     let description = text(obs, "desc").or_else(|| text(now, "desc"));
@@ -1117,7 +1207,9 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
             .clone()
             .map(translate_condition)
             .unwrap_or_else(|| "暂无描述".into()),
-        updated_at: text(obs, "observed_at").unwrap_or_else(|| "公开接口".into()),
+        updated_at: text(obs, "observed_at")
+            .or_else(|| text(now, "time"))
+            .unwrap_or_else(|| "公开接口".into()),
         icon,
         is_day: icon_source.as_deref().map(is_day_icon).unwrap_or(true),
         precip_mm,
@@ -1806,6 +1898,48 @@ mod tests {
         assert_eq!(indices[3].level, "未知");
     }
 
+    #[cfg(feature = "network")]
+    #[test]
+    fn station_matching_uses_the_place_name() {
+        // "Alabat, Quezon" 属于 Quezon 省，不能因为含 "quezon" 就被选成马尼拉的站
+        let observation = serde_json::json!({
+            "data": [
+                { "obs": { "loc": "Alabat, Quezon", "temp": "24.0°C" } },
+                { "obs": { "loc": "Science Garden, Quezon City", "temp": "31.6°C" } },
+                { "obs": { "loc": "Mactan, Cebu", "temp": "30.1°C" } },
+                { "obs": { "loc": "Dalaguete, Cebu", "temp": "29.4°C" } }
+            ]
+        });
+        let manila = Place {
+            id: "manila".into(),
+            name: "Manila".into(),
+            region: "Metro Manila".into(),
+            latitude: 14.5995,
+            longitude: 120.9842,
+        };
+        let cebu = Place {
+            id: "cebu".into(),
+            name: "Cebu City".into(),
+            region: "Central Visayas".into(),
+            latitude: 10.3157,
+            longitude: 123.8854,
+        };
+        let baguio = Place {
+            id: "baguio".into(),
+            name: "Baguio".into(),
+            region: "Cordillera".into(),
+            latitude: 16.4023,
+            longitude: 120.5960,
+        };
+
+        let picked = pick_station(&observation, &manila).and_then(|obs| text(Some(obs), "loc"));
+        assert_eq!(picked.as_deref(), Some("Science Garden, Quezon City"));
+
+        let picked = pick_station(&observation, &cebu).and_then(|obs| text(Some(obs), "loc"));
+        assert_eq!(picked.as_deref(), Some("Mactan, Cebu"));
+
+        assert!(pick_station(&observation, &baguio).is_none());
+    }
     #[cfg(feature = "network")]
     #[test]
     fn public_units_are_parsed_without_becoming_zero() {
