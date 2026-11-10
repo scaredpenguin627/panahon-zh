@@ -49,6 +49,7 @@ pub fn fetch() -> Result<AirQuality, String> {
             name.to_owned(),
             AirQualityStation {
                 name_zh: station_zh(name).to_owned(),
+                name: Some(name.to_owned()),
                 pm10: number(row, "Sum(CAMS.PM10AQI)").map(|value| value as f32),
                 pm25: None,
                 aqi: None,
@@ -68,6 +69,7 @@ pub fn fetch() -> Result<AirQuality, String> {
                 name.to_owned(),
                 AirQualityStation {
                     name_zh: station_zh(name).to_owned(),
+                    name: Some(name.to_owned()),
                     pm10: None,
                     pm25: pm25_value,
                     aqi: None,

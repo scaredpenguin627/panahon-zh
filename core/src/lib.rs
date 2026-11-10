@@ -201,6 +201,9 @@ pub struct Alert {
 pub struct AirQualityStation {
     #[serde(rename = "nameZh")]
     pub name_zh: String,
+    /// 官方报表里的拉丁站名，英文界面使用。
+    #[serde(default)]
+    pub name: Option<String>,
     pub pm10: Option<f32>,
     #[serde(rename = "pm25")]
     pub pm25: Option<f32>,
@@ -676,6 +679,7 @@ fn fetch_cams_air_quality(latitude: f64, longitude: f64) -> Result<AirQuality, S
     let data_clock = text(Some(current), "time");
     let station = AirQualityStation {
         name_zh: "当前位置（预测）".into(),
+        name: Some("Current location (model)".into()),
         pm10: number(Some(current), "pm10").map(|value| value as f32),
         pm25: number(Some(current), "pm2_5").map(|value| value as f32),
         aqi,

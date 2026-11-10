@@ -591,7 +591,18 @@ pub fn aqi_summary(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
                     air.summary.station_count,
                     if is_english { "stations" } else { "个监测站" }
                 );
-                if let Some(station) = &air.summary.max_station {
+                let highest = air
+                    .stations
+                    .iter()
+                    .max_by_key(|station| station.aqi.unwrap_or(0))
+                    .map(|station| {
+                        if is_english {
+                            station.name.clone().unwrap_or_else(|| station.name_zh.clone())
+                        } else {
+                            station.name_zh.clone()
+                        }
+                    });
+                if let Some(station) = highest {
                     meta.push_str(&format!(
                         " · {}{}",
                         if is_english { "highest " } else { "最高 " },
