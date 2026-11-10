@@ -12,6 +12,8 @@ pub struct Rendered {
     pub translated: usize,
     /// 正文句子总数。
     pub total: usize,
+    /// 没有命中模板、保留英文的句子。
+    pub untranslated: Vec<String>,
 }
 
 impl Rendered {
@@ -25,6 +27,7 @@ impl Rendered {
 pub fn render(message: &str) -> Rendered {
     let mut translated = 0;
     let mut total = 0;
+    let mut gaps: Vec<String> = Vec::new();
     let mut out: Vec<String> = Vec::new();
 
     for line in message.lines() {
@@ -54,7 +57,10 @@ pub fn render(message: &str) -> Rendered {
                     translated += 1;
                     paragraph.push(chinese);
                 }
-                None => paragraph.push(clean_place_marks(&sentence)),
+                None => {
+                    gaps.push(sentence.clone());
+                    paragraph.push(clean_place_marks(&sentence));
+                }
             }
         }
         if !paragraph.is_empty() {
@@ -66,6 +72,7 @@ pub fn render(message: &str) -> Rendered {
         text: out.join("\n"),
         translated,
         total,
+        untranslated: gaps,
     }
 }
 
@@ -215,25 +222,73 @@ fn translate_system_name(value: &str) -> String {
 }
 
 fn split_sentences(paragraph: &str) -> Vec<String> {
+    // 菲律宾地名里 Sto. / Sta. / Brgy. 很常见，不能当作句末
+    const ABBREVIATIONS: [&str; 25] = [
+        "sto", "sta", "st", "ste", "mt", "brgy", "no", "nos", "dr", "mr", "mrs", "ms", "jr", "sr",
+        "gen", "gov", "lt", "pres", "capt", "col", "sgt", "hon", "sec", "rep", "atty",
+    ];
+
+    let chars: Vec<char> = paragraph.chars().collect();
     let mut sentences = Vec::new();
     let mut current = String::new();
-    for ch in paragraph.chars() {
+    let mut index = 0;
+    let mut depth = 0i32;
+
+    while index < chars.len() {
+        let ch = chars[index];
         current.push(ch);
-        if ch == '.' || ch == '!' || ch == '?' {
+        match ch {
+            '(' => depth += 1,
+            ')' => depth = (depth - 1).max(0),
+            _ => {}
+        }
+
+        let is_end = ch == '!' || ch == '?';
+        let is_dot = ch == '.';
+        let mut boundary = is_end && depth == 0;
+
+        if is_dot && depth == 0 {
+            // 取点号前最后一个词
+            let mut word = String::new();
+            for previous in current.chars().rev().skip(1) {
+                if previous.is_ascii_alphabetic() {
+                    word.insert(0, previous);
+                } else {
+                    break;
+                }
+            }
+            // 单个大写字母（"Carlos P. Garcia"）也是缩写
+            let single_initial = word.chars().count() == 1
+                && word.chars().all(|ch| ch.is_ascii_uppercase());
+            let is_abbreviation = single_initial
+                || ABBREVIATIONS
+                    .iter()
+                    .any(|abbr| word.eq_ignore_ascii_case(abbr));
+            // 下一个非空字符必须是大写或结尾，才算句末
+            let next = chars[index + 1..]
+                .iter()
+                .find(|candidate| !candidate.is_whitespace())
+                .copied();
+            let next_upper = next.map(|candidate| candidate.is_uppercase()).unwrap_or(true);
+            boundary = !is_abbreviation && next_upper;
+        }
+
+        if boundary {
             let trimmed = current.trim();
             if !trimmed.is_empty() {
                 sentences.push(trimmed.to_owned());
             }
             current.clear();
         }
+        index += 1;
     }
+
     let tail = current.trim();
     if !tail.is_empty() {
         sentences.push(tail.to_owned());
     }
     sentences
 }
-
 fn translate_sentence(sentence: &str) -> Option<String> {
     let lower = sentence.to_ascii_lowercase();
 
@@ -281,6 +336,19 @@ fn translate_sentence(sentence: &str) -> Option<String> {
         ));
     }
 
+    // "The above conditions are being experienced in X which may persist ..."
+    if lower.starts_with("the above conditions are being experienced")
+        || lower.starts_with("same conditions are being experienced")
+    {
+        let places = places_after(sentence, "in")?;
+        let mut text = format!("{places} 正在出现上述天气");
+        if let Some(duration) = duration_zh(sentence) {
+            text.push_str(&format!("，可能持续 {duration}，并影响周边地区"));
+        }
+        text.push('。');
+        return Some(text);
+    }
+
     // 已经出现 / 预计出现的降雨
     if lower.contains("rainshowers") || lower.contains("rains") || lower.contains("rainfall") {
         let intensity = if lower.contains("moderate to heavy") {
@@ -313,8 +381,12 @@ fn translate_sentence(sentence: &str) -> Option<String> {
         } else if wind {
             text.push_str("，伴有强风");
         }
-        if let Some((from, to)) = hour_range(sentence) {
-            text.push_str(&format!("，可能持续 {from} 至 {to} 小时"));
+        if let Some(duration) = duration_zh(sentence) {
+            if lower.contains("next") {
+                text.push_str(&format!("，预计在未来 {duration}内"));
+            } else {
+                text.push_str(&format!("，可能持续 {duration}"));
+            }
         }
         text.push('。');
         return Some(text);
@@ -351,12 +423,67 @@ fn places_after(sentence: &str, preposition: &str) -> Option<String> {
     if places.is_empty() {
         return None;
     }
-    let places = places
-        .replace(" which may persist", "")
-        .replace(" and may affect nearby areas", "");
+    // 地点串后面常跟时间短语或从句，按关键词截断
+    let mut places = places;
+    for cut in [
+        " which may persist",
+        " and may affect",
+        " within ",
+        " in the next ",
+        " are expected",
+        " are being",
+        " is expected",
+    ] {
+        if let Some(index) = places.to_ascii_lowercase().find(cut) {
+            places.truncate(index);
+        }
+    }
     Some(places.trim().to_owned())
 }
 
+/// 把 "within 1 to 2 hours" / "within the next 30 minutes to an hour" 换成中文时长。
+fn duration_zh(sentence: &str) -> Option<String> {
+    let lower = sentence.to_ascii_lowercase();
+    let start = lower.find("within")? + "within".len();
+    let tail = &lower[start..];
+    let end = tail
+        .find("hour")
+        .map(|index| index + 4)
+        .or_else(|| tail.find("minute").map(|index| index + 6))?;
+    let raw = tail[..end].trim().trim_start_matches("the next").trim();
+
+    let unit = |text: &str| {
+        if text.contains("minute") {
+            "分钟"
+        } else {
+            "小时"
+        }
+    };
+    let number = |text: &str| -> Option<u32> {
+        if text.contains("an hour") || text.contains("a minute") {
+            return Some(1);
+        }
+        text.split(|ch: char| !ch.is_ascii_digit())
+            .find(|part| !part.is_empty())
+            .and_then(|part| part.parse().ok())
+    };
+
+    match raw.split_once(" to ") {
+        Some((first, second)) => {
+            let from = number(first)?;
+            let to = number(second)?;
+            Some(if unit(first) == unit(second) {
+                format!("{from} 至 {to} {}", unit(second))
+            } else {
+                format!("{from} {}至 {to} {}", unit(first), unit(second))
+            })
+        }
+        None => {
+            let value = number(raw)?;
+            Some(format!("{value} {}", unit(raw)))
+        }
+    }
+}
 /// "within 1 to 2 hours" → (1, 2)
 fn hour_range(sentence: &str) -> Option<(u32, u32)> {
     let lower = sentence.to_ascii_lowercase();
