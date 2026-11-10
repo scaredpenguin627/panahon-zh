@@ -35,3 +35,10 @@ assets/ui-font-chars.txt
 
 # Recipe captures from the headless-Chrome helper
 captured/
+
+# Local device screenshots from this workstation
+dev-*.png
+hw-ui-*.png
+cur-*.png
+shot-*.png
+hw-*.png

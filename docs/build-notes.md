@@ -19,6 +19,8 @@ cargo +stable-x86_64-pc-windows-gnu run --features "desktop network"
 $env:PATH = "$env:ANDROID_NDK_HOME\toolchains\llvm\prebuilt\windows-x86_64\bin;$env:PATH"
 ```
 
+`build.ps1` 会自动选择 NDK 的 `aarch64-linux-android35-clang.cmd`（或 x86_64 对应版本），并加入 `-z max-page-size=16384`。这样生成的 `libpanahon_zh.so` 的 ELF LOAD 段按 16 KB 对齐，适配 Android 15/16 的 16 KB 页设备；手动调用 `cargo apk` 时请先设置同一个 `CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER` 和 `RUSTFLAGS`。
+
 ## APK
 
 ```powershell
@@ -43,10 +45,10 @@ adb install -r target\release\apk\panahon-zh.apk
 界面文案改动后必须重新生成，否则新字会显示成方框：
 
 ```powershell
-python tools\subset-font.py --source <NotoSansCJKsc-Regular.otf>
+py -3.15 tools\subset-font.py --source <NotoSansCJKsc-Regular.otf>
 ```
 
-生成结果约 230 KB，覆盖 600 个字符左右。
+生成结果约 360 KB，覆盖 600 个字符左右。
 
 ## 截图
 
@@ -67,3 +69,16 @@ pwsh -File tools\screenshot.ps1 -ProcessName panahon-zh -Out shot.png
 - 雷达图层加载最新帧，显示 9 帧时间轴和观测时间。
 - 关闭 Wi-Fi 与移动数据后启动，显示内置样例，无崩溃。
 - 页面滚动、预警列表、地点搜索框、通知按钮均可用。
+
+
+## 华为天气证据
+
+APK 解包与尺寸提取：
+
+```powershell
+java -jar hw-tools\apktool.jar d -f -q huawei-weather-14-0-15-301.apk -o hw-decode --no-src
+aapt2 dump resources huawei-weather-14-0-15-301.apk > hw-decode-resources.txt
+```
+
+数值整理在 `docs/huawei-design-spec.md`。该 APK 依赖 EMUI 框架，在 GrapheneOS 上启动崩溃
+`ClassNotFoundException: com.huawei.android.os.SystemPropertiesEx`，因此没有真机截图。

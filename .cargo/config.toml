@@ -1,0 +1,4 @@
+[target.aarch64-linux-android]
+# Android 15+ devices can use 16 KB memory pages. Keep the native library
+# compatible with both 4 KB and 16 KB devices.
+rustflags = ["-C", "link-arg=-z", "-C", "link-arg=max-page-size=16384"]

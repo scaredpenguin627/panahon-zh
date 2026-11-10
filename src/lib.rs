@@ -106,6 +106,111 @@ pub(crate) fn window_insets_px() -> Option<(f32, f32)> {
 }
 
 #[cfg(target_os = "android")]
+pub(crate) fn read_preference(key: &str) -> Option<String> {
+    let app = ANDROID_APP.get()?.clone();
+    let key = key.to_owned();
+    let vm = unsafe { jni::JavaVM::from_raw(app.vm_as_ptr() as _) };
+    vm.attach_current_thread(|env| -> jni::errors::Result<Option<String>> {
+        let raw_activity = app.activity_as_ptr() as jni::sys::jobject;
+        let activity =
+            unsafe { env.as_cast_raw::<jni::refs::Global<jni::objects::JObject>>(&raw_activity)? };
+        let name = env.new_string("panahon_settings")?;
+        let prefs = env
+            .call_method(
+                activity.as_ref(),
+                jni::jni_str!("getSharedPreferences"),
+                jni::jni_sig!("(Ljava/lang/String;I)Landroid/content/SharedPreferences;"),
+                &[
+                    jni::objects::JValue::Object(&name),
+                    jni::objects::JValue::Int(0),
+                ],
+            )?
+            .l()?;
+        let key = env.new_string(key)?;
+        let default = jni::objects::JObject::null();
+        let value = env
+            .call_method(
+                &prefs,
+                jni::jni_str!("getString"),
+                jni::jni_sig!("(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"),
+                &[
+                    jni::objects::JValue::Object(&key),
+                    jni::objects::JValue::Object(&default),
+                ],
+            )?
+            .l()?;
+        if value.is_null() {
+            return Ok(None);
+        }
+        let value = unsafe { jni::objects::JString::from_raw(&env, value.into_raw()) };
+        Ok(Some(value.try_to_string(&env)?))
+    })
+    .ok()
+    .flatten()
+}
+
+#[cfg(not(target_os = "android"))]
+pub(crate) fn read_preference(_key: &str) -> Option<String> {
+    None
+}
+
+#[cfg(target_os = "android")]
+pub(crate) fn write_preference(key: &str, value: &str) {
+    let Some(app) = ANDROID_APP.get().cloned() else {
+        return;
+    };
+    let key = key.to_owned();
+    let value = value.to_owned();
+    app.clone().run_on_java_main_thread(Box::new(move || {
+        let vm = unsafe { jni::JavaVM::from_raw(app.vm_as_ptr() as _) };
+        let _ = vm.attach_current_thread(|env| -> jni::errors::Result<()> {
+            let raw_activity = app.activity_as_ptr() as jni::sys::jobject;
+            let activity = unsafe {
+                env.as_cast_raw::<jni::refs::Global<jni::objects::JObject>>(&raw_activity)?
+            };
+            let name = env.new_string("panahon_settings")?;
+            let prefs = env
+                .call_method(
+                    activity.as_ref(),
+                    jni::jni_str!("getSharedPreferences"),
+                    jni::jni_sig!("(Ljava/lang/String;I)Landroid/content/SharedPreferences;"),
+                    &[
+                        jni::objects::JValue::Object(&name),
+                        jni::objects::JValue::Int(0),
+                    ],
+                )?
+                .l()?;
+            let editor = env
+                .call_method(
+                    &prefs,
+                    jni::jni_str!("edit"),
+                    jni::jni_sig!("()Landroid/content/SharedPreferences$Editor;"),
+                    &[],
+                )?
+                .l()?;
+            let key = env.new_string(key)?;
+            let value = env.new_string(value)?;
+            env.call_method(
+                &editor,
+                jni::jni_str!("putString"),
+                jni::jni_sig!(
+                    "(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;"
+                ),
+                &[
+                    jni::objects::JValue::Object(&key),
+                    jni::objects::JValue::Object(&value),
+                ],
+            )?;
+            env.call_method(&editor, jni::jni_str!("apply"), jni::jni_sig!("()V"), &[])?;
+            Ok(())
+        });
+    }));
+}
+
+#[cfg(not(target_os = "android"))]
+pub(crate) fn write_preference(_key: &str, _value: &str) {}
+
+#[cfg(target_os = "android")]
 pub(crate) fn request_notification_permission() {
     let Some(app) = ANDROID_APP.get().cloned() else {
         return;

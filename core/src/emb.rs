@@ -146,6 +146,7 @@ pub fn fetch() -> Result<AirQuality, String> {
             category: max.map(|station| station.category.clone()),
         },
         stations,
+        trend: Vec::new(),
     })
 }
 

@@ -11,6 +11,7 @@ use std::io::Read;
 use std::time::Duration;
 
 #[cfg(feature = "network")]
+pub mod advisory;
 pub mod emb;
 
 pub const API_ROOT: &str = "https://api.mobile.panahon.gov.ph/api/v1";
@@ -97,6 +98,16 @@ pub struct RemoteMapSnapshot {
     pub frame_count: Option<u32>,
     pub item_count: Option<u32>,
     pub image: Option<Vec<u8>>,
+    pub summary: Option<String>,
+    pub track: Vec<MapTrackPoint>,
+}
+#[derive(Clone, Debug, PartialEq)]
+pub struct MapTrackPoint {
+    pub at: String,
+    pub latitude: f32,
+    pub longitude: f32,
+    pub kind: String,
+    pub radius_km: Option<f32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -111,9 +122,16 @@ pub struct Place {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct CurrentWeather {
     pub temperature_c: f32,
+    /// Provenance of `temperature_c`. When this is `Unavailable` the UI must
+    /// render a dash instead of the number.
+    pub temperature_quality: DataQuality,
     pub feels_like_c: f32,
     pub humidity_percent: u8,
+    /// Provenance of `humidity_percent`.
+    pub humidity_quality: DataQuality,
     pub wind_kph: f32,
+    /// Provenance of `wind_kph`.
+    pub wind_quality: DataQuality,
     pub wind_direction: String,
     pub condition: String,
     pub updated_at: String,
@@ -122,8 +140,12 @@ pub struct CurrentWeather {
     /// Total precipitation in the latest hour, in millimetres.
     pub precip_mm: f32,
     pub precip_desc: String,
+    /// Provenance of the precipitation value shown in the UI.
+    pub precip_quality: DataQuality,
     /// PAGASA heat-index band, e.g. "Caution". Empty when unknown.
     pub heat_index_desc: String,
+    /// Provenance of the feels-like / heat-index value shown in the UI.
+    pub heat_index_quality: DataQuality,
     pub pressure_hpa: Option<f32>,
     pub solar_wm2: Option<f32>,
     /// Automatic station the observation came from.
@@ -140,6 +162,8 @@ pub struct ForecastDay {
     pub low_c: f32,
     pub high_c: f32,
     pub precip_mm: f32,
+    /// Provenance of the forecast precipitation value.
+    pub precip_quality: DataQuality,
     pub icon: WeatherIcon,
     pub heat_index_c: Option<f32>,
 }
@@ -151,6 +175,8 @@ pub struct HourlyForecast {
     pub summary: String,
     pub temperature_c: f32,
     pub precip_mm: f32,
+    /// Provenance of the hourly precipitation value.
+    pub precip_quality: DataQuality,
     pub icon: WeatherIcon,
     pub is_day: bool,
 }
@@ -165,6 +191,9 @@ pub struct Alert {
     pub issued_at: String,
     pub valid_until: String,
     pub detail: String,
+    /// Template-based Chinese rendering of `detail`, when one could be built.
+    /// The original English text always stays available.
+    pub detail_zh: Option<String>,
     pub defense: String,
 }
 
@@ -204,6 +233,8 @@ pub struct AirQuality {
     pub fetched_at: Option<String>,
     pub summary: AirQualitySummary,
     pub stations: Vec<AirQualityStation>,
+    #[serde(default)]
+    pub trend: Vec<AirQualityTrendPoint>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -215,12 +246,36 @@ pub struct AirQualitySource {
     pub note: String,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct AirQualityTrendPoint {
+    pub at: String,
+    pub aqi: Option<u16>,
+    pub quality: DataQuality,
+}
+
+/// Model-backed sun and visibility details. These values are supplemental to
+/// the PAGASA dashboard and are always shown with their forecast provenance.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct SunWeather {
+    pub uv_index: Option<f32>,
+    pub visibility_km: Option<f32>,
+    pub sunrise: Option<String>,
+    pub sunset: Option<String>,
+    pub source: String,
+}
+
 /// A locally derived suggestion. No extra API call is involved.
 #[derive(Clone, Debug, PartialEq)]
 pub struct LifeIndex {
     pub title: String,
     pub level: String,
     pub advice: String,
+    /// The observation value this suggestion was computed from, shown to the
+    /// reader so the reasoning stays visible.
+    pub basis: String,
+    /// Current life indices are local heuristics unless an upstream product is
+    /// added in the future.
+    pub quality: DataQuality,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -230,6 +285,8 @@ pub struct Dashboard {
     pub forecast: Vec<ForecastDay>,
     pub hourly: Vec<HourlyForecast>,
     pub alerts: Vec<Alert>,
+    pub sun: SunWeather,
+    pub outlook_url: Option<String>,
     pub source: DataSource,
 }
 
@@ -237,6 +294,32 @@ pub struct Dashboard {
 pub enum DataSource {
     OfflineSample,
     PublicApi,
+}
+
+/// Describes where a displayed weather value came from.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub enum DataQuality {
+    /// Supplied by an official observation or forecast field.
+    Official,
+    /// Supplied by an official forecast or nowcast field.
+    Forecast,
+    /// Derived locally from the latest observation and intended only as a
+    /// quick reference.
+    Estimated,
+    /// The source did not provide a usable value.
+    Unavailable,
+}
+
+impl DataQuality {
+    /// True for values that came from an official PAGASA product.
+    pub fn is_official(self) -> bool {
+        matches!(self, Self::Official | Self::Forecast)
+    }
+
+    /// True when the value is meaningful enough to show.
+    pub fn is_available(self) -> bool {
+        !matches!(self, Self::Unavailable)
+    }
 }
 
 /// AQI 0–500 split into the six bands used by PAGASA and DENR-EMB.
@@ -264,9 +347,12 @@ impl Dashboard {
             },
             current: CurrentWeather {
                 temperature_c: 30.0,
+                temperature_quality: DataQuality::Estimated,
                 feels_like_c: 34.0,
                 humidity_percent: 72,
+                humidity_quality: DataQuality::Estimated,
                 wind_kph: 11.0,
+                wind_quality: DataQuality::Estimated,
                 wind_direction: "西南".into(),
                 condition: "局部多云".into(),
                 updated_at: "离线示例".into(),
@@ -274,7 +360,9 @@ impl Dashboard {
                 is_day: true,
                 precip_mm: 0.0,
                 precip_desc: "无降雨".into(),
+                precip_quality: DataQuality::Estimated,
                 heat_index_desc: "注意".into(),
+                heat_index_quality: DataQuality::Estimated,
                 pressure_hpa: Some(1010.0),
                 solar_wm2: Some(520.0),
                 station: Some("示例站点".into()),
@@ -344,6 +432,7 @@ impl Dashboard {
                         summary: if afternoon { "局部多云" } else { "多云" }.into(),
                         temperature_c: if afternoon { 32.0 } else { 27.0 },
                         precip_mm: if afternoon { 0.2 } else { 0.0 },
+                        precip_quality: DataQuality::Estimated,
                         icon: if afternoon {
                             WeatherIcon::PartlyCloudy
                         } else {
@@ -361,8 +450,17 @@ impl Dashboard {
                 issued_at: "离线示例".into(),
                 valid_until: "离线示例".into(),
                 detail: "联网后将从 PAGASA 公开接口加载官方预警。".into(),
+                detail_zh: None,
                 defense: "联网并确认数据来源后，再按官方防御指南行动。".into(),
             }],
+            sun: SunWeather {
+                uv_index: Some(5.0),
+                visibility_km: Some(10.0),
+                sunrise: Some("05:42".into()),
+                sunset: Some("17:32".into()),
+                source: "离线示例".into(),
+            },
+            outlook_url: None,
             source: DataSource::OfflineSample,
         }
     }
@@ -390,72 +488,116 @@ fn day(
         low_c,
         high_c,
         precip_mm,
+        precip_quality: DataQuality::Estimated,
         icon,
         heat_index_c,
     }
 }
 
+/// 本地生活建议。
+///
+/// 每条建议都带上计算依据（`basis`），界面必须把依据一起显示出来。输入缺失时
+/// 直接给"未知"，不要用默认值凑一个结论。
 pub fn life_indices(current: &CurrentWeather) -> Vec<LifeIndex> {
-    let temp = current.temperature_c;
-    let (wear_level, wear_advice) = if temp >= 32.0 {
-        ("炎热", "轻薄短袖，注意防晒补水")
-    } else if temp >= 27.0 {
-        ("较热", "短袖即可，室内注意通风")
-    } else if temp >= 22.0 {
-        ("舒适", "短袖或薄长袖都合适")
-    } else if temp >= 16.0 {
-        ("偏凉", "建议加一件薄外套")
+    let estimated = DataQuality::Estimated;
+
+    let (wear_level, wear_advice, wear_basis) = if current.temperature_quality.is_available() {
+        let temp = current.temperature_c;
+        let (level, advice) = if temp >= 32.0 {
+            ("炎热", "轻薄短袖，注意防晒补水")
+        } else if temp >= 27.0 {
+            ("较热", "短袖即可，室内注意通风")
+        } else if temp >= 22.0 {
+            ("舒适", "短袖或薄长袖都合适")
+        } else if temp >= 16.0 {
+            ("偏凉", "建议加一件薄外套")
+        } else {
+            ("寒冷", "穿厚外套，注意保暖")
+        };
+        (level, advice, format!("气温 {temp:.0}°C"))
     } else {
-        ("寒冷", "穿厚外套，注意保暖")
+        ("未知", "暂无气温观测，无法给出穿衣建议", "无数据".into())
     };
 
-    let feels = current.feels_like_c.max(temp);
-    let (heat_level, heat_advice) = if feels >= 54.0 {
-        ("危险", "尽量避免户外活动，及时补水")
-    } else if feels >= 41.0 {
-        ("谨慎", "减少长时间暴晒，随身带水")
-    } else if feels >= 32.0 {
-        ("注意", "长时间户外活动要多补水")
+    let (heat_level, heat_advice, heat_basis) = if current.heat_index_quality.is_available() {
+        let feels = current.feels_like_c;
+        let (level, advice) = if feels >= 54.0 {
+            ("危险", "尽量避免户外活动，及时补水")
+        } else if feels >= 41.0 {
+            ("谨慎", "减少长时间暴晒，随身带水")
+        } else if feels >= 32.0 {
+            ("注意", "长时间户外活动要多补水")
+        } else {
+            ("舒适", "体感舒适，适合户外活动")
+        };
+        (level, advice, format!("体感 {feels:.0}°C"))
     } else {
-        ("舒适", "体感舒适，适合户外活动")
+        ("未知", "暂无体感温度，避免长时间暴晒", "无数据".into())
     };
 
-    let (trip_level, trip_advice) = if current.precip_mm >= 5.0 {
-        ("不宜", "有明显降雨，带伞并留意积水")
-    } else if current.precip_mm > 0.2 {
-        ("一般", "可能有阵雨，出门带伞")
+    let (trip_level, trip_advice, trip_basis) = if current.precip_quality.is_available() {
+        let (level, advice) = if current.precip_mm >= 5.0 {
+            ("不宜", "有明显降雨，带伞并留意积水")
+        } else if current.precip_mm > 0.2 {
+            ("一般", "当前观测有降水，出门建议带伞")
+        } else {
+            ("适宜", "当前观测降水较少，适合出行")
+        };
+        (level, advice, format!("降水 {:.1} mm", current.precip_mm))
     } else {
-        ("适宜", "降雨概率低，适合出行")
+        ("未知", "暂无降水观测，出行前请查看官方预报", "无数据".into())
     };
 
-    let (dry_level, dry_advice) = if current.humidity_percent >= 85 || current.precip_mm > 0.2 {
-        ("不宜", "湿度大或有降雨，不建议晾晒")
-    } else if current.humidity_percent >= 70 {
-        ("一般", "晾晒时间需要拉长")
-    } else {
-        ("适宜", "空气较干，适合晾晒")
-    };
+    let (dry_level, dry_advice, dry_basis) =
+        if current.humidity_quality.is_available() && current.precip_quality.is_available() {
+            let (level, advice) = if current.humidity_percent >= 85 || current.precip_mm > 0.2 {
+                ("不宜", "湿度大或有降雨，不建议晾晒")
+            } else if current.humidity_percent >= 70 {
+                ("一般", "晾晒时间需要拉长")
+            } else {
+                ("适宜", "空气较干，适合晾晒")
+            };
+            (
+                level,
+                advice,
+                format!(
+                    "湿度 {}% · {}",
+                    current.humidity_percent,
+                    if current.precip_mm > 0.2 { "有雨" } else { "无雨" }
+                ),
+            )
+        } else {
+            ("未知", "缺少湿度或降水观测，无法判断", "无数据".into())
+        };
 
     vec![
         LifeIndex {
             title: "穿衣".into(),
             level: wear_level.into(),
             advice: wear_advice.into(),
+            basis: wear_basis,
+            quality: estimated,
         },
         LifeIndex {
             title: "中暑".into(),
             level: heat_level.into(),
             advice: heat_advice.into(),
+            basis: heat_basis,
+            quality: estimated,
         },
         LifeIndex {
             title: "出行".into(),
             level: trip_level.into(),
             advice: trip_advice.into(),
+            basis: trip_basis,
+            quality: estimated,
         },
         LifeIndex {
             title: "晾晒".into(),
             level: dry_level.into(),
             advice: dry_advice.into(),
+            basis: dry_basis,
+            quality: estimated,
         },
     ]
 }
@@ -505,7 +647,10 @@ pub fn fetch_air_quality_at(latitude: f64, longitude: f64) -> Result<AirQuality,
     }
 
     match emb::fetch() {
-        Ok(data) => Ok(data),
+        Ok(mut data) => {
+            data.trend = fetch_air_quality_trend(latitude, longitude).unwrap_or_default();
+            Ok(data)
+        }
         Err(emb_error) => {
             let mut fallback = fetch_cams_air_quality(latitude, longitude)?;
             fallback.source.note =
@@ -556,7 +701,46 @@ fn fetch_cams_air_quality(latitude: f64, longitude: f64) -> Result<AirQuality, S
             category: Some(category),
         },
         stations: vec![station],
+        trend: fetch_air_quality_trend(latitude, longitude).unwrap_or_default(),
     })
+}
+
+#[cfg(feature = "network")]
+fn fetch_air_quality_trend(
+    latitude: f64,
+    longitude: f64,
+) -> Result<Vec<AirQualityTrendPoint>, String> {
+    let url = format!(
+        "https://air-quality-api.open-meteo.com/v1/air-quality?latitude={latitude:.4}&longitude={longitude:.4}&hourly=us_aqi&past_days=1&forecast_days=1&timezone=auto"
+    );
+    let value = get_json(&url)?;
+    let times = value
+        .pointer("/hourly/time")
+        .and_then(serde_json::Value::as_array)
+        .ok_or_else(|| "空气质量趋势缺少时间序列".to_owned())?;
+    let aqis = value
+        .pointer("/hourly/us_aqi")
+        .and_then(serde_json::Value::as_array)
+        .ok_or_else(|| "空气质量趋势缺少 AQI 序列".to_owned())?;
+    let start = times.len().saturating_sub(24);
+    let mut trend = Vec::new();
+    for index in start..times.len() {
+        let at = times
+            .get(index)
+            .and_then(serde_json::Value::as_str)
+            .unwrap_or_default()
+            .to_owned();
+        let aqi = aqis
+            .get(index)
+            .and_then(serde_json::Value::as_f64)
+            .map(|value| value.round().clamp(0.0, 500.0) as u16);
+        trend.push(AirQualityTrendPoint {
+            at,
+            aqi,
+            quality: DataQuality::Forecast,
+        });
+    }
+    Ok(trend)
 }
 
 #[cfg(not(feature = "network"))]
@@ -593,25 +777,63 @@ pub fn fetch_remote_map_layer(layer: &str) -> Result<RemoteMapSnapshot, String> 
                 frame_count: None,
                 item_count: Some(rows.len() as u32),
                 image: None,
+                summary: None,
+                track: Vec::new(),
             })
         }
         "typhoon" => {
             let value = map_json(&format!("{MAP_ROOT}/api/v1/cyclone-track?token={token}"))?;
-            let rows = value
+            let cyclone = value
                 .as_array()
+                .and_then(|rows| rows.first())
+                .unwrap_or(&value);
+            let info = cyclone
+                .pointer("/info")
+                .and_then(serde_json::Value::as_object)
                 .ok_or_else(|| "台风图层响应格式无法解析".to_owned())?;
-            let latest_at = rows
+            let mut track = info
                 .iter()
-                .filter_map(|row| row.get("info").and_then(serde_json::Value::as_object))
-                .flat_map(|info| info.keys())
-                .max()
-                .cloned();
+                .filter_map(|(at, row)| {
+                    Some(MapTrackPoint {
+                        at: at.to_owned(),
+                        latitude: row.get("latitude")?.as_str()?.parse().ok()?,
+                        longitude: row.get("longitude")?.as_str()?.parse().ok()?,
+                        kind: row
+                            .get("cyclone_type")
+                            .and_then(serde_json::Value::as_str)
+                            .unwrap_or("?")
+                            .to_owned(),
+                        radius_km: row
+                            .get("radius")
+                            .and_then(serde_json::Value::as_str)
+                            .and_then(|value| value.parse().ok()),
+                    })
+                })
+                .collect::<Vec<_>>();
+            track.sort_by(|a, b| a.at.cmp(&b.at));
+            let latest = track.last();
+            let summary = latest.map(|row| {
+                let latitude = row.latitude;
+                let longitude = row.longitude;
+                let kind = row.kind.as_str();
+                let radius = row.radius_km.unwrap_or(0.0);
+                let name = cyclone
+                    .get("cyclone_name")
+                    .and_then(serde_json::Value::as_str)
+                    .unwrap_or("未命名台风");
+                Some(format!(
+                    "Cyclone {name} · {kind} · {latitude:.1}°N {longitude:.1}°E · radius {radius:.0} km · {}",
+                    row.at
+                ))
+            });
             Ok(RemoteMapSnapshot {
                 layer: layer.to_owned(),
-                latest_at,
+                latest_at: latest.map(|point| point.at.clone()),
                 frame_count: None,
-                item_count: Some(rows.len() as u32),
+                item_count: Some(info.len() as u32),
                 image: None,
+                summary: summary.flatten(),
+                track,
             })
         }
         "hazard" => {
@@ -635,14 +857,40 @@ pub fn fetch_remote_map_layer(layer: &str) -> Result<RemoteMapSnapshot, String> 
                         .unwrap_or(rows.len() as u64) as u32,
                 ),
                 image: None,
+                summary: None,
+                track: Vec::new(),
             })
         }
         _ => Err(format!("未知地图图层：{layer}")),
     }
 }
 
+/// Fetch a specific frame from a time-based map layer. `index` is zero-based;
+/// out-of-range values are clamped to the newest available frame. The latest
+/// frame remains the default path used by [`fetch_remote_map_layer`].
+#[cfg(feature = "network")]
+pub fn fetch_remote_map_layer_frame(
+    layer: &str,
+    index: usize,
+) -> Result<RemoteMapSnapshot, String> {
+    let token = fetch_map_token()?;
+    match layer {
+        "radar" => fetch_radar_snapshot_at(&token, Some(index)),
+        "satellite" => fetch_satellite_snapshot_at(&token, Some(index)),
+        _ => fetch_remote_map_layer(layer),
+    }
+}
+
 #[cfg(not(feature = "network"))]
 pub fn fetch_remote_map_layer(_layer: &str) -> Result<RemoteMapSnapshot, String> {
+    Err("网络适配器未启用".into())
+}
+
+#[cfg(not(feature = "network"))]
+pub fn fetch_remote_map_layer_frame(
+    _layer: &str,
+    _index: usize,
+) -> Result<RemoteMapSnapshot, String> {
     Err("网络适配器未启用".into())
 }
 
@@ -669,6 +917,14 @@ fn fetch_map_token() -> Result<String, String> {
 
 #[cfg(feature = "network")]
 fn fetch_radar_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
+    fetch_radar_snapshot_at(token, None)
+}
+
+#[cfg(feature = "network")]
+fn fetch_radar_snapshot_at(
+    token: &str,
+    frame_index: Option<usize>,
+) -> Result<RemoteMapSnapshot, String> {
     let sublayer = "mosaic-rainrate";
     let value = map_json(&format!(
         "{MAP_ROOT}/api/v1/radar/timeline?token={token}&sublayer={sublayer}"
@@ -677,14 +933,18 @@ fn fetch_radar_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
         .pointer("/data/timeline")
         .and_then(serde_json::Value::as_array)
         .ok_or_else(|| "雷达图层响应格式无法解析".to_owned())?;
-    let latest = rows
-        .last()
+    let selected = rows
+        .get(
+            frame_index
+                .unwrap_or_else(|| rows.len().saturating_sub(1))
+                .min(rows.len().saturating_sub(1)),
+        )
         .ok_or_else(|| "雷达图层没有可用时间帧".to_owned())?;
-    let timestamp = latest
+    let timestamp = selected
         .get("observed_at_unix")
         .and_then(serde_json::Value::as_i64)
         .ok_or_else(|| "雷达图层缺少时间戳".to_owned())?;
-    let observed_at = latest
+    let observed_at = selected
         .get("observed_at")
         .and_then(serde_json::Value::as_str)
         .map(str::to_owned);
@@ -705,11 +965,21 @@ fn fetch_radar_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
         frame_count: Some(rows.len() as u32),
         item_count: None,
         image: Some(map_bytes(&image_url)?),
+        summary: None,
+        track: Vec::new(),
     })
 }
 
 #[cfg(feature = "network")]
 fn fetch_satellite_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
+    fetch_satellite_snapshot_at(token, None)
+}
+
+#[cfg(feature = "network")]
+fn fetch_satellite_snapshot_at(
+    token: &str,
+    frame_index: Option<usize>,
+) -> Result<RemoteMapSnapshot, String> {
     let value = map_json(&format!(
         "{MAP_ROOT}/api/v1/himawari/timeline?token={token}"
     ))?;
@@ -717,10 +987,12 @@ fn fetch_satellite_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
         .pointer("/data/timeline")
         .and_then(serde_json::Value::as_array)
         .ok_or_else(|| "卫星图层响应格式无法解析".to_owned())?;
+    let index = frame_index
+        .unwrap_or_else(|| rows.len().saturating_sub(1))
+        .min(rows.len().saturating_sub(1));
     let latest = rows
-        .last()
+        .get(index)
         .ok_or_else(|| "卫星图层没有可用时间帧".to_owned())?;
-    let index = rows.len().saturating_sub(1);
     let revision = latest
         .get("revision")
         .and_then(serde_json::Value::as_str)
@@ -741,6 +1013,8 @@ fn fetch_satellite_snapshot(token: &str) -> Result<RemoteMapSnapshot, String> {
         frame_count: Some(rows.len() as u32),
         item_count: None,
         image: Some(map_bytes(&image_url)?),
+        summary: None,
+        track: Vec::new(),
     })
 }
 
@@ -797,18 +1071,45 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
         .or_else(|| icon_source.as_deref().map(WeatherIcon::from_text))
         .unwrap_or(WeatherIcon::Unknown);
 
-    let temperature = number(obs, "temp")
-        .or_else(|| number(now, "tmp"))
-        .unwrap_or(0.0) as f32;
-    let feels_like = number(obs, "heat_index")
-        .or_else(|| number(now, "hindex"))
-        .unwrap_or(temperature as f64) as f32;
+    let (temperature, temperature_quality) = if let Some(value) = number(obs, "temp") {
+        (value as f32, DataQuality::Official)
+    } else if let Some(value) = number(now, "tmp") {
+        (value as f32, DataQuality::Forecast)
+    } else {
+        (0.0, DataQuality::Unavailable)
+    };
+    let (humidity, humidity_quality) = match number(obs, "hum") {
+        Some(value) => (value.clamp(0.0, 100.0) as u8, DataQuality::Official),
+        None => (0, DataQuality::Unavailable),
+    };
+    let (wind, wind_quality) = match number(obs, "ws") {
+        Some(value) => (value as f32, DataQuality::Official),
+        None => (0.0, DataQuality::Unavailable),
+    };
+    let (feels_like, heat_index_quality) = if let Some(value) = number(obs, "heat_index") {
+        (value as f32, DataQuality::Official)
+    } else if let Some(value) = number(now, "hindex") {
+        (value as f32, DataQuality::Forecast)
+    } else {
+        (temperature, DataQuality::Unavailable)
+    };
+
+    let (precip_mm, precip_quality) = if let Some(value) = number(obs, "precip_1h") {
+        (value.max(0.0) as f32, DataQuality::Official)
+    } else if let Some(value) = number(now, "tprecip") {
+        (value.max(0.0) as f32, DataQuality::Forecast)
+    } else {
+        (0.0, DataQuality::Unavailable)
+    };
 
     let current = CurrentWeather {
         temperature_c: temperature,
+        temperature_quality,
         feels_like_c: feels_like,
-        humidity_percent: number(obs, "hum").unwrap_or(0.0).clamp(0.0, 100.0) as u8,
-        wind_kph: number(obs, "ws").unwrap_or(0.0) as f32,
+        humidity_percent: humidity,
+        humidity_quality,
+        wind_kph: wind,
+        wind_quality,
         wind_direction: text(obs, "wd")
             .map(|value| wind_direction_zh(&value))
             .unwrap_or_else(|| "未知".into()),
@@ -819,15 +1120,28 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
         updated_at: text(obs, "observed_at").unwrap_or_else(|| "公开接口".into()),
         icon,
         is_day: icon_source.as_deref().map(is_day_icon).unwrap_or(true),
-        precip_mm: number(obs, "precip_1h")
-            .or_else(|| number(now, "tprecip"))
-            .unwrap_or(0.0) as f32,
+        precip_mm,
         precip_desc: text(now, "tprecip_desc")
             .map(|value| translate_precip(&value))
-            .unwrap_or_else(|| "无降雨".into()),
+            .map(|value| {
+                // 0 mm 时上游仍可能给"小雨"，这里以数值为准
+                if precip_mm <= 0.05 && precip_quality.is_available() {
+                    "无降雨".to_owned()
+                } else {
+                    value
+                }
+            })
+            .or_else(|| match precip_quality {
+                quality if quality.is_official() && precip_mm <= 0.05 => Some("无降雨".into()),
+                quality if quality.is_official() => Some(format!("约 {precip_mm:.1} mm")),
+                _ => None,
+            })
+            .unwrap_or_else(|| "暂无降水数据".into()),
+        precip_quality,
         heat_index_desc: text(now, "hindex_desc")
             .map(|value| translate_heat_index(&value))
             .unwrap_or_default(),
+        heat_index_quality,
         pressure_hpa: number(obs, "mslp").map(|value| value as f32),
         solar_wm2: number(obs, "sr").map(|value| value as f32),
         station: text(obs, "loc"),
@@ -850,6 +1164,7 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
                         .as_deref()
                         .map(WeatherIcon::from_text)
                         .unwrap_or_else(|| WeatherIcon::from_text(&description));
+                    let precip = number(Some(row), "tprecip");
                     ForecastDay {
                         date: text(Some(row), "d")
                             .map(translate_day)
@@ -858,7 +1173,12 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
                         summary: translate_condition(description),
                         low_c: number(Some(row), "tmin").unwrap_or(0.0) as f32,
                         high_c: number(Some(row), "tmax").unwrap_or(0.0) as f32,
-                        precip_mm: number(Some(row), "tprecip").unwrap_or(0.0) as f32,
+                        precip_mm: precip.unwrap_or(0.0) as f32,
+                        precip_quality: if precip.is_some() {
+                            DataQuality::Forecast
+                        } else {
+                            DataQuality::Unavailable
+                        },
                         icon,
                         heat_index_c: number(Some(row), "hmax").map(|value| value as f32),
                     }
@@ -880,13 +1200,19 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
                         .as_deref()
                         .map(WeatherIcon::from_text)
                         .unwrap_or_else(|| WeatherIcon::from_text(&description));
+                    let precip = number(Some(row), "tprecip");
                     HourlyForecast {
                         time: text(Some(row), "time")
                             .map(|value| hour_label(&value, index == 0))
                             .unwrap_or_else(|| "未知".into()),
                         summary: translate_condition(description),
                         temperature_c: number(Some(row), "tmp").unwrap_or(0.0) as f32,
-                        precip_mm: number(Some(row), "tprecip").unwrap_or(0.0) as f32,
+                        precip_mm: precip.unwrap_or(0.0) as f32,
+                        precip_quality: if precip.is_some() {
+                            DataQuality::Forecast
+                        } else {
+                            DataQuality::Unavailable
+                        },
                         icon,
                         is_day: icon_url.as_deref().map(is_day_icon).unwrap_or(true),
                     }
@@ -899,12 +1225,15 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
         .pointer("/data")
         .and_then(serde_json::Value::as_array)
         .map(|items| {
-            items
+            let parsed = items
                 .iter()
                 .take(20)
                 .map(|item| {
                     let kind = text(Some(item), "type").unwrap_or_else(|| "天气预警".into());
                     let raw_title = text(Some(item), "title").unwrap_or_else(|| "天气预警".into());
+                    let detail = text(Some(item), "message")
+                        .unwrap_or_else(|| "请查看官方详情".into());
+                    let rendered = advisory::render(&detail);
                     Alert {
                         id: text(Some(item), "alert_id").unwrap_or_default(),
                         title: translate_alert_title(&raw_title),
@@ -913,14 +1242,30 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
                         issued_at: text(Some(item), "issued_at")
                             .unwrap_or_else(|| "未知时间".into()),
                         valid_until: text(Some(item), "valid_until_at").unwrap_or_default(),
-                        detail: text(Some(item), "message")
-                            .unwrap_or_else(|| "请查看官方详情".into()),
+                        detail,
+                        detail_zh: rendered.is_useful().then_some(rendered.text),
                         defense: defense_for(&kind).into(),
                     }
+                })
+                .collect::<Vec<_>>();
+
+            // PAGASA returns a global alert feed. Prefer alerts whose stated
+            // area contains the selected city/province, while retaining
+            // explicitly nationwide alerts. This avoids presenting unrelated
+            // warnings from the rest of the country as local notifications.
+            parsed
+                .into_iter()
+                .filter(|alert| {
+                    alert_is_global(&alert.area) || alert_matches_place(&alert.area, place)
                 })
                 .collect::<Vec<_>>()
         })
         .unwrap_or_default();
+    let sun = fetch_sun_weather(place).unwrap_or_default();
+    let outlook_url = nowcast
+        .pointer("/data/public_weather_forecast/url")
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_owned);
 
     Ok(Dashboard {
         place: place.clone(),
@@ -928,8 +1273,67 @@ pub fn fetch_public_dashboard(place: &Place) -> Result<Dashboard, String> {
         forecast,
         hourly: hourly_items,
         alerts: alert_items,
+        sun,
+        outlook_url,
         source: DataSource::PublicApi,
     })
+}
+
+#[cfg(feature = "network")]
+fn alert_matches_place(area: &str, place: &Place) -> bool {
+    let haystack = normalize_location(area);
+    if haystack.is_empty() {
+        return false;
+    }
+
+    let mut candidates = vec![
+        place.name.as_str(),
+        place.region.as_str(),
+        place.id.as_str(),
+    ];
+    // The offline sample uses Chinese labels, while PAGASA's alert feed uses
+    // the English regional aliases. Keep the common NCR aliases together so
+    // the first online refresh still filters correctly.
+    let ncr = normalize_location(&format!("{} {}", place.name, place.region));
+    if place.id.eq_ignore_ascii_case("manila")
+        || ncr.contains("manila")
+        || ncr.contains("capital")
+        || (place.latitude > 14.35
+            && place.latitude < 14.95
+            && place.longitude > 120.75
+            && place.longitude < 121.35)
+    {
+        candidates.extend(["NCR", "Metro Manila", "National Capital Region"]);
+    }
+
+    candidates
+        .into_iter()
+        .map(normalize_location)
+        .filter(|candidate| candidate.len() >= 3)
+        .any(|candidate| haystack.contains(&candidate))
+}
+
+#[cfg(feature = "network")]
+fn alert_is_global(area: &str) -> bool {
+    let normalized = normalize_location(area);
+    [
+        "nationwide",
+        "entirecountry",
+        "allareas",
+        "allregions",
+        "philippines",
+    ]
+    .into_iter()
+    .any(|marker| normalized.contains(marker))
+}
+
+#[cfg(feature = "network")]
+fn normalize_location(value: &str) -> String {
+    value
+        .chars()
+        .filter(|ch| ch.is_ascii_alphanumeric())
+        .flat_map(|ch| ch.to_lowercase())
+        .collect()
 }
 
 #[cfg(not(feature = "network"))]
@@ -987,6 +1391,45 @@ fn get_json(url: &str) -> Result<serde_json::Value, String> {
         .map_err(|err| format!("网络请求失败：{err}"))?
         .into_json::<serde_json::Value>()
         .map_err(|err| format!("接口响应无法解析：{err}"))
+}
+
+#[cfg(feature = "network")]
+fn fetch_sun_weather(place: &Place) -> Result<SunWeather, String> {
+    let url = format!(
+        "https://api.open-meteo.com/v1/forecast?latitude={:.5}&longitude={:.5}&current=uv_index,visibility&daily=sunrise,sunset&timezone=auto&forecast_days=1",
+        place.latitude, place.longitude
+    );
+    let value = get_json(&url)?;
+    let uv_index = number(value.pointer("/current"), "uv_index").map(|value| value as f32);
+    let visibility_km =
+        number(value.pointer("/current"), "visibility").map(|value| (value / 1000.0) as f32);
+    let sunrise = value
+        .pointer("/daily/sunrise/0")
+        .and_then(serde_json::Value::as_str)
+        .map(short_iso_clock);
+    let sunset = value
+        .pointer("/daily/sunset/0")
+        .and_then(serde_json::Value::as_str)
+        .map(short_iso_clock);
+    if uv_index.is_none() && visibility_km.is_none() && sunrise.is_none() && sunset.is_none() {
+        return Err("Open-Meteo 没有返回日照补充数据".into());
+    }
+    Ok(SunWeather {
+        uv_index,
+        visibility_km,
+        sunrise,
+        sunset,
+        source: "Open-Meteo 模型预报".into(),
+    })
+}
+
+#[cfg(feature = "network")]
+fn short_iso_clock(value: &str) -> String {
+    value
+        .get(11..16)
+        .filter(|clock| clock.as_bytes().get(2) == Some(&b':'))
+        .unwrap_or(value)
+        .to_owned()
 }
 
 #[cfg(feature = "network")]
@@ -1056,10 +1499,10 @@ pub(crate) fn translate_condition(value: String) -> String {
     let lower = value.to_ascii_lowercase();
     if lower.contains("thunder") {
         "雷雨".into()
-    } else if lower.contains("rainshower") || lower.contains("shower") {
-        "阵雨".into()
     } else if lower.contains("heavy rain") {
         "大雨".into()
+    } else if lower.contains("rainshower") || lower.contains("shower") {
+        "阵雨".into()
     } else if lower.contains("rain") {
         "小雨".into()
     } else if lower.contains("partly cloudy") {
@@ -1101,11 +1544,13 @@ fn translate_precip(value: &str) -> String {
 fn translate_heat_index(value: &str) -> String {
     let lower = value.to_ascii_lowercase();
     if lower.contains("extreme") {
-        "极易中暑".into()
+        if lower.contains("caution") {
+            "注意防暑".into()
+        } else {
+            "极易中暑".into()
+        }
     } else if lower.contains("danger") {
         "有中暑危险".into()
-    } else if lower.contains("extreme caution") {
-        "注意防暑".into()
     } else if lower.contains("caution") {
         "注意补水".into()
     } else {
@@ -1219,7 +1664,8 @@ fn hour_label(value: &str, first: bool) -> String {
 
 #[cfg(feature = "network")]
 pub(crate) fn translate_day(value: String) -> String {
-    match value.trim().to_ascii_lowercase().as_str() {
+    let trimmed = value.trim();
+    match trimmed.to_ascii_lowercase().as_str() {
         "today" => "今天".into(),
         "tomorrow" => "明天".into(),
         "sun" | "sunday" => "周日".into(),
@@ -1229,7 +1675,27 @@ pub(crate) fn translate_day(value: String) -> String {
         "thu" | "thursday" => "周四".into(),
         "fri" | "friday" => "周五".into(),
         "sat" | "saturday" => "周六".into(),
-        other => other.to_owned(),
+        _ => {
+            // Some API revisions return an ISO date in `d` instead of a
+            // weekday. Keep the label compact and readable rather than
+            // exposing a timestamp such as `2026-11-09T00:00:00Z`.
+            let date = trimmed.split('T').next().unwrap_or(trimmed);
+            let parts = date
+                .split(|ch: char| ch == '-' || ch == '/' || ch == '.')
+                .filter_map(|part| part.parse::<u32>().ok())
+                .collect::<Vec<_>>();
+            if parts.len() >= 2 {
+                let (month, day) = if parts.len() >= 3 {
+                    (parts[parts.len() - 2], parts[parts.len() - 1])
+                } else {
+                    (parts[0], parts[1])
+                };
+                if (1..=12).contains(&month) && (1..=31).contains(&day) {
+                    return format!("{month}月{day}日");
+                }
+            }
+            trimmed.to_owned()
+        }
     }
 }
 
@@ -1244,6 +1710,26 @@ mod tests {
         assert_eq!(dashboard.hourly.len(), 24);
         assert_eq!(dashboard.place.id, "manila");
         assert_eq!(dashboard.source, DataSource::OfflineSample);
+    }
+
+    #[test]
+    fn sample_dashboard_has_sun_details_for_offline_rendering() {
+        let dashboard = Dashboard::sample();
+        assert!(dashboard.sun.sunrise.is_some());
+        assert!(dashboard.sun.sunset.is_some());
+        assert!(dashboard.sun.uv_index.is_some());
+    }
+
+    #[test]
+    fn air_quality_without_trend_stays_backward_compatible() {
+        let json = r#"{
+            "source":{"provider":"test","page":"","note":""},
+            "updatedAt":null,"dataClock":null,"fetchedAt":null,
+            "summary":{"stationCount":0,"avgAqi":null,"maxAqi":null,"maxStation":null,"category":null},
+            "stations":[]
+        }"#;
+        let air: AirQuality = serde_json::from_str(json).expect("legacy AQI payload");
+        assert!(air.trend.is_empty());
     }
 
     #[test]
@@ -1265,6 +1751,14 @@ mod tests {
     }
 
     #[test]
+    fn data_quality_distinguishes_official_forecast_from_estimates() {
+        assert!(DataQuality::Official.is_official());
+        assert!(DataQuality::Forecast.is_official());
+        assert!(!DataQuality::Estimated.is_official());
+        assert!(!DataQuality::Unavailable.is_official());
+    }
+
+    #[test]
     fn icons_are_derived_from_pagasa_descriptions() {
         assert_eq!(
             WeatherIcon::from_text(
@@ -1279,6 +1773,13 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "network")]
+    #[test]
+    fn heavy_rain_descriptions_keep_their_severity() {
+        assert_eq!(translate_condition("Heavy rain showers".into()), "大雨");
+        assert_eq!(translate_condition("Rain showers".into()), "阵雨");
+    }
+
     #[test]
     fn life_indices_react_to_rain_and_heat() {
         let mut current = Dashboard::sample().current;
@@ -1288,6 +1789,21 @@ mod tests {
         assert_eq!(indices.len(), 4);
         assert_eq!(indices[1].level, "谨慎");
         assert_eq!(indices[2].level, "不宜");
+        assert!(indices
+            .iter()
+            .all(|index| index.quality == DataQuality::Estimated));
+    }
+
+    #[test]
+    fn missing_precipitation_is_not_presented_as_zero_rain() {
+        let mut current = Dashboard::sample().current;
+        current.precip_mm = 0.0;
+        current.precip_quality = DataQuality::Unavailable;
+        current.heat_index_quality = DataQuality::Unavailable;
+        let indices = life_indices(&current);
+        assert_eq!(indices[1].level, "未知");
+        assert_eq!(indices[2].level, "未知");
+        assert_eq!(indices[3].level, "未知");
     }
 
     #[cfg(feature = "network")]
@@ -1307,5 +1823,37 @@ mod tests {
         assert_eq!(hour_label("1:00 PM", false), "13时");
         assert_eq!(hour_label("12:00 AM", false), "0时");
         assert_eq!(hour_label("9:00 AM", true), "现在");
+    }
+
+    #[cfg(feature = "network")]
+    #[test]
+    fn alerts_are_scoped_to_the_selected_place_or_nationwide() {
+        let manila = Place {
+            id: "manila".into(),
+            name: "马尼拉".into(),
+            region: "国家首都区".into(),
+            latitude: 14.5995,
+            longitude: 120.9842,
+        };
+        assert!(alert_matches_place("Metro Manila", &manila));
+        assert!(alert_matches_place("NCR", &manila));
+        assert!(!alert_matches_place("Cebu Province", &manila));
+        assert!(alert_is_global("Nationwide Philippines"));
+    }
+
+    #[cfg(feature = "network")]
+    #[test]
+    fn heat_index_translation_keeps_extreme_caution_distinct() {
+        assert_eq!(translate_heat_index("Extreme Caution"), "注意防暑");
+        assert_eq!(translate_heat_index("Danger"), "有中暑危险");
+        assert_eq!(translate_heat_index("Extreme Danger"), "极易中暑");
+    }
+
+    #[cfg(feature = "network")]
+    #[test]
+    fn date_labels_are_compact_for_iso_dates() {
+        assert_eq!(translate_day("2026-11-09".into()), "11月9日");
+        assert_eq!(translate_day("11/09".into()), "11月9日");
+        assert_eq!(translate_day("today".into()), "今天");
     }
 }
