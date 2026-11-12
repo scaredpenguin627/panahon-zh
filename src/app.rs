@@ -81,15 +81,21 @@ fn localized_error(error: &str, is_english: bool) -> String {
 }
 
 enum Msg {
-    Dashboard(Result<Dashboard, String>),
-    Air(Result<AirQuality, String>),
+    Dashboard(u64, Result<Dashboard, String>),
+    Air(u64, Result<AirQuality, String>),
     Version(Result<ApiVersion, String>),
     Places(Result<Vec<Place>, String>),
-    Map(Box<(String, Option<usize>, Result<RemoteMapSnapshot, String>)>),
+    Map(
+        u64,
+        Box<(String, Option<usize>, Result<RemoteMapSnapshot, String>)>,
+    ),
 }
 
 pub struct PanahonApp {
     tab: usize,
+    place_generation: u64,
+    map_generation: u64,
+    cached: bool,
     language: UiLanguage,
     dashboard: Dashboard,
     status: String,
@@ -143,15 +149,22 @@ impl PanahonApp {
             .is_some_and(|value| value == "1");
         let mut app = Self {
             tab: initial_tab,
+            place_generation: 0,
+            map_generation: 0,
+            cached: true,
             language,
-            dashboard: Dashboard {
-                place,
-                ..Dashboard::sample()
+            dashboard: if std::env::var("PANAHON_DEMO").as_deref() == Ok("1") {
+                Dashboard::sample()
+            } else {
+                crate::read_preference("weather_cache_v2")
+                    .and_then(|raw| serde_json::from_str::<Dashboard>(&raw).ok())
+                    .filter(|data| data.place == place && data.source == DataSource::PublicApi)
+                    .unwrap_or_else(|| Dashboard::empty(place))
             },
             status: if language.is_english() {
-                "Offline sample".into()
+                "Loading official data…".into()
             } else {
-                "离线数据".into()
+                "正在读取官方数据…".into()
             },
             loading_weather: false,
             air: None,
@@ -191,8 +204,10 @@ impl PanahonApp {
         if notifications_enabled {
             let _ = crate::start_local_notification_scheduler();
         }
-        app.refresh_weather(&cc.egui_ctx);
-        app.refresh_air(&cc.egui_ctx);
+        if std::env::var("PANAHON_DEMO").as_deref() != Ok("1") {
+            app.refresh_weather(&cc.egui_ctx);
+            app.refresh_air(&cc.egui_ctx);
+        }
         app
     }
 
@@ -204,8 +219,10 @@ impl PanahonApp {
         let tx = self.tx.clone();
         let ctx = ctx.clone();
         let place = self.dashboard.place.clone();
+        let generation = self.place_generation;
         std::thread::spawn(move || {
-            let _ = tx.send(Msg::Dashboard(fetch_public_dashboard(&place)));
+            let _ = tx.send(Msg::Dashboard(generation, fetch_public_dashboard(&place)));
+            ctx.request_repaint();
             let version = fetch_api_version();
             let _ = tx.send(Msg::Version(version));
             ctx.request_repaint();
@@ -221,8 +238,12 @@ impl PanahonApp {
         let ctx = ctx.clone();
         let latitude = self.dashboard.place.latitude;
         let longitude = self.dashboard.place.longitude;
+        let generation = self.place_generation;
         std::thread::spawn(move || {
-            let _ = tx.send(Msg::Air(fetch_air_quality_at(latitude, longitude)));
+            let _ = tx.send(Msg::Air(
+                generation,
+                fetch_air_quality_at(latitude, longitude),
+            ));
             ctx.request_repaint();
         });
     }
@@ -232,6 +253,8 @@ impl PanahonApp {
             return;
         }
         self.loading_map = true;
+        self.map_generation += 1;
+        let generation = self.map_generation;
         self.map_status = if self.language.is_english() {
             "Reading official layer…".into()
         } else {
@@ -255,7 +278,7 @@ impl PanahonApp {
                 }
                 _ => fetch_remote_map_layer(&key),
             };
-            let _ = tx.send(Msg::Map(Box::new((title, frame_index, result))));
+            let _ = tx.send(Msg::Map(generation, Box::new((title, frame_index, result))));
             ctx.request_repaint();
         });
     }
@@ -301,7 +324,13 @@ impl PanahonApp {
     fn drain(&mut self, ctx: &egui::Context) {
         while let Ok(message) = self.rx.try_recv() {
             match message {
-                Msg::Dashboard(Ok(dashboard)) => {
+                Msg::Dashboard(generation, _) | Msg::Air(generation, _)
+                    if generation != self.place_generation => {}
+                Msg::Dashboard(_, Ok(dashboard)) => {
+                    if let Ok(raw) = serde_json::to_string(&dashboard) {
+                        crate::write_preference("weather_cache_v2", &raw);
+                    }
+                    self.cached = false;
                     self.dashboard = dashboard;
                     self.status = if self.language.is_english() {
                         "Updated".into()
@@ -310,7 +339,8 @@ impl PanahonApp {
                     };
                     self.loading_weather = false;
                 }
-                Msg::Dashboard(Err(error)) => {
+                Msg::Dashboard(_, Err(error)) => {
+                    self.cached = true;
                     self.status = if self.language.is_english() {
                         format!("Refresh failed: {}", localized_error(&error, true))
                     } else {
@@ -318,13 +348,13 @@ impl PanahonApp {
                     };
                     self.loading_weather = false;
                 }
-                Msg::Air(Ok(air)) => {
+                Msg::Air(_, Ok(air)) => {
                     self.record_air_history(&air);
                     self.air = Some(air);
                     self.air_status = None;
                     self.loading_air = false;
                 }
-                Msg::Air(Err(error)) => {
+                Msg::Air(_, Err(error)) => {
                     self.air_status = Some(localized_error(&error, self.language.is_english()));
                     self.loading_air = false;
                 }
@@ -342,9 +372,14 @@ impl PanahonApp {
                     };
                     self.searching = false;
                 }
-                Msg::Map(payload) => {
+                Msg::Map(generation, _) if generation != self.map_generation => {}
+                Msg::Map(_, payload) => {
                     let (title, requested_frame, result) = *payload;
                     self.loading_map = false;
+                    if requested_frame.is_some_and(|index| index != self.map_frame_index as usize) {
+                        self.refresh_map(ctx);
+                        continue;
+                    }
                     match result {
                         Ok(snapshot) => {
                             self.map_detail = snapshot.summary.clone();
@@ -573,9 +608,7 @@ impl PanahonApp {
 
         if let Some(alert) = self.dashboard.alerts.first() {
             let response = ui
-                .scope(|ui| {
-                    widgets::alert_card(ui, alert, palette, self.language.is_english())
-                })
+                .scope(|ui| widgets::alert_card(ui, alert, palette, self.language.is_english()))
                 .response;
             if response.interact(Sense::click()).clicked() {
                 self.tab = 3;
@@ -704,13 +737,17 @@ impl PanahonApp {
                             );
                             ui.add_space(6.0);
                         }
-                        let color = widgets::aqi_text_color(station.aqi);
+                        let color = widgets::aqi_color(station.aqi);
                         ui.horizontal(|ui| {
                             ui.vertical(|ui| {
                                 ui.label(
-                                    RichText::new(&station.name_zh)
-                                        .size(13.0)
-                                        .color(palette.text),
+                                    RichText::new(if self.language.is_english() {
+                                        station.name.as_deref().unwrap_or(&station.name_zh)
+                                    } else {
+                                        &station.name_zh
+                                    })
+                                    .size(13.0)
+                                    .color(palette.text),
                                 );
                                 let mut detail = String::new();
                                 if let Some(pm25) = station.pm25 {
@@ -804,7 +841,11 @@ impl PanahonApp {
             widgets::card_header_public(
                 ui,
                 palette,
-                if is_english { "Weather map" } else { "天气地图" },
+                if is_english {
+                    "Weather map"
+                } else {
+                    "天气地图"
+                },
                 "PAGASA",
             );
             ui.add_space(8.0);
@@ -836,6 +877,8 @@ impl PanahonApp {
                         .clicked()
                     {
                         self.map_layer = index;
+                        self.map_generation += 1;
+                        self.loading_map = false;
                         self.map_texture = None;
                         self.map_size = None;
                         self.map_frame_count = None;
@@ -857,8 +900,8 @@ impl PanahonApp {
             if let (Some(texture), Some(size)) = (&self.map_texture, self.map_size) {
                 let width = ui.available_width();
                 let aspect = size[1] as f32 / size[0].max(1) as f32;
-                let (rect, _) = ui
-                    .allocate_exact_size(Vec2::new(width, width * aspect), egui::Sense::hover());
+                let (rect, _) =
+                    ui.allocate_exact_size(Vec2::new(width, width * aspect), egui::Sense::hover());
                 // 雷达和卫星图是带透明通道的叠加层，铺一层深色底衬才看得清
                 ui.painter().rect_filled(
                     rect,
@@ -920,7 +963,11 @@ impl PanahonApp {
             ui.horizontal_wrapped(|ui| {
                 if widgets::pill_button(
                     ui,
-                    if is_english { "Refresh" } else { "刷新图层" },
+                    if is_english {
+                        "Refresh"
+                    } else {
+                        "刷新图层"
+                    },
                     palette,
                 )
                 .clicked()
@@ -930,7 +977,11 @@ impl PanahonApp {
                 }
                 if self.map_frame_count.is_some_and(|count| count > 1) {
                     let label = if self.map_playing {
-                        if is_english { "Pause" } else { "暂停" }
+                        if is_english {
+                            "Pause"
+                        } else {
+                            "暂停"
+                        }
                     } else if is_english {
                         "Play"
                     } else {
@@ -1224,8 +1275,22 @@ impl PanahonApp {
             ui.set_min_width(ui.available_width());
             let is_english = self.language.is_english();
             for (index, label) in [
-                (2usize, if is_english { "Weather map" } else { "天气地图" }),
-                (3usize, if is_english { "Alerts & reminders" } else { "预警与提醒" }),
+                (
+                    2usize,
+                    if is_english {
+                        "Weather map"
+                    } else {
+                        "天气地图"
+                    },
+                ),
+                (
+                    3usize,
+                    if is_english {
+                        "Alerts & reminders"
+                    } else {
+                        "预警与提醒"
+                    },
+                ),
             ] {
                 let response = ui
                     .horizontal(|ui| {
@@ -1241,7 +1306,7 @@ impl PanahonApp {
                 ui.add_space(6.0);
             }
         });
-      ui.add_space(10.0);
+        ui.add_space(10.0);
 
         theme::card().show(ui, |ui| {
             ui.set_min_width(ui.available_width());
@@ -1271,7 +1336,7 @@ impl PanahonApp {
                 .color(palette.faint),
             );
         });
-      ui.add_space(10.0);
+        ui.add_space(10.0);
 
         theme::card().show(ui, |ui| {
             ui.set_min_width(ui.available_width());
@@ -1339,7 +1404,15 @@ impl PanahonApp {
                     )
                     .clicked()
                 {
-                    self.dashboard.place = place;
+                    self.place_generation += 1;
+                    self.loading_weather = false;
+                    self.loading_air = false;
+                    self.air = None;
+                    self.air_status = None;
+                    self.air_history.clear();
+                    self.cached = false;
+                    self.dashboard = Dashboard::empty(place);
+                    self.tab = 0;
                     crate::write_preference("place", &encode_place(&self.dashboard.place));
                     self.search_results.clear();
                     self.status = if self.language.is_english() {
@@ -1353,7 +1426,7 @@ impl PanahonApp {
                 }
             }
         });
-      ui.add_space(10.0);
+        ui.add_space(10.0);
 
         theme::card().show(ui, |ui| {
             ui.set_min_width(ui.available_width());
@@ -1405,7 +1478,7 @@ impl PanahonApp {
                 .color(palette.faint),
             );
         });
-      ui.add_space(10.0);
+        ui.add_space(10.0);
 
         theme::card().show(ui, |ui| {
             ui.set_min_width(ui.available_width());
@@ -1420,6 +1493,8 @@ impl PanahonApp {
             );
             ui.add_space(4.0);
             let source = match (self.dashboard.source.clone(), self.language.is_english()) {
+                (DataSource::Unavailable, true) => "No data",
+                (DataSource::Unavailable, false) => "暂无数据",
                 (DataSource::PublicApi, true) => "public API",
                 (DataSource::OfflineSample, true) => "offline sample",
                 (DataSource::PublicApi, false) => "公开接口",
@@ -1513,6 +1588,8 @@ impl PanahonApp {
     fn footer(&mut self, ui: &mut egui::Ui, palette: &Palette) {
         ui.add_space(4.0);
         let source = match (self.dashboard.source.clone(), self.language.is_english()) {
+            (DataSource::Unavailable, true) => "No data",
+            (DataSource::Unavailable, false) => "暂无数据",
             (DataSource::PublicApi, true) => "PAGASA public API",
             (DataSource::OfflineSample, true) => "Offline sample",
             (DataSource::PublicApi, false) => "PAGASA 公开接口",
@@ -1550,17 +1627,13 @@ impl PanahonApp {
         let stroke = egui::Stroke::new(2.0_f32, palette.text);
 
         ui.horizontal_centered(|ui| {
-            let (left_rect, left) =
-                ui.allocate_exact_size(Vec2::splat(40.0), Sense::click());
+            let (left_rect, left) = ui.allocate_exact_size(Vec2::splat(40.0), Sense::click());
             let center = left_rect.center();
             if self.tab == 0 {
                 for row in 0..3 {
                     let y = center.y - 7.0 + row as f32 * 7.0;
                     ui.painter().line_segment(
-                        [
-                            Pos2::new(center.x - 9.0, y),
-                            Pos2::new(center.x + 9.0, y),
-                        ],
+                        [Pos2::new(center.x - 9.0, y), Pos2::new(center.x + 9.0, y)],
                         stroke,
                     );
                 }
@@ -1587,16 +1660,32 @@ impl PanahonApp {
             let title = match self.tab {
                 0 => self.dashboard.place.name.clone(),
                 1 => {
-                    if is_english { "Air quality".into() } else { "空气质量".into() }
+                    if is_english {
+                        "Air quality".into()
+                    } else {
+                        "空气质量".into()
+                    }
                 }
                 2 => {
-                    if is_english { "Weather map".into() } else { "天气地图".into() }
+                    if is_english {
+                        "Weather map".into()
+                    } else {
+                        "天气地图".into()
+                    }
                 }
                 3 => {
-                    if is_english { "Alerts".into() } else { "预警".into() }
+                    if is_english {
+                        "Alerts".into()
+                    } else {
+                        "预警".into()
+                    }
                 }
                 _ => {
-                    if is_english { "Settings".into() } else { "设置".into() }
+                    if is_english {
+                        "Settings".into()
+                    } else {
+                        "设置".into()
+                    }
                 }
             };
 
@@ -1610,8 +1699,7 @@ impl PanahonApp {
                 palette.text,
             );
 
-            let (right_rect, right) = ui
-                .allocate_exact_size(Vec2::splat(40.0), Sense::click());
+            let (right_rect, right) = ui.allocate_exact_size(Vec2::splat(40.0), Sense::click());
             if self.tab == 0 {
                 let radius = 8.0;
                 let mut points = Vec::new();
@@ -1675,7 +1763,9 @@ impl eframe::App for PanahonApp {
                     .inner_margin(egui::Margin::symmetric(theme::CARD_MARGIN as i8, 0)),
             )
             .show(ctx, |ui| {
-                let area = egui::ScrollArea::vertical().auto_shrink([false, false]);
+                let area = egui::ScrollArea::vertical()
+                    .id_salt(("page", self.tab, self.place_generation))
+                    .auto_shrink([false, false]);
                 // 桌面截图时可用 PANAHON_SCROLL 固定滚动位置
                 let area = match std::env::var("PANAHON_SCROLL")
                     .ok()
@@ -1685,16 +1775,16 @@ impl eframe::App for PanahonApp {
                     None => area,
                 };
                 area.show(ui, |ui| {
-                        ui.set_width(ui.available_width());
-                        match self.tab {
-                            0 => self.weather_page(ui, &palette),
-                            1 => self.air_page(ui, &palette),
-                            2 => self.map_page(ui, &palette),
-                            3 => self.alerts_page(ui, &palette),
-                            _ => self.profile_page(ui, &palette),
-                        }
-                        ui.add_space(16.0 + safe_bottom);
-                    });
+                    ui.set_width(ui.available_width());
+                    match self.tab {
+                        0 => self.weather_page(ui, &palette),
+                        1 => self.air_page(ui, &palette),
+                        2 => self.map_page(ui, &palette),
+                        3 => self.alerts_page(ui, &palette),
+                        _ => self.profile_page(ui, &palette),
+                    }
+                    ui.add_space(16.0 + safe_bottom);
+                });
             });
     }
 }

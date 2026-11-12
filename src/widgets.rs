@@ -117,6 +117,7 @@ pub fn aqi_color(aqi: Option<u16>) -> Color32 {
 }
 
 /// A darker variant of the band colour for text on light cards.
+#[allow(dead_code)]
 pub fn aqi_text_color(aqi: Option<u16>) -> Color32 {
     match aqi.unwrap_or(0) {
         0..=50 => Color32::from_rgb(0x14, 0x7A, 0x44),
@@ -206,12 +207,7 @@ fn updated_text(value: &str, is_english: bool) -> String {
 /// 主天气区：华为的当前天气块是居中、留白充足的，最小高 268dp。
 ///
 /// 从上到下：城市 → 更新时间 → 大号温度 → 高低温 → 天气现象 · 空气质量。
-pub fn hero(
-    ui: &mut egui::Ui,
-    dashboard: &Dashboard,
-    air: Option<&AirQuality>,
-    palette: &Palette,
-) {
+pub fn hero(ui: &mut egui::Ui, dashboard: &Dashboard, air: Option<&AirQuality>, palette: &Palette) {
     let is_english = english(ui);
     let current = &dashboard.current;
     let (rect, _) = ui.allocate_exact_size(
@@ -254,9 +250,12 @@ pub fn hero(
 
     if let Some(day) = dashboard.forecast.first() {
         ui.label(
-            RichText::new(format!("{:.0}° / {:.0}°", day.low_c, day.high_c))
-                .size(16.0)
-                .color(palette.dim),
+            RichText::new(match (day.low_c, day.high_c) {
+                (Some(low), Some(high)) => format!("{low:.0}° / {high:.0}°"),
+                _ => "—".into(),
+            })
+            .size(16.0)
+            .color(palette.dim),
         );
     }
 
@@ -276,7 +275,6 @@ pub fn hero(
         }
     }
     ui.label(RichText::new(line).size(15.0).color(palette.text));
-
 }
 /// 供 app.rs 复用的卡片标题行。
 pub fn card_header_public(ui: &mut egui::Ui, palette: &Palette, title: &str, source: &str) {
@@ -304,11 +302,12 @@ pub fn hourly_strip(ui: &mut egui::Ui, hours: &[HourlyForecast], palette: &Palet
 
     theme::card().show(ui, |ui| {
         ui.set_min_width(ui.available_width());
-        let source = if hours
-            .iter()
-            .any(|hour| !hour.precip_quality.is_official())
-        {
-            if is_english { "Official forecast · rain partly estimated" } else { "官方预报 · 降水含估算" }
+        let source = if hours.iter().any(|hour| !hour.precip_quality.is_official()) {
+            if is_english {
+                "Official forecast · rain partly estimated"
+            } else {
+                "官方预报 · 降水含估算"
+            }
         } else if is_english {
             "Official forecast"
         } else {
@@ -317,7 +316,11 @@ pub fn hourly_strip(ui: &mut egui::Ui, hours: &[HourlyForecast], palette: &Palet
         card_header(
             ui,
             palette,
-            if is_english { "Hourly forecast" } else { "逐小时预报" },
+            if is_english {
+                "Hourly forecast"
+            } else {
+                "逐小时预报"
+            },
             source,
         );
         ui.add_space(6.0);
@@ -335,10 +338,8 @@ pub fn hourly_strip(ui: &mut egui::Ui, hours: &[HourlyForecast], palette: &Palet
 }
 
 fn hour_cell(ui: &mut egui::Ui, hour: &HourlyForecast, palette: &Palette, is_english: bool) {
-    let (rect, _) = ui.allocate_exact_size(
-        Vec2::new(theme::HOUR_CELL_WIDTH, 118.0),
-        Sense::hover(),
-    );
+    let (rect, _) =
+        ui.allocate_exact_size(Vec2::new(theme::HOUR_CELL_WIDTH, 118.0), Sense::hover());
     let painter = ui.painter();
     let time = if is_english {
         if hour.time == "现在" {
@@ -387,7 +388,9 @@ fn hour_cell(ui: &mut egui::Ui, hour: &HourlyForecast, palette: &Palette, is_eng
     painter.text(
         Pos2::new(rect.center().x, rect.top() + 88.0),
         Align2::CENTER_TOP,
-        format!("{:.0}°", hour.temperature_c),
+        hour.temperature_c
+            .map(|value| format!("{value:.0}°"))
+            .unwrap_or_else(|| "—".into()),
         FontId::proportional(16.0),
         palette.text,
     );
@@ -410,7 +413,11 @@ pub fn daily_list(ui: &mut egui::Ui, days: &[ForecastDay], palette: &Palette) {
         card_header(
             ui,
             palette,
-            if is_english { "Daily forecast" } else { "多日天气" },
+            if is_english {
+                "Daily forecast"
+            } else {
+                "多日天气"
+            },
             source,
         );
         ui.add_space(2.0);
@@ -499,15 +506,23 @@ fn day_row(ui: &mut egui::Ui, day: &ForecastDay, palette: &Palette, is_english: 
 
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 ui.label(
-                    RichText::new(format!("{:.0}°", day.high_c))
-                        .size(17.0)
-                        .color(palette.text),
+                    RichText::new(
+                        day.high_c
+                            .map(|value| format!("{value:.0}°"))
+                            .unwrap_or_else(|| "—".into()),
+                    )
+                    .size(17.0)
+                    .color(palette.text),
                 );
                 ui.label(RichText::new("/").size(13.0).color(palette.faint));
                 ui.label(
-                    RichText::new(format!("{:.0}°", day.low_c))
-                        .size(17.0)
-                        .color(palette.dim),
+                    RichText::new(
+                        day.low_c
+                            .map(|value| format!("{value:.0}°"))
+                            .unwrap_or_else(|| "—".into()),
+                    )
+                    .size(17.0)
+                    .color(palette.dim),
                 );
             });
         },
@@ -549,8 +564,16 @@ pub fn aqi_summary(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
         card_header(
             ui,
             palette,
-            if is_english { "Air quality" } else { "空气质量" },
-            if is_english { "DENR-EMB" } else { "DENR-EMB 官方" },
+            if is_english {
+                "Air quality"
+            } else {
+                "空气质量"
+            },
+            if is_english {
+                "DENR-EMB"
+            } else {
+                "DENR-EMB 官方"
+            },
         );
         ui.add_space(10.0);
 
@@ -564,11 +587,7 @@ pub fn aqi_summary(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
                     is_english,
                 );
                 ui.horizontal(|ui| {
-                    ui.label(
-                        RichText::new(&category)
-                            .size(18.0)
-                            .color(color),
-                    );
+                    ui.label(RichText::new(&category).size(18.0).color(color));
                     ui.label(
                         RichText::new(format!(
                             "AQI {}",
@@ -589,7 +608,11 @@ pub fn aqi_summary(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
                 let mut meta = format!(
                     "{} {}",
                     air.summary.station_count,
-                    if is_english { "stations" } else { "个监测站" }
+                    if is_english {
+                        "stations"
+                    } else {
+                        "个监测站"
+                    }
                 );
                 let highest = air
                     .stations
@@ -597,7 +620,10 @@ pub fn aqi_summary(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
                     .max_by_key(|station| station.aqi.unwrap_or(0))
                     .map(|station| {
                         if is_english {
-                            station.name.clone().unwrap_or_else(|| station.name_zh.clone())
+                            station
+                                .name
+                                .clone()
+                                .unwrap_or_else(|| station.name_zh.clone())
                         } else {
                             station.name_zh.clone()
                         }
@@ -613,7 +639,11 @@ pub fn aqi_summary(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
                 ui.label(
                     RichText::new(format!(
                         "{}{}",
-                        if is_english { "Data time " } else { "数据时间 " },
+                        if is_english {
+                            "Data time "
+                        } else {
+                            "数据时间 "
+                        },
                         air.data_clock.as_deref().unwrap_or("--")
                     ))
                     .size(10.0)
@@ -788,10 +818,7 @@ pub fn aqi_trend(ui: &mut egui::Ui, trend: &[AirQualityTrendPoint], palette: &Pa
         for step in 0..3 {
             let y = rect.top() + rect.height() * (step as f32 + 1.0) / 4.0;
             painter.line_segment(
-                [
-                    Pos2::new(rect.left(), y),
-                    Pos2::new(rect.right(), y),
-                ],
+                [Pos2::new(rect.left(), y), Pos2::new(rect.right(), y)],
                 egui::Stroke::new(1.0_f32, palette.card_line),
             );
         }
@@ -802,9 +829,7 @@ pub fn aqi_trend(ui: &mut egui::Ui, trend: &[AirQualityTrendPoint], palette: &Pa
             .enumerate()
             .map(|(index, (_, value, _))| {
                 let x = rect.left() + rect.width() * index as f32 / last as f32;
-                let y = rect.bottom()
-                    - 8.0
-                    - (*value as f32 - low) / span * (rect.height() - 20.0);
+                let y = rect.bottom() - 8.0 - (*value as f32 - low) / span * (rect.height() - 20.0);
                 Pos2::new(x, y)
             })
             .collect();
@@ -896,15 +921,25 @@ pub fn aqi_history(ui: &mut egui::Ui, history: &[(String, u16)], palette: &Palet
         ui.add_space(4.0);
         ui.horizontal(|ui| {
             ui.label(
-                RichText::new(slice.first().map(|entry| entry.0.as_str()).unwrap_or_default())
-                    .size(10.0)
-                    .color(palette.faint),
+                RichText::new(
+                    slice
+                        .first()
+                        .map(|entry| entry.0.as_str())
+                        .unwrap_or_default(),
+                )
+                .size(10.0)
+                .color(palette.faint),
             );
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 ui.label(
-                    RichText::new(slice.last().map(|entry| entry.0.as_str()).unwrap_or_default())
-                        .size(10.0)
-                        .color(palette.faint),
+                    RichText::new(
+                        slice
+                            .last()
+                            .map(|entry| entry.0.as_str())
+                            .unwrap_or_default(),
+                    )
+                    .size(10.0)
+                    .color(palette.faint),
                 );
             });
         });
@@ -912,12 +947,7 @@ pub fn aqi_history(ui: &mut egui::Ui, history: &[(String, u16)], palette: &Palet
 }
 
 /// 台风路径：列出 PAGASA 公开的路径点，并画出大致走向。
-pub fn typhoon_track(
-    ui: &mut egui::Ui,
-    track: &[MapTrackPoint],
-    palette: &Palette,
-    english: bool,
-) {
+pub fn typhoon_track(ui: &mut egui::Ui, track: &[MapTrackPoint], palette: &Palette, english: bool) {
     if track.is_empty() {
         return;
     }
@@ -972,7 +1002,11 @@ pub fn typhoon_track(
             } else {
                 palette.text
             };
-            painter.circle_filled(*point, if index + 1 == coords.len() { 4.0 } else { 2.6 }, color);
+            painter.circle_filled(
+                *point,
+                if index + 1 == coords.len() { 4.0 } else { 2.6 },
+                color,
+            );
         }
 
         ui.add_space(6.0);
@@ -992,12 +1026,9 @@ pub fn typhoon_track(
                         );
                     }
                     ui.label(
-                        RichText::new(format!(
-                            "{:.1}, {:.1}",
-                            point.latitude, point.longitude
-                        ))
-                        .size(10.0)
-                        .color(palette.faint),
+                        RichText::new(format!("{:.1}, {:.1}", point.latitude, point.longitude))
+                            .size(10.0)
+                            .color(palette.faint),
                     );
                     ui.label(RichText::new(&point.kind).size(11.0).color(palette.text));
                 });
@@ -1142,7 +1173,7 @@ pub fn detail_grid(ui: &mut egui::Ui, current: &CurrentWeather, palette: &Palett
                     format!("观测站：{station}")
                 })
                 .size(10.0)
-                    .color(palette.faint),
+                .color(palette.faint),
             );
         }
     });
@@ -1285,7 +1316,11 @@ pub fn life_indices(ui: &mut egui::Ui, indices: &[LifeIndex], palette: &Palette)
         card_header(
             ui,
             palette,
-            if is_english { "Lifestyle" } else { "生活指数" },
+            if is_english {
+                "Lifestyle"
+            } else {
+                "生活指数"
+            },
             if is_english {
                 "Local estimate"
             } else {
@@ -1304,20 +1339,22 @@ pub fn life_indices(ui: &mut egui::Ui, indices: &[LifeIndex], palette: &Palette)
                     Layout::top_down(Align::Center),
                     |ui| {
                         ui.add_space(18.0);
-                        ui.label(
-                            RichText::new(&level)
-                                .size(16.0)
-                                .color(if index.level == "未知" {
-                                    palette.faint
-                                } else {
-                                    palette.text
-                                }),
-                        );
+                        ui.label(RichText::new(&level).size(16.0).color(
+                            if index.level == "未知" {
+                                palette.faint
+                            } else {
+                                palette.text
+                            },
+                        ));
                         ui.add_space(2.0);
                         ui.label(RichText::new(&title).size(12.0).color(palette.dim));
                         ui.add_space(2.0);
-                        ui.label(RichText::new(basis_text(&index.basis, is_english)).size(10.0).color(palette.faint))
-                            .on_hover_text(advice);
+                        ui.label(
+                            RichText::new(basis_text(&index.basis, is_english))
+                                .size(10.0)
+                                .color(palette.faint),
+                        )
+                        .on_hover_text(advice);
                     },
                 );
             }
@@ -1405,10 +1442,18 @@ pub fn alert_card(ui: &mut egui::Ui, alert: &Alert, palette: &Palette, english: 
         ui.set_min_width(ui.available_width());
         ui.horizontal(|ui| {
             ui.label(
-                RichText::new(alert_title_text(&alert.title, english))
-                    .size(15.0)
-                    .strong()
-                    .color(palette.text),
+                RichText::new(if english {
+                    if alert.title_en.is_empty() {
+                        alert.title.clone()
+                    } else {
+                        alert.title_en.clone()
+                    }
+                } else {
+                    alert_title_text(&alert.title, false)
+                })
+                .size(15.0)
+                .strong()
+                .color(palette.text),
             );
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 if !alert.valid_until.is_empty() {

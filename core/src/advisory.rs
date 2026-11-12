@@ -59,12 +59,12 @@ pub fn render(message: &str) -> Rendered {
                 }
                 None => {
                     gaps.push(sentence.clone());
-                    paragraph.push(clean_place_marks(&sentence));
+                    paragraph.push(sentence);
                 }
             }
         }
         if !paragraph.is_empty() {
-            out.push(paragraph.join(""));
+            out.push(paragraph.join("\n"));
         }
     }
 
@@ -184,7 +184,13 @@ fn translate_weather_system(line: &str) -> Option<String> {
     if !lower.starts_with("weather system") {
         return None;
     }
-    let value = line.split(':').skip(1).collect::<Vec<_>>().join(":").trim().to_owned();
+    let value = line
+        .split(':')
+        .skip(1)
+        .collect::<Vec<_>>()
+        .join(":")
+        .trim()
+        .to_owned();
     if value.is_empty() {
         return None;
     }
@@ -258,8 +264,8 @@ fn split_sentences(paragraph: &str) -> Vec<String> {
                 }
             }
             // 单个大写字母（"Carlos P. Garcia"）也是缩写
-            let single_initial = word.chars().count() == 1
-                && word.chars().all(|ch| ch.is_ascii_uppercase());
+            let single_initial =
+                word.chars().count() == 1 && word.chars().all(|ch| ch.is_ascii_uppercase());
             let is_abbreviation = single_initial
                 || ABBREVIATIONS
                     .iter()
@@ -269,7 +275,9 @@ fn split_sentences(paragraph: &str) -> Vec<String> {
                 .iter()
                 .find(|candidate| !candidate.is_whitespace())
                 .copied();
-            let next_upper = next.map(|candidate| candidate.is_uppercase()).unwrap_or(true);
+            let next_upper = next
+                .map(|candidate| candidate.is_uppercase())
+                .unwrap_or(true);
             boundary = !is_abbreviation && next_upper;
         }
 
@@ -292,8 +300,22 @@ fn split_sentences(paragraph: &str) -> Vec<String> {
 fn translate_sentence(sentence: &str) -> Option<String> {
     let lower = sentence.to_ascii_lowercase();
 
+    // Ambiguous qualifications and negations must survive verbatim. Never turn
+    // "not expected", an evacuation order, or a numerical threshold into a
+    // generic positive forecast or weaker advice.
+    if [
+        " not ", " no ", "unlikely", "except", "cancel", "evacuat", " mm", "%", " km/h",
+    ]
+    .iter()
+    .any(|marker| lower.contains(marker))
+    {
+        return None;
+    }
+
     // 通用提醒句
-    if lower.starts_with("all are advised to take precautionary measures") {
+    if lower.starts_with("all are advised to take precautionary measures")
+        && lower.contains("flash floods and landslides")
+    {
         return Some("请采取防范措施，警惕山洪和山体滑坡等风险。".into());
     }
     if lower.starts_with("all are advised to continue monitoring")
@@ -302,38 +324,21 @@ fn translate_sentence(sentence: &str) -> Option<String> {
     {
         return Some("请持续关注最新通报。".into());
     }
-    if lower.starts_with("flooding is possible") || lower.starts_with("flooding may occur") {
-        return Some(format!(
-            "低洼地区可能出现积水。{}",
-            if lower.contains("landslide") {
-                "山区需防范滑坡。"
-            } else {
-                ""
-            }
-        ));
-    }
-    if lower.starts_with("residents in") && lower.contains("advised to evacuate") {
-        return Some("请相关地区居民留意官方疏散通知。".into());
-    }
 
     // 雷暴可能 / 不可能
     if lower.starts_with("thunderstorm is more likely to develop over")
         || lower.starts_with("thunderstorms are more likely to develop over")
     {
         let places = places_after(sentence, "over")?;
-        let hours = hours_within(sentence).unwrap_or(12);
-        return Some(format!(
-            "{places} 在未来 {hours} 小时内较可能出现雷暴。"
-        ));
+        let hours = hours_within(sentence)?;
+        return Some(format!("{places} 在未来 {hours} 小时内较可能出现雷暴。"));
     }
     if lower.starts_with("thunderstorm is less likely to develop over")
         || lower.starts_with("thunderstorms are less likely to develop over")
     {
         let places = places_after(sentence, "over")?;
-        let hours = hours_within(sentence).unwrap_or(12);
-        return Some(format!(
-            "{places} 在未来 {hours} 小时内较不可能出现雷暴。"
-        ));
+        let hours = hours_within(sentence)?;
+        return Some(format!("{places} 在未来 {hours} 小时内较不可能出现雷暴。"));
     }
 
     // "The above conditions are being experienced in X which may persist ..."
@@ -350,8 +355,15 @@ fn translate_sentence(sentence: &str) -> Option<String> {
     }
 
     // 已经出现 / 预计出现的降雨
-    if lower.contains("rainshowers") || lower.contains("rains") || lower.contains("rainfall") {
-        let intensity = if lower.contains("moderate to heavy") {
+    if (lower.contains("rainshowers") || lower.contains("rains") || lower.contains("rainfall"))
+        && (lower.contains("are expected")
+            || lower.contains("is expected")
+            || lower.contains("are being experienced")
+            || lower.contains("is being experienced"))
+    {
+        let intensity = if lower.contains("moderate to occasionally heavy") {
+            "中雨，局地大雨"
+        } else if lower.contains("moderate to heavy") {
             "中到大雨"
         } else if lower.contains("light to moderate to occasionally heavy") {
             "小到中雨，局地大雨"
@@ -535,6 +547,21 @@ mod tests {
     const WATCH: &str = "Thunderstorm Watch #VISPRSD\nIssued at 10:00 AM 10 November 2026\n\nThunderstorm is MORE LIKELY to develop over #Cebu, #Bohol, #Siquijor, #NegrosOriental within 12 hours.\n\nAll are advised to continue monitoring for updates.";
 
     #[test]
+    fn safety_critical_qualifiers_are_not_rewritten() {
+        for text in [
+            "Heavy rains are not expected over #Cebu.",
+            "Residents in #Cebu are advised to evacuate immediately.",
+            "Rainfall of 100 mm is expected over #Cebu.",
+            "Heavy rains are expected over #Cebu except northern areas.",
+            "Thunderstorm is more likely to develop over #Cebu.",
+        ] {
+            let result = render(text);
+            assert_eq!(result.text, text);
+            assert_eq!(result.translated, 0);
+        }
+    }
+
+    #[test]
     fn thunderstorm_advisory_is_rendered() {
         let rendered = render(THUNDERSTORM);
         assert!(rendered.is_useful());
@@ -567,8 +594,16 @@ mod tests {
     #[test]
     fn issued_date_variants_parse() {
         let rendered = render("Rainfall Advisory No. 2 #NCR_PRSD\nWeather System: Northeast Monsoon (Amihan)\nIssued at: 11:00 AM, 10 November 2026(Tuesday)\n\nLight to moderate rains are expected over Rizal(Tanay, Rodriguez) and Laguna(Santa Maria).");
-        assert!(rendered.text.contains("天气系统：东北季风(Amihan)"), "got: {}", rendered.text);
-        assert!(rendered.text.contains("发布于 2026年11月10日 11:00"), "got: {}", rendered.text);
+        assert!(
+            rendered.text.contains("天气系统：东北季风(Amihan)"),
+            "got: {}",
+            rendered.text
+        );
+        assert!(
+            rendered.text.contains("发布于 2026年11月10日 11:00"),
+            "got: {}",
+            rendered.text
+        );
         assert!(rendered.text.contains("小到中雨"));
     }
 }

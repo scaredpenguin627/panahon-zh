@@ -61,7 +61,7 @@ pub fn palette(icon: WeatherIcon, is_day: bool) -> Palette {
         bottom,
         text: Color32::WHITE,
         dim: Color32::from_rgba_unmultiplied(255, 255, 255, 153), // #99FFFFFF
-        faint: Color32::from_rgba_unmultiplied(255, 255, 255, 77),  // #4DFFFFFF
+        faint: Color32::from_rgba_unmultiplied(255, 255, 255, 77), // #4DFFFFFF
         card_line: Color32::from_rgba_unmultiplied(255, 255, 255, 38),
         accent: rgb(0xFFC94D),
         track: Color32::from_rgba_unmultiplied(255, 255, 255, 56),

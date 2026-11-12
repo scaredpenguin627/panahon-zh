@@ -41,15 +41,30 @@ fn main() {
             );
             for day in &dashboard.forecast {
                 println!(
-                    "  {} {} {:.0}~{:.0}°C {:.1}mm {:?}",
-                    day.date, day.date_label, day.low_c, day.high_c, day.precip_mm, day.icon
+                    "  {} {} {}~{}°C {:.1}mm {:?}",
+                    day.date,
+                    day.date_label,
+                    day.low_c
+                        .map(|v| format!("{v:.0}"))
+                        .unwrap_or_else(|| "—".into()),
+                    day.high_c
+                        .map(|v| format!("{v:.0}"))
+                        .unwrap_or_else(|| "—".into()),
+                    day.precip_mm,
+                    day.icon
                 );
             }
             println!("  逐小时 {} 条，前 3 条：", dashboard.hourly.len());
             for hour in dashboard.hourly.iter().take(3) {
                 println!(
-                    "    {} {:.0}°C {:.1}mm {:?} day={}",
-                    hour.time, hour.temperature_c, hour.precip_mm, hour.icon, hour.is_day
+                    "    {} {}°C {:.1}mm {:?} day={}",
+                    hour.time,
+                    hour.temperature_c
+                        .map(|v| format!("{v:.0}"))
+                        .unwrap_or_else(|| "—".into()),
+                    hour.precip_mm,
+                    hour.icon,
+                    hour.is_day
                 );
             }
             println!("  预警 {} 条", dashboard.alerts.len());
