@@ -74,7 +74,7 @@ fn localized_error(error: &str, is_english: bool) -> String {
     }
     match error {
         "网络适配器未启用" => "Network adapter is disabled".into(),
-        "请输入至少 3 个字符" => "Enter at least 3 characters".into(),
+        "请输入至少 2 个字符" => "Enter at least 2 characters".into(),
         "地点响应格式无法解析" => "Location response could not be parsed".into(),
         _ => error.to_owned(),
     }
@@ -118,6 +118,8 @@ pub struct PanahonApp {
     search_query: String,
     search_results: Vec<Place>,
     searching: bool,
+    search_focus: bool,
+    search_attempted: bool,
     version: Option<String>,
     notification_status: String,
     tx: Sender<Msg>,
@@ -189,6 +191,8 @@ impl PanahonApp {
             search_query: String::new(),
             search_results: Vec::new(),
             searching: false,
+            search_focus: false,
+            search_attempted: false,
             version: None,
             notification_status: if notifications_enabled {
                 "每 30 分钟提醒一次".into()
@@ -308,10 +312,11 @@ impl PanahonApp {
     }
 
     fn search(&mut self, ctx: &egui::Context) {
-        if self.searching || self.search_query.trim().chars().count() < 3 {
+        if self.searching || self.search_query.trim().chars().count() < 2 {
             return;
         }
         self.searching = true;
+        self.search_attempted = true;
         let tx = self.tx.clone();
         let ctx = ctx.clone();
         let query = self.search_query.clone();
@@ -1355,12 +1360,16 @@ impl PanahonApp {
                     [ui.available_width() - 74.0, 32.0],
                     egui::TextEdit::singleline(&mut self.search_query).hint_text(
                         if self.language.is_english() {
-                            "Enter a city (at least 3 letters)"
+                            "Enter a city in English or Chinese"
                         } else {
-                            "输入城市名，至少 3 个字母"
+                            "输入城市名（支持中文、英文或拼音）"
                         },
                     ),
                 );
+                if self.search_focus {
+                    response.request_focus();
+                    self.search_focus = false;
+                }
                 if response.lost_focus() && ui.input(|input| input.key_pressed(egui::Key::Enter)) {
                     let ctx = ui.ctx().clone();
                     self.search(&ctx);
@@ -1391,6 +1400,17 @@ impl PanahonApp {
                     },
                 );
             }
+            if self.search_attempted && !self.searching && self.search_results.is_empty() {
+                ui.label(
+                    RichText::new(if self.language.is_english() {
+                        "No matching Philippine location was returned. Try an English or Chinese city name."
+                    } else {
+                        "没有找到可用地点。当前数据源覆盖菲律宾城市，请尝试中文、英文或拼音名称。"
+                    })
+                    .size(11.0)
+                    .color(palette.faint),
+                );
+            }
             for place in self.search_results.clone() {
                 if ui
                     .add_sized(
@@ -1415,6 +1435,7 @@ impl PanahonApp {
                     self.tab = 0;
                     crate::write_preference("place", &encode_place(&self.dashboard.place));
                     self.search_results.clear();
+                    self.search_attempted = false;
                     self.status = if self.language.is_english() {
                         "Location changed; refreshing…".into()
                     } else {
@@ -1619,17 +1640,18 @@ impl PanahonApp {
     }
 }
 impl PanahonApp {
-    /// 顶部栏：首页显示菜单 / 城市 / 刷新，子页显示返回 / 标题。
+    /// 顶部栏：首页显示菜单 / 城市 / 搜索 / 更多，子页显示返回 / 标题。
     ///
     /// 用常规布局分配交互区域，避免手算矩形与绘制位置脱节。
     fn top_bar(&mut self, ui: &mut egui::Ui, palette: &Palette) {
         let is_english = self.language.is_english();
         let stroke = egui::Stroke::new(2.0_f32, palette.text);
+        let on_home = self.tab == 0;
 
         ui.horizontal_centered(|ui| {
             let (left_rect, left) = ui.allocate_exact_size(Vec2::splat(40.0), Sense::click());
             let center = left_rect.center();
-            if self.tab == 0 {
+            if on_home {
                 for row in 0..3 {
                     let y = center.y - 7.0 + row as f32 * 7.0;
                     ui.painter().line_segment(
@@ -1654,7 +1676,53 @@ impl PanahonApp {
                 );
             }
             if left.clicked() {
-                self.tab = if self.tab == 0 { 4 } else { 0 };
+                if !on_home {
+                    self.tab = 0;
+                }
+            }
+
+            if on_home {
+                egui::Popup::menu(&left).width(190.0).show(|ui| {
+                    ui.label(
+                        RichText::new(if is_english { "Weather" } else { "天气" })
+                            .size(11.0)
+                            .color(palette.faint),
+                    );
+                    if ui
+                        .button(if is_english {
+                            "City management"
+                        } else {
+                            "城市管理"
+                        })
+                        .clicked()
+                    {
+                        self.tab = 4;
+                        self.search_focus = true;
+                        self.search_attempted = false;
+                    }
+                    if ui
+                        .button(if is_english {
+                            "Weather map"
+                        } else {
+                            "天气地图"
+                        })
+                        .clicked()
+                    {
+                        self.tab = 2;
+                    }
+                    if ui
+                        .button(if is_english { "Alerts" } else { "预警" })
+                        .clicked()
+                    {
+                        self.tab = 3;
+                    }
+                    if ui
+                        .button(if is_english { "Settings" } else { "设置" })
+                        .clicked()
+                    {
+                        self.tab = 4;
+                    }
+                });
             }
 
             let title = match self.tab {
@@ -1689,7 +1757,8 @@ impl PanahonApp {
                 }
             };
 
-            let spare = (ui.available_width() - 40.0).max(80.0);
+            let right_width = if on_home { 80.0 } else { 40.0 };
+            let spare = (ui.available_width() - right_width).max(80.0);
             let (mid, _) = ui.allocate_exact_size(Vec2::new(spare, 40.0), Sense::hover());
             ui.painter().text(
                 mid.center(),
@@ -1700,25 +1769,69 @@ impl PanahonApp {
             );
 
             let (right_rect, right) = ui.allocate_exact_size(Vec2::splat(40.0), Sense::click());
-            if self.tab == 0 {
-                let radius = 8.0;
-                let mut points = Vec::new();
-                for step in 0..=18 {
-                    let angle = -std::f32::consts::FRAC_PI_2
-                        + std::f32::consts::TAU * 0.75 * step as f32 / 18.0;
-                    points.push(right_rect.center() + Vec2::new(angle.cos(), angle.sin()) * radius);
-                }
-                ui.painter().add(egui::Shape::line(points, stroke));
-                let tip = right_rect.center() + Vec2::new(radius, 0.0);
+            if on_home {
+                let center = right_rect.center();
                 ui.painter()
-                    .line_segment([tip, tip + Vec2::new(-3.0, -5.0)], stroke);
-                ui.painter()
-                    .line_segment([tip, tip + Vec2::new(-5.0, 2.0)], stroke);
+                    .circle_stroke(center + Vec2::new(-2.0, -2.0), 7.0, stroke);
+                ui.painter().line_segment(
+                    [center + Vec2::new(3.0, 3.0), center + Vec2::new(9.0, 9.0)],
+                    stroke,
+                );
                 if right.clicked() {
-                    let ctx = ui.ctx().clone();
-                    self.refresh_weather(&ctx);
-                    self.refresh_air(&ctx);
+                    self.tab = 4;
+                    self.search_results.clear();
+                    self.search_focus = true;
+                    self.search_attempted = false;
                 }
+
+                let (more_rect, more) = ui.allocate_exact_size(Vec2::splat(40.0), Sense::click());
+                for dx in [-3.0_f32, 3.0] {
+                    for dy in [-3.0_f32, 3.0] {
+                        ui.painter().circle_filled(
+                            more_rect.center() + Vec2::new(dx, dy),
+                            1.8,
+                            palette.text,
+                        );
+                    }
+                }
+                egui::Popup::menu(&more).width(190.0).show(|ui| {
+                    if ui
+                        .button(if is_english {
+                            "Refresh weather"
+                        } else {
+                            "刷新天气"
+                        })
+                        .clicked()
+                    {
+                        let ctx = ui.ctx().clone();
+                        self.refresh_weather(&ctx);
+                        self.refresh_air(&ctx);
+                    }
+                    if ui
+                        .button(if is_english {
+                            "Weather map"
+                        } else {
+                            "天气地图"
+                        })
+                        .clicked()
+                    {
+                        self.tab = 2;
+                    }
+                    if ui
+                        .button(if is_english { "Alerts" } else { "预警" })
+                        .clicked()
+                    {
+                        self.tab = 3;
+                    }
+                    if ui
+                        .button(if is_english { "Settings" } else { "设置" })
+                        .clicked()
+                    {
+                        self.tab = 4;
+                    }
+                });
+            } else {
+                let _ = right;
             }
         });
     }

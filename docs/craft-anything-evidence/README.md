@@ -27,3 +27,5 @@ Hex-Rays IDA MCP 以 Dalvik 处理器打开已生成的 `classes.dex.i64` 和 `c
 
 在 Pixel 10a（GrapheneOS，1080×2424，420 dpi）上启动该 APK 会在 `WeatherApplication` 静态初始化阶段因缺少 `com.huawei.android.os.SystemPropertiesEx` 崩溃。`docs/huawei-weather-ida-evidence.md` 和 `docs/huawei-design-spec.md` 因此只采用 `aapt`、`apktool`、IDA 和 Craft Anything 的静态证据，不把启动画面当作可用的华为真机 UI 证据。
 
+用户提供的主界面录屏补充了静态分析无法确定的交互证据，见 [`video-ui-analysis.md`](video-ui-analysis.md)。录屏确认顶部固定导航包含三横线、城市名、搜索和四点菜单，并确定了向下滚动时小时预报、多日预报、AQI、生活指数和地图卡片的实际顺序。
+
