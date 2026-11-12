@@ -9,8 +9,8 @@ use std::time::{Duration, Instant};
 use eframe::egui::{self, Align, Align2, Color32, FontId, Layout, Pos2, RichText, Sense, Vec2};
 use panahon_core::{
     fetch_air_quality_at, fetch_api_version, fetch_public_dashboard, fetch_remote_map_layer,
-    fetch_remote_map_layer_frame, search_places, AirQuality, ApiVersion, Dashboard, DataSource,
-    MapTrackPoint, Place, RemoteMapSnapshot,
+    fetch_remote_map_layer_frame, search_places, AirQuality, ApiVersion, Dashboard, DataQuality,
+    DataSource, MapTrackPoint, Place, RemoteMapSnapshot,
 };
 
 #[cfg(target_os = "android")]
@@ -19,12 +19,56 @@ use panahon_core::OFFICIAL_MAP_URL;
 use crate::theme::{self, Palette};
 use crate::widgets;
 
-const MAP_LAYERS: [(&str, &str); 5] = [
-    ("radar", "雷达"),
-    ("satellite", "卫星"),
-    ("lightning", "闪电"),
-    ("typhoon", "台风"),
-    ("hazard", "灾害"),
+struct MapLayer {
+    key: &'static str,
+    title_zh: &'static str,
+    title_en: &'static str,
+    supported: bool,
+}
+
+const MAP_LAYERS: [MapLayer; 7] = [
+    MapLayer {
+        key: "radar",
+        title_zh: "降水雷达",
+        title_en: "Precipitation radar",
+        supported: true,
+    },
+    MapLayer {
+        key: "satellite",
+        title_zh: "卫星",
+        title_en: "Satellite",
+        supported: true,
+    },
+    MapLayer {
+        key: "lightning",
+        title_zh: "闪电",
+        title_en: "Lightning",
+        supported: true,
+    },
+    MapLayer {
+        key: "typhoon",
+        title_zh: "台风",
+        title_en: "Typhoon",
+        supported: true,
+    },
+    MapLayer {
+        key: "hazard",
+        title_zh: "灾害",
+        title_en: "Hazard",
+        supported: true,
+    },
+    MapLayer {
+        key: "temperature",
+        title_zh: "温度",
+        title_en: "Temperature",
+        supported: false,
+    },
+    MapLayer {
+        key: "wind",
+        title_zh: "风力",
+        title_en: "Wind",
+        supported: false,
+    },
 ];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -80,6 +124,30 @@ fn localized_error(error: &str, is_english: bool) -> String {
     }
 }
 
+fn setting_text(key: &str, english: bool, android: bool) -> &'static str {
+    match (key, english, android) {
+        ("runtime_status", true, _) => "Runtime status",
+        ("runtime_status", false, _) => "运行状态",
+        ("weather_cache", true, _) => "Weather cache",
+        ("weather_cache", false, _) => "天气缓存",
+        ("available", true, _) => "available",
+        ("available", false, _) => "可用",
+        ("unavailable", true, _) => "not available",
+        ("unavailable", false, _) => "不可用",
+        ("notifications", true, _) => "Notifications",
+        ("notifications", false, _) => "通知",
+        ("permissions", true, _) => "Permissions",
+        ("permissions", false, _) => "权限",
+        ("permission_android", true, true) => "location selected manually; permission is optional",
+        ("permission_android", false, true) => "当前地点由用户选择；定位权限为可选",
+        ("permission_android", true, false) => {
+            "desktop uses the selected city; no location permission"
+        }
+        ("permission_android", false, false) => "桌面使用已选城市；不请求定位权限",
+        _ => "—",
+    }
+}
+
 enum Msg {
     Dashboard(u64, Result<Dashboard, String>),
     Air(u64, Result<AirQuality, String>),
@@ -106,6 +174,9 @@ pub struct PanahonApp {
     loading_air: bool,
     map_layer: usize,
     map_status: String,
+    map_source: String,
+    map_quality: DataQuality,
+    map_updated_at: Option<String>,
     map_detail: Option<String>,
     map_track: Vec<MapTrackPoint>,
     map_texture: Option<egui::TextureHandle>,
@@ -179,6 +250,9 @@ impl PanahonApp {
             } else {
                 "选择图层后点刷新".into()
             },
+            map_source: "PAGASA".into(),
+            map_quality: DataQuality::Unavailable,
+            map_updated_at: None,
             map_detail: None,
             map_track: Vec::new(),
             map_texture: None,
@@ -266,14 +340,25 @@ impl PanahonApp {
         };
         let tx = self.tx.clone();
         let ctx = ctx.clone();
-        let (key, title) = MAP_LAYERS[self.map_layer];
-        let key = key.to_owned();
+        let layer = &MAP_LAYERS[self.map_layer];
+        let key = layer.key.to_owned();
         let title = if self.language.is_english() {
-            ["Radar", "Satellite", "Lightning", "Typhoon", "Hazard"][self.map_layer]
+            layer.title_en
         } else {
-            title
+            layer.title_zh
         }
         .to_owned();
+        if !layer.supported {
+            self.loading_map = false;
+            self.map_quality = DataQuality::Unavailable;
+            self.map_updated_at = None;
+            self.map_status = if self.language.is_english() {
+                format!("{title} layer has no data adapter")
+            } else {
+                format!("{title}图层暂无数据适配器")
+            };
+            return;
+        }
         let frame_index = self.map_frame_count.map(|_| self.map_frame_index as usize);
         std::thread::spawn(move || {
             let result = match frame_index {
@@ -387,6 +472,9 @@ impl PanahonApp {
                     }
                     match result {
                         Ok(snapshot) => {
+                            self.map_source = snapshot.source.clone();
+                            self.map_quality = snapshot.quality;
+                            self.map_updated_at = snapshot.latest_at.clone();
                             self.map_detail = snapshot.summary.clone();
                             self.map_track = snapshot.track.clone();
                             self.map_frame_count = snapshot.frame_count;
@@ -453,6 +541,8 @@ impl PanahonApp {
                             });
                         }
                         Err(error) => {
+                            self.map_quality = DataQuality::Unavailable;
+                            self.map_updated_at = None;
                             self.map_detail = None;
                             self.map_track.clear();
                             self.map_texture = None;
@@ -538,6 +628,9 @@ impl PanahonApp {
     fn weather_page(&mut self, ui: &mut egui::Ui, palette: &Palette) {
         widgets::hero(ui, &self.dashboard, self.air.as_ref(), palette);
         ui.add_space(14.0);
+
+        widgets::blender_sky_card(ui, palette);
+        ui.add_space(10.0);
 
         widgets::hourly_strip(ui, &self.dashboard.hourly, palette);
         ui.add_space(10.0);
@@ -711,6 +804,8 @@ impl PanahonApp {
             (Some(air), _) => {
                 widgets::aqi_summary(ui, air, palette);
                 ui.add_space(10.0);
+                widgets::aqi_pollutants(ui, air, palette);
+                ui.add_space(10.0);
 
                 widgets::aqi_trend(ui, &air.trend, palette);
                 ui.add_space(10.0);
@@ -851,12 +946,12 @@ impl PanahonApp {
                 } else {
                     "天气地图"
                 },
-                "PAGASA",
+                &self.map_source,
             );
             ui.add_space(8.0);
 
             ui.horizontal_wrapped(|ui| {
-                for (index, (_, title)) in MAP_LAYERS.iter().enumerate() {
+                for (index, layer) in MAP_LAYERS.iter().enumerate() {
                     let active = index == self.map_layer;
                     let fill = if active {
                         Color32::from_rgba_unmultiplied(255, 255, 255, 210)
@@ -864,23 +959,36 @@ impl PanahonApp {
                         Color32::from_rgba_unmultiplied(255, 255, 255, 26)
                     };
                     let color = if active { palette.bottom } else { palette.text };
+                    let label = if is_english {
+                        layer.title_en
+                    } else {
+                        layer.title_zh
+                    };
                     if ui
                         .add(
-                            egui::Button::new(
-                                RichText::new(if is_english {
-                                    ["Radar", "Satellite", "Lightning", "Typhoon", "Hazard"][index]
+                            egui::Button::new(RichText::new(label).size(12.0).color(
+                                if layer.supported {
+                                    color
                                 } else {
-                                    *title
-                                })
-                                .size(12.0)
-                                .color(color),
-                            )
+                                    palette.faint
+                                },
+                            ))
                             .fill(fill)
                             .corner_radius(egui::CornerRadius::same(12))
                             .min_size(Vec2::new(58.0, 28.0)),
                         )
                         .clicked()
                     {
+                        if !layer.supported {
+                            self.map_status = if is_english {
+                                format!("{label} layer has no data adapter")
+                            } else {
+                                format!("{label}图层暂无数据适配器")
+                            };
+                            self.map_quality = DataQuality::Unavailable;
+                            self.map_updated_at = None;
+                            return;
+                        }
                         self.map_layer = index;
                         self.map_generation += 1;
                         self.loading_map = false;
@@ -888,6 +996,8 @@ impl PanahonApp {
                         self.map_size = None;
                         self.map_frame_count = None;
                         self.map_frame_index = 0;
+                        self.map_quality = DataQuality::Unavailable;
+                        self.map_updated_at = None;
                         self.map_detail = None;
                         self.map_track.clear();
                         self.map_playing = false;
@@ -926,9 +1036,9 @@ impl PanahonApp {
                     |ui| {
                         ui.label(
                             RichText::new(if is_english {
-                                "Radar and satellite layers\nshow the latest PAGASA frame"
+                                "Precipitation radar and satellite\nshow the latest PAGASA frame"
                             } else {
-                                "雷达与卫星图层\n显示 PAGASA 最新一帧"
+                                "降水雷达与卫星图层\n显示 PAGASA 最新一帧"
                             })
                             .size(12.0)
                             .color(palette.faint),
@@ -1018,6 +1128,13 @@ impl PanahonApp {
                 RichText::new(&self.map_status)
                     .size(11.0)
                     .color(palette.dim),
+            );
+            widgets::provenance_line(
+                ui,
+                palette,
+                &self.map_source,
+                self.map_updated_at.as_deref(),
+                self.map_quality,
             );
         });
 
@@ -1317,6 +1434,71 @@ impl PanahonApp {
             ui.set_min_width(ui.available_width());
             theme::section_title(
                 ui,
+                setting_text(
+                    "runtime_status",
+                    self.language.is_english(),
+                    cfg!(target_os = "android"),
+                ),
+                palette,
+            );
+            let cached = if self.cached {
+                setting_text(
+                    "available",
+                    self.language.is_english(),
+                    cfg!(target_os = "android"),
+                )
+            } else {
+                setting_text(
+                    "unavailable",
+                    self.language.is_english(),
+                    cfg!(target_os = "android"),
+                )
+            };
+            let permission = setting_text(
+                "permission_android",
+                self.language.is_english(),
+                cfg!(target_os = "android"),
+            );
+            for (label, value) in [
+                (
+                    setting_text(
+                        "weather_cache",
+                        self.language.is_english(),
+                        cfg!(target_os = "android"),
+                    ),
+                    cached,
+                ),
+                (
+                    setting_text(
+                        "notifications",
+                        self.language.is_english(),
+                        cfg!(target_os = "android"),
+                    ),
+                    self.notification_status.as_str(),
+                ),
+                (
+                    setting_text(
+                        "permissions",
+                        self.language.is_english(),
+                        cfg!(target_os = "android"),
+                    ),
+                    permission,
+                ),
+            ] {
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new(label).size(12.0).color(palette.dim));
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        ui.label(RichText::new(value).size(11.0).color(palette.faint));
+                    });
+                });
+            }
+        });
+        ui.add_space(10.0);
+
+        theme::card().show(ui, |ui| {
+            ui.set_min_width(ui.available_width());
+            theme::section_title(
+                ui,
                 if self.language.is_english() {
                     "Current location"
                 } else {
@@ -1587,9 +1769,9 @@ impl PanahonApp {
                             ui.add_space(2.0);
                             ui.label(
                                 RichText::new(if is_english {
-                                    "Radar · satellite · typhoon track"
+                                    "Precipitation radar · satellite · typhoon track"
                                 } else {
-                                    "雷达 · 卫星 · 台风路径"
+                                    "降水雷达 · 卫星 · 台风路径"
                                 })
                                 .size(11.0)
                                 .color(palette.faint),

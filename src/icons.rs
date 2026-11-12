@@ -95,6 +95,7 @@ pub fn draw(painter: &Painter, rect: Rect, icon: WeatherIcon, is_day: bool, back
                 );
             }
         }
+        WeatherIcon::Unknown => unknown(painter, center, s * 0.34),
         icon => {
             cloud(painter, center + Vec2::new(0.0, -s * 0.10), s * 0.68, CLOUD);
             match icon {
@@ -108,6 +109,17 @@ pub fn draw(painter: &Painter, rect: Rect, icon: WeatherIcon, is_day: bool, back
             }
         }
     }
+}
+
+fn unknown(painter: &Painter, center: Pos2, radius: f32) {
+    painter.circle_stroke(center, radius, Stroke::new(radius * 0.12, Color32::WHITE));
+    painter.text(
+        center + Vec2::new(0.0, radius * 0.02),
+        egui::Align2::CENTER_CENTER,
+        "?",
+        egui::FontId::proportional(radius * 1.25),
+        Color32::WHITE,
+    );
 }
 
 fn dim(color: Color32) -> Color32 {

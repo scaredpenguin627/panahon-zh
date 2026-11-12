@@ -109,6 +109,9 @@ pub struct RemoteMapSnapshot {
     pub image: Option<Vec<u8>>,
     pub summary: Option<String>,
     pub track: Vec<MapTrackPoint>,
+    pub source: String,
+    pub quality: DataQuality,
+    pub error: Option<String>,
 }
 #[derive(Clone, Debug, PartialEq)]
 pub struct MapTrackPoint {
@@ -147,7 +150,9 @@ pub struct CurrentWeather {
     pub icon: WeatherIcon,
     pub is_day: bool,
     /// Station precipitation only; use precip_unit for the source's actual unit.
-    pub precip_mm: f32,
+    /// None means no usable precipitation field; Some(0.0) is a real zero.
+    #[serde(default)]
+    pub precip_mm: Option<f32>,
     #[serde(default)]
     pub precip_unit: String,
     pub precip_desc: String,
@@ -172,7 +177,9 @@ pub struct ForecastDay {
     pub summary: String,
     pub low_c: Option<f32>,
     pub high_c: Option<f32>,
-    pub precip_mm: f32,
+    /// None means no usable precipitation field; Some(0.0) is a real zero.
+    #[serde(default)]
+    pub precip_mm: Option<f32>,
     /// Provenance of the forecast precipitation value.
     pub precip_quality: DataQuality,
     pub icon: WeatherIcon,
@@ -185,7 +192,9 @@ pub struct HourlyForecast {
     pub time: String,
     pub summary: String,
     pub temperature_c: Option<f32>,
-    pub precip_mm: f32,
+    /// None means no usable precipitation field; Some(0.0) is a real zero.
+    #[serde(default)]
+    pub precip_mm: Option<f32>,
     /// Provenance of the hourly precipitation value.
     pub precip_quality: DataQuality,
     pub icon: WeatherIcon,
@@ -208,6 +217,10 @@ pub struct Alert {
     /// The original English text always stays available.
     pub detail_zh: Option<String>,
     pub defense: String,
+    #[serde(default)]
+    pub source: String,
+    #[serde(default)]
+    pub quality: DataQuality,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -217,11 +230,24 @@ pub struct AirQualityStation {
     /// 官方报表里的拉丁站名，英文界面使用。
     #[serde(default)]
     pub name: Option<String>,
+    #[serde(default)]
     pub pm10: Option<f32>,
     #[serde(rename = "pm25")]
+    #[serde(default)]
     pub pm25: Option<f32>,
+    #[serde(default)]
+    pub so2: Option<f32>,
+    #[serde(default)]
+    pub no2: Option<f32>,
+    #[serde(default)]
+    pub co: Option<f32>,
+    #[serde(default)]
+    pub o3: Option<f32>,
+    #[serde(default)]
     pub aqi: Option<u16>,
+    #[serde(default)]
     pub pollutant: Option<String>,
+    #[serde(default)]
     pub category: String,
 }
 
@@ -241,6 +267,8 @@ pub struct AirQualitySummary {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct AirQuality {
     pub source: AirQualitySource,
+    #[serde(default)]
+    pub quality: DataQuality,
     #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
     #[serde(rename = "dataClock")]
@@ -266,6 +294,7 @@ pub struct AirQualitySource {
 pub struct AirQualityTrendPoint {
     pub at: String,
     pub aqi: Option<u16>,
+    #[serde(default)]
     pub quality: DataQuality,
 }
 
@@ -278,6 +307,8 @@ pub struct SunWeather {
     pub sunrise: Option<String>,
     pub sunset: Option<String>,
     pub source: String,
+    #[serde(default)]
+    pub updated_at: Option<String>,
 }
 
 /// A locally derived suggestion. No extra API call is involved.
@@ -292,6 +323,8 @@ pub struct LifeIndex {
     /// Current life indices are local heuristics unless an upstream product is
     /// added in the future.
     pub quality: DataQuality,
+    pub source: String,
+    pub updated_at: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -320,7 +353,7 @@ pub enum DataSource {
 }
 
 /// Describes where a displayed weather value came from.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub enum DataQuality {
     /// Supplied by an official observation or forecast field.
     Official,
@@ -330,6 +363,7 @@ pub enum DataQuality {
     /// quick reference.
     Estimated,
     /// The source did not provide a usable value.
+    #[default]
     Unavailable,
 }
 
@@ -368,6 +402,7 @@ impl Dashboard {
         data.current.wind_quality = DataQuality::Unavailable;
         data.current.heat_index_quality = DataQuality::Unavailable;
         data.current.precip_quality = DataQuality::Unavailable;
+        data.current.precip_mm = None;
         data.current.condition = "暂无数据".into();
         data.current.updated_at.clear();
         data.current.icon = WeatherIcon::Unknown;
@@ -405,7 +440,7 @@ impl Dashboard {
                 updated_at: "离线示例".into(),
                 icon: WeatherIcon::PartlyCloudy,
                 is_day: true,
-                precip_mm: 0.0,
+                precip_mm: Some(0.0),
                 precip_unit: "mm/h".into(),
                 precip_desc: "无降雨".into(),
                 precip_quality: DataQuality::Estimated,
@@ -479,7 +514,7 @@ impl Dashboard {
                         },
                         summary: if afternoon { "局部多云" } else { "多云" }.into(),
                         temperature_c: Some(if afternoon { 32.0 } else { 27.0 }),
-                        precip_mm: if afternoon { 0.2 } else { 0.0 },
+                        precip_mm: Some(if afternoon { 0.2 } else { 0.0 }),
                         precip_quality: DataQuality::Estimated,
                         icon: if afternoon {
                             WeatherIcon::PartlyCloudy
@@ -501,6 +536,8 @@ impl Dashboard {
                 detail: "联网后将从 PAGASA 公开接口加载官方预警。".into(),
                 detail_zh: None,
                 defense: "联网并确认数据来源后，再按官方防御指南行动。".into(),
+                source: "PAGASA 公开接口".into(),
+                quality: DataQuality::Estimated,
             }],
             sun: SunWeather {
                 uv_index: Some(5.0),
@@ -508,6 +545,7 @@ impl Dashboard {
                 sunrise: Some("05:42".into()),
                 sunset: Some("17:32".into()),
                 source: "离线示例".into(),
+                updated_at: Some("离线示例".into()),
             },
             outlook_url: None,
             source: DataSource::OfflineSample,
@@ -517,9 +555,10 @@ impl Dashboard {
         }
     }
 
-    /// Derive four suggestions from the current observation.
+    /// Derive four suggestions only when the dashboard has the forecast inputs
+    /// required by the corresponding rules.
     pub fn life_indices(&self) -> Vec<LifeIndex> {
-        life_indices(&self.current)
+        life_indices_with_inputs(&self.current, &self.hourly, &self.forecast)
     }
 }
 
@@ -539,7 +578,7 @@ fn day(
         summary: summary.into(),
         low_c: Some(low_c),
         high_c: Some(high_c),
-        precip_mm,
+        precip_mm: Some(precip_mm),
         precip_quality: DataQuality::Estimated,
         icon,
         heat_index_c,
@@ -551,53 +590,106 @@ fn day(
 /// 每条建议都带上计算依据（`basis`），界面必须把依据一起显示出来。输入缺失时
 /// 直接给"未知"，不要用默认值凑一个结论。
 pub fn life_indices(current: &CurrentWeather) -> Vec<LifeIndex> {
+    life_indices_with_inputs(current, &[], &[])
+}
+
+/// Derive conservative lifestyle suggestions. The UI must not present a
+/// seemingly precise daily recommendation from a single current observation:
+/// complete hourly and daily inputs are a hard gate for every index.
+pub fn life_indices_with_inputs(
+    current: &CurrentWeather,
+    hourly: &[HourlyForecast],
+    daily: &[ForecastDay],
+) -> Vec<LifeIndex> {
+    let complete_inputs = !hourly.is_empty() && !daily.is_empty();
     let temp = current.temperature_quality.is_available();
-    let heat = current.heat_index_quality.is_official();
+    let heat = complete_inputs && current.heat_index_quality.is_official();
     vec![
         LifeIndex {
             title: "穿衣".into(),
-            level: if temp { "参考气温" } else { "未知" }.into(),
-            advice: "结合个人耐受、日照和风选择衣物；当前气温不能代表全天。".into(),
-            basis: if temp {
+            level: if complete_inputs && temp {
+                "参考气温"
+            } else {
+                "暂无指数"
+            }
+            .into(),
+            advice: if complete_inputs && temp {
+                "结合逐小时和逐日预报、个人耐受、日照和风选择衣物。"
+            } else {
+                "缺少完整逐小时或逐日输入，无法生成生活指数。"
+            }
+            .into(),
+            basis: if complete_inputs && temp {
                 format!("气温 {:.0}°C", current.temperature_c)
             } else {
-                "无数据".into()
+                "缺少完整逐小时/逐日输入".into()
             },
-            quality: DataQuality::Unavailable,
+            quality: if complete_inputs && temp {
+                DataQuality::Estimated
+            } else {
+                DataQuality::Unavailable
+            },
+            source: "本地规则".into(),
+            updated_at: current.updated_at.clone(),
         },
         LifeIndex {
             title: "热指数".into(),
             level: if heat {
                 trust::heat_band(current.feels_like_c)
             } else {
-                "未知"
+                "暂无指数"
             }
             .into(),
-            advice: "PAGASA 热指数分级；日照和活动强度会改变个人风险。".into(),
+            advice: if heat {
+                "PAGASA 热指数分级；日照和活动强度会改变个人风险。"
+            } else {
+                "缺少完整逐小时或逐日输入，无法确认热风险。"
+            }
+            .into(),
             basis: if heat {
                 format!("热指数 {:.0}°C", current.feels_like_c)
             } else {
-                "无数据".into()
+                "缺少完整逐小时/逐日输入".into()
             },
             quality: if heat {
                 current.heat_index_quality
             } else {
                 DataQuality::Unavailable
             },
+            source: if heat {
+                "PAGASA 官方热指数".into()
+            } else {
+                "PAGASA 官方热指数".into()
+            },
+            updated_at: current.updated_at.clone(),
         },
         LifeIndex {
             title: "出行".into(),
-            level: "查看预报".into(),
-            advice: "查看出行时段的逐小时预报和预警；当前无雨不代表之后无雨。".into(),
-            basis: "无官方指数".into(),
+            level: "暂无指数".into(),
+            advice: "当前没有可审计的官方出行指数；请查看逐小时预报和预警。".into(),
+            basis: if complete_inputs {
+                "未提供官方指数"
+            } else {
+                "缺少完整逐小时/逐日输入"
+            }
+            .into(),
             quality: DataQuality::Unavailable,
+            source: "未提供官方指数".into(),
+            updated_at: current.updated_at.clone(),
         },
         LifeIndex {
             title: "晾晒".into(),
             level: "暂无指数".into(),
             advice: "缺少未来降雨、湿度、风和日照的完整指标，无法判断晾晒条件。".into(),
-            basis: "无官方指数".into(),
+            basis: if complete_inputs {
+                "无官方指数"
+            } else {
+                "缺少完整逐小时/逐日输入"
+            }
+            .into(),
             quality: DataQuality::Unavailable,
+            source: "未提供官方指数".into(),
+            updated_at: current.updated_at.clone(),
         },
     ]
 }
@@ -642,13 +734,21 @@ pub fn fetch_air_quality_at(latitude: f64, longitude: f64) -> Result<AirQuality,
         return fetch_cams_air_quality(latitude, longitude);
     }
     if !AQI_ENDPOINT.is_empty() {
-        return ureq::get(AQI_ENDPOINT)
+        let mut air = ureq::get(AQI_ENDPOINT)
             .timeout(Duration::from_secs(20))
             .set("User-Agent", "PanahonZh/0.2 (Rust client)")
             .call()
             .map_err(|err| format!("空气质量服务请求失败：{err}"))?
             .into_json::<AirQuality>()
-            .map_err(|err| format!("空气质量响应无法解析：{err}"));
+            .map_err(|err| format!("空气质量响应无法解析：{err}"))?;
+        if matches!(air.quality, DataQuality::Unavailable) {
+            air.quality = if air.source.provider.contains("EMB") {
+                DataQuality::Official
+            } else {
+                DataQuality::Forecast
+            };
+        }
+        return Ok(air);
     }
 
     match emb::fetch() {
@@ -684,6 +784,10 @@ fn fetch_cams_air_quality(latitude: f64, longitude: f64) -> Result<AirQuality, S
         name: Some("Current location (model)".into()),
         pm10: number(Some(current), "pm10").map(|value| value as f32),
         pm25: number(Some(current), "pm2_5").map(|value| value as f32),
+        so2: None,
+        no2: None,
+        co: None,
+        o3: None,
         aqi,
         pollutant: None,
         category: category.clone(),
@@ -696,6 +800,7 @@ fn fetch_cams_air_quality(latitude: f64, longitude: f64) -> Result<AirQuality, S
             page: "https://open-meteo.com/en/docs/air-quality-api".into(),
             note: "位置级预测。DENR-EMB 官方站点数据不可用时的备用来源。".into(),
         },
+        quality: DataQuality::Forecast,
         updated_at: data_clock.clone(),
         data_clock,
         fetched_at: None,
@@ -785,6 +890,9 @@ pub fn fetch_remote_map_layer(layer: &str) -> Result<RemoteMapSnapshot, String> 
                 image: None,
                 summary: None,
                 track: Vec::new(),
+                source: "PAGASA 地图接口".into(),
+                quality: DataQuality::Official,
+                error: None,
             })
         }
         "typhoon" => {
@@ -840,6 +948,9 @@ pub fn fetch_remote_map_layer(layer: &str) -> Result<RemoteMapSnapshot, String> 
                 image: None,
                 summary: summary.flatten(),
                 track,
+                source: "PAGASA 台风接口".into(),
+                quality: DataQuality::Official,
+                error: None,
             })
         }
         "hazard" => {
@@ -865,6 +976,9 @@ pub fn fetch_remote_map_layer(layer: &str) -> Result<RemoteMapSnapshot, String> 
                 image: None,
                 summary: None,
                 track: Vec::new(),
+                source: "PAGASA 灾害接口".into(),
+                quality: DataQuality::Official,
+                error: None,
             })
         }
         _ => Err(format!("未知地图图层：{layer}")),
@@ -973,6 +1087,9 @@ fn fetch_radar_snapshot_at(
         image: Some(map_bytes(&image_url)?),
         summary: None,
         track: Vec::new(),
+        source: "PAGASA 雷达接口".into(),
+        quality: DataQuality::Official,
+        error: None,
     })
 }
 
@@ -1021,6 +1138,9 @@ fn fetch_satellite_snapshot_at(
         image: Some(map_bytes(&image_url)?),
         summary: None,
         track: Vec::new(),
+        source: "PAGASA Himawari 接口".into(),
+        quality: DataQuality::Official,
+        error: None,
     })
 }
 
@@ -1216,9 +1336,9 @@ pub fn decode_dashboard(
         };
 
     let (precip_mm, precip_quality) = if let Some(value) = bounded(obs, "precip_1h", 0.0, 2000.0) {
-        (value.max(0.0) as f32, DataQuality::Official)
+        (Some(value.max(0.0) as f32), DataQuality::Official)
     } else {
-        (0.0, DataQuality::Unavailable)
+        (None, DataQuality::Unavailable)
     };
 
     let current = CurrentWeather {
@@ -1250,10 +1370,10 @@ pub fn decode_dashboard(
         .into(),
         precip_desc: if !precip_quality.is_available() {
             "暂无降水数据".into()
-        } else if precip_mm <= 0.05 {
+        } else if precip_mm.is_some_and(|value| value <= 0.05) {
             "无降雨".into()
         } else {
-            format!("约 {precip_mm:.1} mm/h")
+            format!("约 {:.1} mm/h", precip_mm.unwrap_or_default())
         },
         precip_quality,
         heat_index_desc: if heat_index_quality.is_available() {
@@ -1300,7 +1420,7 @@ pub fn decode_dashboard(
                         summary: translate_condition(description),
                         low_c: bounded(Some(row), "tmin", -70.0, 60.0).map(|v| v as f32),
                         high_c: bounded(Some(row), "tmax", -70.0, 60.0).map(|v| v as f32),
-                        precip_mm: precip.unwrap_or(0.0) as f32,
+                        precip_mm: precip.map(|value| value as f32),
                         precip_quality: if precip.is_some() {
                             DataQuality::Forecast
                         } else {
@@ -1330,7 +1450,7 @@ pub fn decode_dashboard(
                             .unwrap_or_else(|| "未知".into()),
                         summary: translate_condition(description),
                         temperature_c: bounded(Some(row), "tmp", -70.0, 60.0).map(|v| v as f32),
-                        precip_mm: precip.unwrap_or(0.0) as f32,
+                        precip_mm: precip.map(|value| value as f32),
                         precip_quality: if precip.is_some() {
                             DataQuality::Forecast
                         } else {
@@ -1375,6 +1495,8 @@ pub fn decode_dashboard(
                         // their own trusted app without mixed-language text.
                         detail_zh: None,
                         defense: String::new(),
+                        source: "PAGASA 预警接口".into(),
+                        quality: DataQuality::Official,
                     }
                 })
                 .collect::<Vec<_>>();
@@ -1699,6 +1821,7 @@ fn fetch_sun_weather(place: &Place) -> Result<SunWeather, String> {
         sunrise,
         sunset,
         source: "Open-Meteo 模型预报".into(),
+        updated_at: text(value.pointer("/current"), "time"),
     })
 }
 
@@ -1956,11 +2079,13 @@ mod tests {
         let json = r#"{
             "source":{"provider":"test","page":"","note":""},
             "updatedAt":null,"dataClock":null,"fetchedAt":null,
-            "summary":{"stationCount":0,"avgAqi":null,"maxAqi":null,"maxStation":null,"category":null},
-            "stations":[]
+            "summary":{"stationCount":1,"avgAqi":null,"maxAqi":null,"maxStation":null,"category":null},
+            "stations":[{"nameZh":"站点","pm25":null,"pm10":null,"aqi":null,"pollutant":null}]
         }"#;
         let air: AirQuality = serde_json::from_str(json).expect("legacy AQI payload");
         assert!(air.trend.is_empty());
+        assert_eq!(air.stations[0].so2, None);
+        assert_eq!(air.stations[0].category, "");
     }
 
     #[test]
@@ -2014,27 +2139,70 @@ mod tests {
     #[test]
     fn life_indices_react_to_rain_and_heat() {
         let mut current = Dashboard::sample().current;
-        current.precip_mm = 8.0;
+        current.precip_mm = Some(8.0);
         current.feels_like_c = 45.0;
-        let indices = life_indices(&current);
+        current.heat_index_quality = DataQuality::Official;
+        let sample = Dashboard::sample();
+        let indices = life_indices_with_inputs(&current, &sample.hourly, &sample.forecast);
         assert_eq!(indices.len(), 4);
-        assert_eq!(indices[1].level, "未知");
-        assert_eq!(indices[2].level, "查看预报");
-        assert!(indices
-            .iter()
-            .all(|index| index.quality == DataQuality::Unavailable));
+        assert_eq!(indices[0].level, "参考气温");
+        assert_eq!(indices[1].level, "危险");
+        assert_eq!(indices[1].quality, DataQuality::Official);
+        assert_eq!(indices[2].level, "暂无指数");
     }
 
     #[test]
     fn missing_precipitation_is_not_presented_as_zero_rain() {
         let mut current = Dashboard::sample().current;
-        current.precip_mm = 0.0;
+        current.precip_mm = Some(0.0);
         current.precip_quality = DataQuality::Unavailable;
         current.heat_index_quality = DataQuality::Unavailable;
         let indices = life_indices(&current);
-        assert_eq!(indices[1].level, "未知");
-        assert_eq!(indices[2].level, "查看预报");
+        assert_eq!(indices[1].level, "暂无指数");
+        assert_eq!(indices[2].level, "暂无指数");
         assert_eq!(indices[3].level, "暂无指数");
+    }
+
+    #[test]
+    fn incomplete_life_inputs_explain_unavailable_index() {
+        let dashboard = Dashboard::sample();
+        let indices = life_indices_with_inputs(&dashboard.current, &[], &dashboard.forecast);
+        assert!(indices.iter().all(|index| {
+            index.level == "暂无指数"
+                && index.quality == DataQuality::Unavailable
+                && index.basis.contains("完整逐小时/逐日")
+        }));
+    }
+
+    #[test]
+    fn empty_dashboard_has_no_precipitation_value() {
+        let dashboard = Dashboard::empty(Dashboard::sample().place);
+        assert_eq!(dashboard.current.precip_mm, None);
+        assert_eq!(dashboard.current.precip_quality, DataQuality::Unavailable);
+    }
+
+    #[test]
+    fn official_and_estimated_heat_index_keep_distinct_quality() {
+        let mut current = Dashboard::sample().current;
+        current.feels_like_c = 42.0;
+        current.heat_index_quality = DataQuality::Estimated;
+        assert_eq!(life_indices(&current)[1].quality, DataQuality::Unavailable);
+
+        current.heat_index_quality = DataQuality::Official;
+        let sample = Dashboard::sample();
+        assert_eq!(
+            life_indices_with_inputs(&current, &sample.hourly, &sample.forecast)[1].quality,
+            DataQuality::Official
+        );
+    }
+
+    #[test]
+    fn unknown_weather_icon_is_not_a_rain_icon() {
+        assert_eq!(weather_icon(None, None), WeatherIcon::Unknown);
+        assert_eq!(
+            weather_icon(Some("unrecognised condition"), None),
+            WeatherIcon::Unknown
+        );
     }
 
     #[cfg(feature = "network")]

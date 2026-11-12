@@ -8,11 +8,15 @@ use panahon_core::{
     AirQuality, AirQualityTrendPoint, Alert, CurrentWeather, Dashboard, DataQuality, ForecastDay,
     HourlyForecast, LifeIndex, MapTrackPoint, SunWeather,
 };
+use std::time::Duration;
 
 use crate::icons;
 use crate::theme::{self, Palette};
 
 const LANGUAGE_ID: &str = "panahon-ui-language";
+const BLENDER_SKY_TEXTURE_ID: &str = "panahon-blender-sky-preview";
+const BLENDER_SKY_PREVIEW: &[u8] =
+    include_bytes!("../assets/blender_stage4/preview/cloud_sky_frame_0001.png");
 
 /// Share the selected UI language with leaf widgets without widening every
 /// renderer's public signature.
@@ -68,6 +72,7 @@ fn life_text(title: &str, level: &str, advice: &str, is_english: bool) -> (Strin
         "一般" => "Fair",
         "适宜" => "Good",
         "未知" => "Unknown",
+        "暂无指数" => "Unavailable",
         _ => level,
     };
     let advice = match advice {
@@ -95,6 +100,18 @@ fn life_text(title: &str, level: &str, advice: &str, is_english: bool) -> (Strin
         }
         "暂无官方热指数，避免长时间暴晒并查看预报" => {
             "Official heat index unavailable; limit sun exposure and check the forecast"
+        }
+        "结合逐小时和逐日预报、个人耐受、日照和风选择衣物。" => {
+            "Use hourly and daily forecasts together with personal tolerance, sun and wind"
+        }
+        "缺少完整逐小时或逐日输入，无法生成生活指数。" => {
+            "Complete hourly and daily inputs are required for a lifestyle index"
+        }
+        "缺少完整逐小时或逐日输入，无法确认热风险。" => {
+            "Complete hourly and daily inputs are required to assess heat risk"
+        }
+        "当前没有可审计的官方出行指数；请查看逐小时预报和预警。" => {
+            "No auditable official travel index; check the hourly forecast and alerts"
         }
         "湿度大或有降雨，不建议晾晒" => "Humid or rainy; laundry may not dry",
         "晾晒时间需要拉长" => "Allow extra drying time",
@@ -276,6 +293,69 @@ pub fn hero(ui: &mut egui::Ui, dashboard: &Dashboard, air: Option<&AirQuality>, 
     }
     ui.label(RichText::new(line).size(15.0).color(palette.text));
 }
+
+/// Display the original Blender 5.3 sky prototype as a small, replaceable
+/// visual layer. The PNG is an offline resource; the moving glow is drawn by
+/// egui so the page still animates when video playback is unavailable.
+pub fn blender_sky_card(ui: &mut egui::Ui, palette: &Palette) {
+    let is_english = english(ui);
+    let texture = ui
+        .ctx()
+        .data(|data| data.get_temp::<egui::TextureHandle>(egui::Id::new(BLENDER_SKY_TEXTURE_ID)));
+    let texture = texture.or_else(|| {
+        let decoded = image::load_from_memory(BLENDER_SKY_PREVIEW)
+            .ok()?
+            .to_rgba8();
+        let size = [decoded.width() as usize, decoded.height() as usize];
+        let pixels =
+            egui::ColorImage::from_rgba_unmultiplied(size, decoded.as_flat_samples().as_slice());
+        let handle =
+            ui.ctx()
+                .load_texture(BLENDER_SKY_TEXTURE_ID, pixels, egui::TextureOptions::LINEAR);
+        ui.ctx().data_mut(|data| {
+            data.insert_temp(egui::Id::new(BLENDER_SKY_TEXTURE_ID), handle.clone())
+        });
+        Some(handle)
+    });
+
+    theme::card().show(ui, |ui| {
+        ui.set_min_width(ui.available_width());
+        let (title, description) = if is_english {
+            (
+                "Sky motion prototype",
+                "Blender 5.3 preview · egui glow fallback",
+            )
+        } else {
+            ("天空动效原型", "Blender 5.3 预览 · egui 光晕回退")
+        };
+        card_header(ui, palette, title, "Original offline asset");
+        ui.add_space(6.0);
+        let width = ui.available_width();
+        let height = (width * 0.56).clamp(96.0, 180.0);
+        let (rect, _) = ui.allocate_exact_size(Vec2::new(width, height), Sense::hover());
+        if let Some(texture) = texture {
+            ui.painter().image(
+                texture.id(),
+                rect,
+                egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
+                Color32::WHITE,
+            );
+        } else {
+            ui.painter()
+                .rect_filled(rect, egui::CornerRadius::same(10), palette.track);
+        }
+        let t = ui.input(|input| input.time) as f32;
+        let pulse = (t * 0.8).sin() * 0.5 + 0.5;
+        ui.painter().circle_filled(
+            rect.right_bottom() - Vec2::new(28.0, 24.0),
+            9.0 + pulse * 4.0,
+            Color32::from_rgba_unmultiplied(255, 226, 160, 24 + (pulse * 36.0) as u8),
+        );
+        ui.ctx().request_repaint_after(Duration::from_millis(80));
+        ui.add_space(4.0);
+        ui.label(RichText::new(description).size(10.0).color(palette.faint));
+    });
+}
 /// 供 app.rs 复用的卡片标题行。
 pub fn card_header_public(ui: &mut egui::Ui, palette: &Palette, title: &str, source: &str) {
     card_header(ui, palette, title, source);
@@ -371,7 +451,8 @@ fn hour_cell(ui: &mut egui::Ui, hour: &HourlyForecast, palette: &Palette, is_eng
         hour.is_day,
         palette.top,
     );
-    if hour.precip_quality.is_available() && hour.precip_mm > 0.05 {
+    if hour.precip_quality.is_available() && hour.precip_mm.is_some_and(|value| value > 0.05) {
+        let precip = hour.precip_mm.unwrap_or_default();
         let prefix = if hour.precip_quality == DataQuality::Estimated {
             "≈"
         } else {
@@ -380,7 +461,7 @@ fn hour_cell(ui: &mut egui::Ui, hour: &HourlyForecast, palette: &Palette, is_eng
         painter.text(
             Pos2::new(rect.center().x, rect.top() + 70.0),
             Align2::CENTER_TOP,
-            format!("{prefix}{:.1}mm", hour.precip_mm),
+            format!("{prefix}{precip:.1}mm"),
             FontId::proportional(10.0),
             Color32::from_rgb(0xA9, 0xD6, 0xF5),
         );
@@ -473,7 +554,10 @@ fn day_row(ui: &mut egui::Ui, day: &ForecastDay, palette: &Palette, is_english: 
                 |ui| {
                     ui.add_space(5.0);
                     icons::paint(ui, day.icon, true, 24.0, palette.top);
-                    if day.precip_quality.is_available() && day.precip_mm > 0.05 {
+                    if day.precip_quality.is_available()
+                        && day.precip_mm.is_some_and(|value| value > 0.05)
+                    {
+                        let precip = day.precip_mm.unwrap_or_default();
                         let prefix = if day.precip_quality == DataQuality::Estimated {
                             "≈"
                         } else {
@@ -482,7 +566,7 @@ fn day_row(ui: &mut egui::Ui, day: &ForecastDay, palette: &Palette, is_english: 
                         ui.add_sized(
                             [56.0, 12.0],
                             egui::Label::new(
-                                RichText::new(format!("{prefix}{:.1}mm", day.precip_mm))
+                                RichText::new(format!("{prefix}{precip:.1}mm"))
                                     .size(10.0)
                                     .color(Color32::from_rgb(0xA9, 0xD6, 0xF5)),
                             ),
@@ -649,8 +733,105 @@ pub fn aqi_summary(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
                     .size(10.0)
                     .color(palette.faint),
                 );
+                provenance_line(
+                    ui,
+                    palette,
+                    &air.source.provider,
+                    air.data_clock.as_deref().or(air.updated_at.as_deref()),
+                    air.quality,
+                );
             });
         });
+    });
+}
+
+/// Show the pollutant fields promised by the AQI screen.  EMB currently
+/// exposes PM2.5/PM10 station sub-indices through the adapter; the other
+/// pollutants remain explicit unavailable values rather than being inferred.
+pub fn aqi_pollutants(ui: &mut egui::Ui, air: &AirQuality, palette: &Palette) {
+    let is_english = english(ui);
+    let max_field = |field: fn(&panahon_core::AirQualityStation) -> Option<f32>| {
+        air.stations
+            .iter()
+            .filter_map(field)
+            .max_by(|a, b| a.total_cmp(b))
+    };
+    let rows = [
+        (
+            "PM2.5",
+            "PM2.5",
+            max_field(|station| station.pm25),
+            "AQI 子指数",
+            "AQI sub-index",
+        ),
+        (
+            "PM10",
+            "PM10",
+            max_field(|station| station.pm10),
+            "AQI 子指数",
+            "AQI sub-index",
+        ),
+        ("SO₂", "SO2", max_field(|station| station.so2), "", ""),
+        ("NO₂", "NO2", max_field(|station| station.no2), "", ""),
+        ("CO", "CO", max_field(|station| station.co), "", ""),
+        ("O₃", "O3", max_field(|station| station.o3), "", ""),
+    ];
+    theme::card().show(ui, |ui| {
+        ui.set_min_width(ui.available_width());
+        card_header(
+            ui,
+            palette,
+            if is_english {
+                "Pollutants"
+            } else {
+                "污染物"
+            },
+            &air.source.provider,
+        );
+        ui.add_space(6.0);
+        for (index, (zh, en, value, unit_zh, unit_en)) in rows.into_iter().enumerate() {
+            if index > 0 {
+                ui.separator();
+            }
+            ui.horizontal(|ui| {
+                ui.label(
+                    RichText::new(if is_english { en } else { zh })
+                        .size(12.0)
+                        .color(palette.dim),
+                );
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    let unit = if is_english { unit_en } else { unit_zh };
+                    let text = value
+                        .map(|number| {
+                            if unit.is_empty() {
+                                format!("{number:.1}")
+                            } else {
+                                format!("{number:.1} {unit}")
+                            }
+                        })
+                        .unwrap_or_else(|| {
+                            if is_english {
+                                "Unavailable".into()
+                            } else {
+                                "暂无数据".into()
+                            }
+                        });
+                    ui.label(RichText::new(text).size(12.0).color(if value.is_some() {
+                        palette.text
+                    } else {
+                        palette.faint
+                    }));
+                });
+            });
+        }
+        ui.add_space(4.0);
+        provenance_line(
+            ui,
+            palette,
+            &air.source.provider,
+            air.data_clock.as_deref().or(air.updated_at.as_deref()),
+            air.quality,
+        );
     });
 }
 
@@ -1082,6 +1263,13 @@ pub fn detail_grid(ui: &mut egui::Ui, current: &CurrentWeather, palette: &Palett
             source,
         );
         ui.add_space(10.0);
+        provenance_line(
+            ui,
+            palette,
+            "PAGASA 自动站",
+            Some(&current.updated_at),
+            current.temperature_quality,
+        );
         ui.columns(2, |columns| {
             theme::metric(
                 &mut columns[0],
@@ -1137,8 +1325,14 @@ pub fn detail_grid(ui: &mut egui::Ui, current: &CurrentWeather, palette: &Palett
                     } else {
                         "暂无".to_owned()
                     }
+                } else if let Some(value) = current.precip_mm {
+                    format!("{value:.1} mm")
                 } else {
-                    format!("{:.1} mm", current.precip_mm)
+                    if is_english {
+                        "Unavailable".to_owned()
+                    } else {
+                        "暂无".to_owned()
+                    }
                 },
                 &precip_hint(current, is_english),
             );
@@ -1164,6 +1358,35 @@ pub fn detail_grid(ui: &mut egui::Ui, current: &CurrentWeather, palette: &Palett
                 },
             );
         });
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            ui.label(
+                RichText::new(if is_english {
+                    "Feels like / heat index"
+                } else {
+                    "体感温度 / 热指数"
+                })
+                .size(12.0)
+                .color(palette.dim),
+            );
+            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                let value = if current.heat_index_quality.is_available() {
+                    format!("{:.0}°C", current.feels_like_c)
+                } else if is_english {
+                    "Unavailable".into()
+                } else {
+                    "暂无".into()
+                };
+                ui.label(RichText::new(value).size(13.0).color(palette.text));
+            });
+        });
+        provenance_line(
+            ui,
+            palette,
+            "PAGASA",
+            Some(&current.updated_at),
+            current.heat_index_quality,
+        );
         if let Some(station) = &current.station {
             ui.add_space(8.0);
             ui.label(
@@ -1303,6 +1526,13 @@ pub fn sun_details(ui: &mut egui::Ui, sun: &SunWeather, palette: &Palette) {
             .size(10.0)
             .color(palette.faint),
         );
+        provenance_line(
+            ui,
+            palette,
+            &sun.source,
+            sun.updated_at.as_deref(),
+            DataQuality::Forecast,
+        );
     });
 }
 
@@ -1340,7 +1570,7 @@ pub fn life_indices(ui: &mut egui::Ui, indices: &[LifeIndex], palette: &Palette)
                     |ui| {
                         ui.add_space(18.0);
                         ui.label(RichText::new(&level).size(16.0).color(
-                            if index.level == "未知" {
+                            if index.quality == DataQuality::Unavailable {
                                 palette.faint
                             } else {
                                 palette.text
@@ -1355,6 +1585,16 @@ pub fn life_indices(ui: &mut egui::Ui, indices: &[LifeIndex], palette: &Palette)
                                 .color(palette.faint),
                         )
                         .on_hover_text(advice);
+                        ui.label(
+                            RichText::new(quality_label(index.quality, is_english))
+                                .size(9.0)
+                                .color(palette.faint),
+                        )
+                        .on_hover_text(format!(
+                            "{} · {}",
+                            index.source,
+                            updated_text(&index.updated_at, is_english)
+                        ));
                     },
                 );
             }
@@ -1386,6 +1626,12 @@ fn basis_text(value: &str, is_english: bool) -> String {
         ("无数据", "No data"),
         ("无雨", "no rain"),
         ("有雨", "rain observed"),
+        (
+            "缺少完整逐小时/逐日输入",
+            "complete hourly/daily inputs unavailable",
+        ),
+        ("未提供官方指数", "no official index"),
+        ("无官方指数", "no official index"),
     ] {
         text = text.replace(zh, en);
     }
@@ -1483,6 +1729,17 @@ pub fn alert_card(ui: &mut egui::Ui, alert: &Alert, palette: &Palette, english: 
             .size(10.0)
             .color(palette.faint),
         );
+        provenance_line(
+            ui,
+            palette,
+            if alert.source.is_empty() {
+                "PAGASA"
+            } else {
+                &alert.source
+            },
+            Some(&alert.issued_at),
+            alert.quality,
+        );
     });
 }
 
@@ -1579,4 +1836,37 @@ pub fn pill_button(ui: &mut egui::Ui, text: &str, palette: &Palette) -> egui::Re
 /// Small pill used for the data-source disclaimer.
 pub fn source_badge(ui: &mut egui::Ui, palette: &Palette, text: &str) {
     ui.label(RichText::new(text).size(10.0).color(palette.faint));
+}
+
+/// One translation table for provenance labels introduced by the rebuilt UI.
+pub fn quality_label(quality: DataQuality, english: bool) -> &'static str {
+    match (quality, english) {
+        (DataQuality::Official, false) => "官方",
+        (DataQuality::Forecast, false) => "官方预报",
+        (DataQuality::Estimated, false) => "本地估算",
+        (DataQuality::Unavailable, false) => "暂无数据",
+        (DataQuality::Official, true) => "Official",
+        (DataQuality::Forecast, true) => "Official forecast",
+        (DataQuality::Estimated, true) => "Local estimate",
+        (DataQuality::Unavailable, true) => "Unavailable",
+    }
+}
+
+pub fn provenance_line(
+    ui: &mut egui::Ui,
+    palette: &Palette,
+    source: &str,
+    updated_at: Option<&str>,
+    quality: DataQuality,
+) {
+    let english = english(ui);
+    let clock = updated_at
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| if english { "--" } else { "未知时间" });
+    let label = if english {
+        format!("{} · {} · {}", source, quality_label(quality, true), clock)
+    } else {
+        format!("{} · {} · {}", source, quality_label(quality, false), clock)
+    };
+    source_badge(ui, palette, &label);
 }

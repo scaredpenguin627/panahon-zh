@@ -20,7 +20,7 @@ fn main() {
     match fetch_public_dashboard(&place) {
         Ok(dashboard) => {
             println!(
-                "天气 OK：{} {:.0}°C {} · 体感 {:.0}°C · {}% · {:.0} km/h {} · 降水 {:.2} mm {} · 站点 {}",
+                "天气 OK：{} {:.0}°C {} · 体感 {:.0}°C · {}% · {:.0} km/h {} · 降水 {:?} mm {} · 站点 {}",
                 dashboard.place.name,
                 dashboard.current.temperature_c,
                 dashboard.current.condition,
@@ -41,7 +41,7 @@ fn main() {
             );
             for day in &dashboard.forecast {
                 println!(
-                    "  {} {} {}~{}°C {:.1}mm {:?}",
+                    "  {} {} {}~{}°C {:?}mm {:?}",
                     day.date,
                     day.date_label,
                     day.low_c
@@ -57,7 +57,7 @@ fn main() {
             println!("  逐小时 {} 条，前 3 条：", dashboard.hourly.len());
             for hour in dashboard.hourly.iter().take(3) {
                 println!(
-                    "    {} {}°C {:.1}mm {:?} day={}",
+                    "    {} {}°C {:?}mm {:?} day={}",
                     hour.time,
                     hour.temperature_c
                         .map(|v| format!("{v:.0}"))
