@@ -1360,19 +1360,21 @@ pub fn decode_dashboard(
                     let raw_title = text(Some(item), "title").unwrap_or_else(|| "天气预警".into());
                     let detail =
                         text(Some(item), "message").unwrap_or_else(|| "请查看官方详情".into());
-                    let rendered = advisory::render(&detail);
                     Alert {
                         id: text(Some(item), "alert_id").unwrap_or_default(),
-                        title: translate_alert_title(&raw_title),
+                        title: raw_title.clone(),
                         title_en: raw_title,
-                        kind: translate_alert_kind(&kind),
+                        kind: kind.clone(),
                         area: text(Some(item), "locations").unwrap_or_else(|| "未注明区域".into()),
                         issued_at: text(Some(item), "issued_at")
                             .unwrap_or_else(|| "未知时间".into()),
                         valid_until: text(Some(item), "valid_until_at").unwrap_or_default(),
                         detail,
-                        detail_zh: (rendered.translated > 0).then_some(rendered.text),
-                        defense: defense_for(&kind).into(),
+                        // Keep the official PAGASA message intact.  The UI
+                        // offers a copy action so users can translate it in
+                        // their own trusted app without mixed-language text.
+                        detail_zh: None,
+                        defense: String::new(),
                     }
                 })
                 .collect::<Vec<_>>();
@@ -1479,11 +1481,23 @@ pub fn fetch_public_dashboard(_place: &Place) -> Result<Dashboard, String> {
 #[cfg(feature = "network")]
 pub fn search_places(query: &str) -> Result<Vec<Place>, String> {
     let query = query.trim();
-    if query.chars().count() < 3 {
-        return Err("请输入至少 3 个字符".into());
+    if query.chars().count() < 2 {
+        return Err("请输入至少 2 个字符".into());
     }
-    let encoded = percent_encode(query);
-    let response = get_json(&format!("{API_ROOT}/location/search?q={encoded}"))?;
+    let api_query = english_location_alias(query).unwrap_or(query);
+    let mut results = known_places(query);
+    if !results.is_empty() {
+        return Ok(results);
+    }
+    // The public endpoint is primarily indexed in English.  Keep the local
+    // Chinese aliases above available even when the network is unavailable.
+    // Unknown places still go through the official location endpoint.
+    let encoded = percent_encode(api_query);
+    let response = match get_json(&format!("{API_ROOT}/location/search?q={encoded}")) {
+        Ok(value) => value,
+        Err(_error) if !results.is_empty() => return Ok(results),
+        Err(error) => return Err(error),
+    };
     let rows = response
         .as_array()
         .or_else(|| {
@@ -1492,7 +1506,7 @@ pub fn search_places(query: &str) -> Result<Vec<Place>, String> {
                 .and_then(serde_json::Value::as_array)
         })
         .ok_or_else(|| "地点响应格式无法解析".to_owned())?;
-    Ok(rows
+    let remote = rows
         .iter()
         .enumerate()
         .filter_map(|(index, row)| {
@@ -1509,7 +1523,137 @@ pub fn search_places(query: &str) -> Result<Vec<Place>, String> {
                 longitude: number(Some(row), "lon")?,
             })
         })
-        .collect())
+        .collect::<Vec<_>>();
+    for place in remote {
+        if !results.iter().any(|existing| {
+            (existing.latitude - place.latitude).abs() < 0.0001
+                && (existing.longitude - place.longitude).abs() < 0.0001
+        }) {
+            results.push(place);
+        }
+    }
+    Ok(results)
+}
+
+#[cfg(feature = "network")]
+fn known_places(query: &str) -> Vec<Place> {
+    let query = query.trim().to_ascii_lowercase();
+    let entries: [(&str, &str, &str, f64, f64, &[&str]); 10] = [
+        (
+            "manila",
+            "马尼拉",
+            "国家首都区",
+            14.5995,
+            120.9842,
+            &["manila", "metro manila", "ncr", "马尼拉", "马尼拉大都会"],
+        ),
+        (
+            "cebu",
+            "宿务",
+            "中米沙鄢",
+            10.3157,
+            123.8854,
+            &["cebu", "cebu city", "宿务", "宿务市"],
+        ),
+        (
+            "davao",
+            "达沃",
+            "达沃区",
+            7.1907,
+            125.4553,
+            &["davao", "davao city", "达沃", "达沃市"],
+        ),
+        (
+            "baguio",
+            "碧瑶",
+            "科迪勒拉行政区",
+            16.4023,
+            120.5960,
+            &["baguio", "碧瑶"],
+        ),
+        (
+            "iloilo",
+            "伊洛伊洛",
+            "西米沙鄢",
+            10.7202,
+            122.5621,
+            &["iloilo", "iloilo city", "伊洛伊洛"],
+        ),
+        (
+            "bacolod",
+            "巴科洛德",
+            "西米沙鄢",
+            10.6765,
+            122.9509,
+            &["bacolod", "巴科洛德"],
+        ),
+        (
+            "cagayan-de-oro",
+            "卡加延德奥罗",
+            "北棉兰老",
+            8.4542,
+            124.6319,
+            &["cagayan de oro", "cagayan", "卡加延德奥罗"],
+        ),
+        (
+            "angeles",
+            "安吉利斯",
+            "中吕宋",
+            15.1450,
+            120.5887,
+            &["angeles", "angeles city", "安吉利斯"],
+        ),
+        (
+            "tagaytay",
+            "大雅台",
+            "甲米地省",
+            14.1153,
+            120.9621,
+            &["tagaytay", "大雅台"],
+        ),
+        (
+            "puerto-princesa",
+            "公主港",
+            "巴拉望省",
+            9.7392,
+            118.7353,
+            &["puerto princesa", "puerto-princesa", "公主港"],
+        ),
+    ];
+    entries
+        .into_iter()
+        .filter(|(_, _, _, _, _, aliases)| {
+            aliases.iter().any(|alias| {
+                let alias = alias.to_ascii_lowercase();
+                alias.contains(&query) || query.contains(&alias)
+            })
+        })
+        .map(|(id, name, region, latitude, longitude, _)| Place {
+            id: id.into(),
+            name: name.into(),
+            region: region.into(),
+            latitude,
+            longitude,
+        })
+        .collect()
+}
+
+#[cfg(feature = "network")]
+fn english_location_alias(query: &str) -> Option<&'static str> {
+    let normalized = query.trim();
+    match normalized {
+        "马尼拉" | "马尼拉大都会" => Some("Manila"),
+        "宿务" | "宿务市" => Some("Cebu City"),
+        "达沃" | "达沃市" => Some("Davao City"),
+        "碧瑶" => Some("Baguio"),
+        "伊洛伊洛" => Some("Iloilo City"),
+        "巴科洛德" => Some("Bacolod"),
+        "卡加延德奥罗" => Some("Cagayan de Oro"),
+        "安吉利斯" => Some("Angeles City"),
+        "大雅台" => Some("Tagaytay"),
+        "公主港" => Some("Puerto Princesa"),
+        _ => None,
+    }
 }
 
 #[cfg(not(feature = "network"))]
@@ -1699,68 +1843,6 @@ fn translate_heat_index(value: &str) -> String {
         "注意补水".into()
     } else {
         value.to_owned()
-    }
-}
-
-#[cfg(feature = "network")]
-fn translate_alert_kind(value: &str) -> String {
-    let lower = value.to_ascii_lowercase();
-    if lower.contains("rainfall") {
-        "降雨提示".into()
-    } else if lower.contains("thunderstorm") {
-        "雷暴提示".into()
-    } else if lower.contains("flood") {
-        "洪水提示".into()
-    } else if lower.contains("tropical cyclone") || lower.contains("typhoon") {
-        "台风提示".into()
-    } else if lower.contains("gale") || lower.contains("wind") {
-        "大风提示".into()
-    } else if lower.contains("heat") {
-        "高温提示".into()
-    } else {
-        value.to_owned()
-    }
-}
-
-#[cfg(feature = "network")]
-/// PAGASA 的标题是英文编号，如 "Thunderstorm Advisory #VISPRSD"。
-/// 这里只替换名称前缀，保留官方编号，方便和官网对照。
-#[cfg(feature = "network")]
-fn translate_alert_title(value: &str) -> String {
-    const PREFIXES: [(&str, &str); 8] = [
-        ("Thunderstorm Advisory", "雷暴提示"),
-        ("Heavy Rainfall Warning", "强降雨警告"),
-        ("Rainfall Advisory", "降雨提示"),
-        ("Flood Advisory", "洪水提示"),
-        ("Flood Warning", "洪水警告"),
-        ("Gale Warning", "大风警告"),
-        ("Tropical Cyclone", "台风提示"),
-        ("Typhoon", "台风提示"),
-    ];
-    for (english, chinese) in PREFIXES {
-        if value
-            .get(..english.len())
-            .is_some_and(|prefix| prefix.eq_ignore_ascii_case(english))
-        {
-            return format!("{chinese}{}", &value[english.len()..]);
-        }
-    }
-    value.to_owned()
-}
-
-#[cfg(feature = "network")]
-fn defense_for(kind: &str) -> &'static str {
-    let lower = kind.to_ascii_lowercase();
-    if lower.contains("rainfall") || lower.contains("flood") {
-        "远离低洼地带和河道，留意官方疏散通知。"
-    } else if lower.contains("thunderstorm") {
-        "避免在空旷地带停留，收好阳台杂物。"
-    } else if lower.contains("tropical cyclone") || lower.contains("typhoon") {
-        "加固门窗，储备饮水和照明，关注路径更新。"
-    } else if lower.contains("gale") || lower.contains("wind") {
-        "减少海上和户外活动，固定易被吹落的物品。"
-    } else {
-        "以 PAGASA 官方公告和当地部门指引为准。"
     }
 }
 
@@ -2030,6 +2112,19 @@ mod tests {
         assert!(alert_matches_place("NCR", &manila));
         assert!(!alert_matches_place("Cebu Province", &manila));
         assert!(alert_is_global("Nationwide Philippines"));
+    }
+
+    #[cfg(feature = "network")]
+    #[test]
+    fn chinese_city_aliases_produce_selectable_places_without_network() {
+        let cebu = known_places("宿务");
+        assert_eq!(cebu.len(), 1);
+        assert_eq!(cebu[0].id, "cebu");
+        assert_eq!(cebu[0].name, "宿务");
+
+        let manila = known_places("Manila");
+        assert_eq!(manila.len(), 1);
+        assert_eq!(manila[0].id, "manila");
     }
 
     #[cfg(feature = "network")]

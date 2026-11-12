@@ -1391,65 +1391,20 @@ fn basis_text(value: &str, is_english: bool) -> String {
     }
     text
 }
-fn alert_title_text(value: &str, english: bool) -> String {
-    if !english {
-        return value.to_owned();
-    }
-    for (zh, en) in [
-        ("雷暴提示", "Thunderstorm advisory"),
-        ("强降雨警告", "Heavy rainfall warning"),
-        ("降雨提示", "Rainfall advisory"),
-        ("洪水警告", "Flood warning"),
-        ("洪水提示", "Flood advisory"),
-        ("大风警告", "Gale warning"),
-        ("台风提示", "Tropical cyclone alert"),
-    ] {
-        if let Some(rest) = value.strip_prefix(zh) {
-            return format!("{en}{rest}");
-        }
-    }
-    value.to_owned()
-}
-
-fn alert_defense_text(value: &str, english: bool) -> String {
-    if !english {
-        return value.to_owned();
-    }
-    match value {
-        "远离低洼地带和河道，留意官方疏散通知。" => {
-            "Stay away from low areas and waterways; follow evacuation notices."
-        }
-        "避免在空旷地带停留，收好阳台杂物。" => {
-            "Avoid open areas and secure loose objects on balconies."
-        }
-        "加固门窗，储备饮水和照明，关注路径更新。" => {
-            "Secure doors and windows, and follow the track updates."
-        }
-        "减少海上和户外活动，固定易被吹落的物品。" => {
-            "Limit marine and outdoor activity; secure loose objects."
-        }
-        "以 PAGASA 官方公告和当地部门指引为准。" => {
-            "Follow PAGASA and local government guidance."
-        }
-        _ => value,
-    }
-    .to_owned()
-}
-
 /// One alert entry.
+///
+/// PAGASA alerts are shown verbatim.  The app does not silently mix a local
+/// template translation with the official message; users can copy the exact
+/// title/body into Google Translate or another translation app themselves.
 pub fn alert_card(ui: &mut egui::Ui, alert: &Alert, palette: &Palette, english: bool) {
     theme::card().show(ui, |ui| {
         ui.set_min_width(ui.available_width());
         ui.horizontal(|ui| {
             ui.label(
-                RichText::new(if english {
-                    if alert.title_en.is_empty() {
-                        alert.title.clone()
-                    } else {
-                        alert.title_en.clone()
-                    }
+                RichText::new(if alert.title_en.is_empty() {
+                    alert.title.clone()
                 } else {
-                    alert_title_text(&alert.title, false)
+                    alert.title_en.clone()
                 })
                 .size(15.0)
                 .strong()
@@ -1461,7 +1416,7 @@ pub fn alert_card(ui: &mut egui::Ui, alert: &Alert, palette: &Palette, english: 
                         RichText::new(if english {
                             format!("Until {}", short_time(&alert.valid_until))
                         } else {
-                            format!("至 {}", short_time(&alert.valid_until))
+                            format!("截至 {}", short_time(&alert.valid_until))
                         })
                         .size(10.0)
                         .color(palette.faint),
@@ -1472,54 +1427,53 @@ pub fn alert_card(ui: &mut egui::Ui, alert: &Alert, palette: &Palette, english: 
         ui.label(RichText::new(&alert.area).size(11.0).color(palette.dim));
         ui.add_space(2.0);
 
-        // 中文正文可用时默认显示译文，并保留切换到英文原文的入口。
-        let toggle_id = egui::Id::new(("alert-original", alert.id.as_str()));
-        let mut show_original = ui
-            .data(|data| data.get_temp::<bool>(toggle_id))
+        ui.label(
+            RichText::new(shorten(&alert.detail, 280))
+                .size(12.0)
+                .color(palette.dim),
+        );
+        ui.add_space(4.0);
+        let copy_id = egui::Id::new(("alert-copied", alert.id.as_str()));
+        let copied = ui
+            .data(|data| data.get_temp::<bool>(copy_id))
             .unwrap_or(false);
-        let chinese = alert.detail_zh.as_deref();
-        let body = if english || show_original || chinese.is_none() {
-            shorten(&alert.detail, 220)
-        } else {
-            shorten(chinese.unwrap_or_default(), 220)
-        };
-        ui.label(RichText::new(body).size(12.0).color(palette.dim));
-
-        if !english && chinese.is_some() {
-            ui.add_space(2.0);
-            let label = if show_original {
-                "显示中文"
+        let copy_text = format!(
+            "{}\n{}\nIssued: {}\nUntil: {}\n\n{}",
+            if alert.title_en.is_empty() {
+                &alert.title
             } else {
-                "查看英文原文"
-            };
-            let response = ui.add(
-                egui::Label::new(
-                    RichText::new(label)
-                        .size(10.0)
-                        .color(Color32::from_rgb(0xFF, 0xD1, 0x66)),
+                &alert.title_en
+            },
+            alert.area,
+            alert.issued_at,
+            alert.valid_until,
+            alert.detail
+        );
+        if ui
+            .add(
+                egui::Button::new(
+                    RichText::new(if copied {
+                        if english {
+                            "Copied original"
+                        } else {
+                            "已复制原文"
+                        }
+                    } else if english {
+                        "Copy original"
+                    } else {
+                        "复制原文"
+                    })
+                    .size(11.0)
+                    .color(Color32::from_rgb(0xFF, 0xD1, 0x66)),
                 )
-                .sense(Sense::click()),
-            );
-            if response.clicked() {
-                show_original = !show_original;
-                ui.data_mut(|data| data.insert_temp(toggle_id, show_original));
-            }
-            ui.label(
-                RichText::new("中文为模板自动翻译")
-                    .size(9.0)
-                    .color(palette.faint),
-            );
+                .fill(Color32::TRANSPARENT),
+            )
+            .clicked()
+        {
+            ui.ctx().copy_text(copy_text);
+            ui.data_mut(|data| data.insert_temp(copy_id, true));
         }
         ui.add_space(2.0);
-        ui.label(
-            RichText::new(if english {
-                format!("Advice: {}", alert_defense_text(&alert.defense, true))
-            } else {
-                format!("防御建议：{}", alert.defense)
-            })
-            .size(11.0)
-            .color(palette.accent),
-        );
         ui.label(
             RichText::new(if english {
                 format!("Issued {}", short_time(&alert.issued_at))
