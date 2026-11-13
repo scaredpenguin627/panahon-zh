@@ -2,7 +2,7 @@
 
 这是一个用 Rust 和 egui 编写的 Android 天气应用。数据来自 PAGASA、DENR-EMB、Open-Meteo 和 CAMS 的公开接口。
 
-当前 Android 构建配置声明最低 SDK 29、目标 SDK 35，构建目标为 `aarch64-linux-android` 和 `x86_64-linux-android`。
+当前 Android 构建配置声明最低 SDK 29、目标 SDK 37，构建目标为 `aarch64-linux-android` 和 `x86_64-linux-android`。
 
 ## 当前已实现范围
 
