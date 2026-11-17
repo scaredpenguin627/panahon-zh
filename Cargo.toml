@@ -1,4 +1,5 @@
 [workspace]
-members = ["services/weather-api"]
+members = ["services/weather-api", "services/mobile-core"]
 resolver = "2"
+
 
