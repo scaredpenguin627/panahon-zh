@@ -1,5 +1,6 @@
 package org.panahon.zh.nativebridge
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -7,8 +8,11 @@ import kotlinx.serialization.json.Json
 data class BackgroundProfile(
     val mode: String = "unknown",
     val isDay: Boolean = true,
+    @SerialName("primary_color")
     val primary: String = "#234E70",
+    @SerialName("secondary_color")
     val secondary: String = "#101722",
+    @SerialName("animation_intensity")
     val intensity: Float = 0.25f,
     val seed: Long = 1L,
 )
@@ -40,4 +44,5 @@ object NativeBridge {
         }
     }
 }
+
 
