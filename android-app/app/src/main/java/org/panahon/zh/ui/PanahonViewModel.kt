@@ -35,6 +35,10 @@ data class PanahonUiState(
     val mapFrameIndex: Int = 0,
     val mapFrameLoading: Boolean = false,
     val mapFrameError: String? = null,
+    val showLocationSearch: Boolean = false,
+    val searchQuery: String = "",
+    val searchResults: List<kotlinx.serialization.json.JsonElement> = emptyList(),
+    val searchLoading: Boolean = false,
     val notice: String? = null,
 )
 
@@ -53,6 +57,33 @@ class PanahonViewModel(application: Application) : AndroidViewModel(application)
     init { refresh() }
 
     fun selectTab(tab: AppTab) { state.value = state.value.copy(tab = tab) }
+
+    fun openSearch() { state.value = state.value.copy(showLocationSearch = true, searchQuery = "", searchResults = emptyList()) }
+
+    fun closeSearch() { state.value = state.value.copy(showLocationSearch = false) }
+
+    fun searchLocations(query: String) {
+        state.value = state.value.copy(searchQuery = query)
+        if (query.trim().length < 2) {
+            state.value = state.value.copy(searchResults = emptyList())
+            return
+        }
+        viewModelScope.launch {
+            state.value = state.value.copy(searchLoading = true)
+            repository.fetch("/api/v1/locations/search?q=${java.net.URLEncoder.encode(query.trim(), "UTF-8")}", "locations_${query.trim().lowercase()}", state.value.apiBaseUrl)
+                .onSuccess { response -> state.value = state.value.copy(searchResults = response.data.asObject()?.array("items") ?: emptyList(), searchLoading = false) }
+                .onFailure { state.value = state.value.copy(searchResults = emptyList(), searchLoading = false) }
+        }
+    }
+
+    fun selectLocation(element: kotlinx.serialization.json.JsonElement) {
+        val location = element.asObject() ?: return
+        val name = location.string("name") ?: location.string("nameEn") ?: return
+        val latitude = location.number("latitude") ?: return
+        val longitude = location.number("longitude") ?: return
+        state.value = state.value.copy(showLocationSearch = false, cityName = name, latitude = latitude, longitude = longitude)
+        refresh()
+    }
 
     fun setApiBaseUrl(value: String) {
         val normalized = value.trim().removeSuffix("/")
@@ -129,4 +160,5 @@ class PanahonViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 }
+
 

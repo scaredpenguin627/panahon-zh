@@ -88,12 +88,16 @@ fun PanahonApp(viewModel: PanahonViewModel = viewModel()) {
             ) { padding ->
                 Column(Modifier.fillMaxSize().padding(padding)) {
                     state.notice?.let { NoticeBanner(it) }
-                    when (state.tab) {
-                        AppTab.HOME -> HomeScreen(state, viewModel)
-                        AppTab.AQI -> AqiScreen(state)
-                        AppTab.MAP -> MapScreen(state, viewModel)
-                        AppTab.ALERTS -> AlertsScreen(state, viewModel)
-                        AppTab.SETTINGS -> SettingsScreen(state, viewModel)
+                    if (state.showLocationSearch) {
+                        LocationSearchScreen(state, viewModel)
+                    } else {
+                        when (state.tab) {
+                            AppTab.HOME -> HomeScreen(state, viewModel)
+                            AppTab.AQI -> AqiScreen(state)
+                            AppTab.MAP -> MapScreen(state, viewModel)
+                            AppTab.ALERTS -> AlertsScreen(state, viewModel)
+                            AppTab.SETTINGS -> SettingsScreen(state, viewModel)
+                        }
                     }
                 }
             }
@@ -108,13 +112,14 @@ private fun AppTopBar(state: PanahonUiState, viewModel: PanahonViewModel) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.LocationOn, null, tint = Color.White.copy(alpha = 0.84f))
                 Spacer(Modifier.width(5.dp))
-                Column {
+                Column(Modifier.clickable { viewModel.openSearch() }) {
                     Text(state.cityName, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                     Text("菲律宾天气", fontSize = 11.sp, color = Color.White.copy(alpha = 0.68f))
                 }
             }
         },
         actions = {
+            IconButton(onClick = { viewModel.openSearch() }) { Icon(Icons.Default.Search, "搜索城市") }
             IconButton(onClick = { viewModel.refresh() }) { Icon(Icons.Default.Refresh, "刷新") }
             IconButton(onClick = { viewModel.selectTab(AppTab.SETTINGS) }) { Icon(Icons.Default.Settings, "设置") }
         },
@@ -345,7 +350,8 @@ private fun MapScreen(state: PanahonUiState, viewModel: PanahonViewModel) {
         val frameCount = data?.array("frames")?.size ?: 0
         if (frameCount > 1) {
             SectionCard("时间轴") {
-                Slider(value = state.mapFrameIndex.toFloat(), onValueChange = { viewModel.loadMapFrame(it.toInt()) }, valueRange = 0f..(frameCount - 1).toFloat(), steps = (frameCount - 2).coerceAtLeast(0))
+                var selectedFrame by remember(state.mapFrameIndex) { mutableStateOf(state.mapFrameIndex.toFloat()) }
+                Slider(value = selectedFrame, onValueChange = { selectedFrame = it }, onValueChangeFinished = { viewModel.loadMapFrame(selectedFrame.toInt()) }, valueRange = 0f..(frameCount - 1).toFloat(), steps = (frameCount - 2).coerceAtLeast(0))
                 Text("第 ${state.mapFrameIndex + 1} / $frameCount 帧", fontSize = 11.sp, color = Color.White.copy(alpha = 0.64f))
             }
         }
@@ -410,6 +416,37 @@ private fun SettingsScreen(state: PanahonUiState, viewModel: PanahonViewModel) {
 }
 
 @Composable
+private fun LocationSearchScreen(state: PanahonUiState, viewModel: PanahonViewModel) {
+    ScrollColumn {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = { viewModel.closeSearch() }) { Text("返回") }
+            Text("搜索地点", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+        }
+        SectionCard("搜索城市") {
+            TextField(
+                value = state.searchQuery,
+                onValueChange = viewModel::searchLocations,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                label = { Text("输入至少两个字符") },
+                leadingIcon = { Icon(Icons.Default.Search, null) },
+            )
+            if (state.searchLoading) CircularProgressIndicator(modifier = Modifier.padding(top = 12.dp).size(22.dp), strokeWidth = 2.dp)
+        }
+        if (state.searchResults.isEmpty() && state.searchQuery.length >= 2 && !state.searchLoading) {
+            EmptyDataCard("没有找到可用地点", "重新输入") { viewModel.searchLocations("") }
+        }
+        state.searchResults.forEach { result ->
+            val item = result.asObject()
+            SectionCard(item?.string("name") ?: item?.string("nameEn") ?: "未知地点") {
+                Text(item?.string("region") ?: "地区暂无", fontSize = 12.sp, color = Color.White.copy(alpha = 0.65f))
+                TextButton(onClick = { viewModel.selectLocation(result) }) { Text("选择此地点") }
+            }
+        }
+    }
+}
+
+@Composable
 private fun PageTitle(title: String, subtitle: String) {
     Column(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) { Text(title, fontSize = 26.sp, fontWeight = FontWeight.SemiBold); Text(subtitle, fontSize = 12.sp, color = Color.White.copy(alpha = 0.65f), modifier = Modifier.padding(top = 3.dp)) }
 }
@@ -440,4 +477,5 @@ private fun qualityLabel(state: LoadState): String = when (state) {
     is LoadState.Ready -> if (state.response.meta.stale) "历史缓存" else "数据可用"
     is LoadState.Failed -> "暂无数据"
 }
+
 
