@@ -1,6 +1,6 @@
 本项目是 Breezy Weather 的社区衍生版本。选择 PAGASA PANaHON 后，应用将所选地点的经纬度发送至 https://api.mobile.panahon.gov.ph/，用于查询该位置的预报和预警。字体随安装包提供，可离线使用。
 
-首页显示 EMB 监测数据时，应用在手机上匹配地点与站点。它从菲律宾环境管理局的区域门户或微软 Power BI（app.powerbi.com 及报表使用的 analysis.windows.net 集群）读取公开报表。按站点查询的门户会收到所选站点的标识。最近一次成功取得的读数保存在本机。启用应用内更新检查后，应用向 GitHub 查询本仓库的正式版本。
+首页显示 EMB 监测数据时，应用在手机上匹配地点与站点。它从菲律宾环境管理局的区域门户或微软 Power BI（app.powerbi.com 及报表使用的 analysis.windows.net 集群）读取公开报表。吕宋中部（Region III）的监测接口使用 embr3-onlinesystems.cloud，会收到所选站点的标识；北棉兰老（Region X）的监测接口使用 api.bpit-inc.com，应用读取报表后在本地筛选站点。最近一次成功取得的读数保存在本机。启用应用内更新检查后，应用向 GitHub 查询本仓库的正式版本。
 
 Breezy Weather doesn’t collect any personal data.
 
