@@ -1,10 +1,14 @@
 package org.breezyweather.sources.panahon
 
 import breezyweather.domain.location.model.Location
+import breezyweather.domain.weather.model.Hourly
+import breezyweather.domain.weather.model.Wind
+import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.HourlyWrapper
 import breezyweather.domain.weather.wrappers.TemperatureWrapper
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.doubleOrNull
+import org.breezyweather.sources.completeCurrentFromHourlyData
 import org.breezyweather.sources.pagasa.json.PagasaCurrentResult
 import org.breezyweather.unit.computing.computeDewPoint
 import org.breezyweather.unit.ratio.Ratio.Companion.percent
@@ -66,4 +70,33 @@ class PanahonAtmosphereTest {
         assertTrue(grid.hourlyReadings(manila).isEmpty())
         assertEquals(listOf(forecast), listOf(forecast).withAtmosphere(emptyMap()))
     }
+
+    @Test
+    fun hourlyDerivedCurrentKeepsModelDewPointAndCreditsOnlyTheFieldsActuallyUsed() {
+        val ph = boracay.copy(forecastSource = "panahon")
+        val hour = Hourly(
+            date = Date(now - now % 3_600_000), relativeHumidity = 77.percent, dewPoint = 23.2.celsius,
+            wind = Wind(speed = 5.32.metersPerSecond)
+        )
+        fun merged(current: CurrentWrapper?, location: Location = ph) =
+            completeCurrentFromHourlyData(current, hour, null, null, location)
+
+        val derived = merged(null)
+        assertEquals("Open-Meteo · 2026-11-20 18:00 PHT", derived.windHumiditySource)
+        assertEquals(23.2.celsius, derived.dewPoint)
+        assertEquals(23.2.celsius, merged(CurrentWrapper(temperature = TemperatureWrapper(30.celsius))).dewPoint)
+
+        val station = CurrentWrapper(
+            relativeHumidity = 88.percent, dewPoint = 24.celsius,
+            wind = Wind(speed = 3.6.kilometersPerHour), windHumiditySource = "PAGASA AWS · Science Garden"
+        )
+        assertEquals(station.windHumiditySource, merged(station).windHumiditySource)
+        assertEquals(station.dewPoint, merged(station).dewPoint)
+        val mixed = merged(CurrentWrapper(wind = Wind(speed = 8.metersPerSecond)))
+        assertEquals(8.metersPerSecond, mixed.wind?.speed)
+        assertEquals(23.2.celsius, mixed.dewPoint)
+        assertNull(mixed.windHumiditySource) // The wind and humidity do not come from one source.
+        assertNull(merged(null, ph.copy(forecastSource = "other")).windHumiditySource)
+    }
+
 }

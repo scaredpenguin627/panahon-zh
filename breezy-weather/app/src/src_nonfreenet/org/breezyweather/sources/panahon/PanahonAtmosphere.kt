@@ -55,13 +55,7 @@ internal data class AtmosphereReading(
     val dewPoint: Temperature?,
     val station: String? = null,
 ) {
-    fun attribution(): String {
-        val clock = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).apply {
-            timeZone = TimeZone.getTimeZone("Asia/Manila")
-        }
-        val source = station?.let { "PAGASA AWS · $it" } ?: "Open-Meteo"
-        return "$source · ${clock.format(time)} PHT"
-    }
+    fun attribution(): String = windHumidityAttribution(time, station)
 }
 
 internal fun PanahonModelGrid.hourlyReadings(location: Location): Map<Date, AtmosphereReading> {

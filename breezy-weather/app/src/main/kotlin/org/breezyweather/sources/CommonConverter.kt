@@ -47,6 +47,7 @@ import org.breezyweather.common.extensions.getIsoFormattedDate
 import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.domain.weather.model.validate
 import org.breezyweather.ui.theme.weatherView.WeatherViewController
+import org.breezyweather.sources.panahon.windHumidityAttribution
 import org.breezyweather.unit.computing.computeApparentTemperature
 import org.breezyweather.unit.computing.computeDewPoint
 import org.breezyweather.unit.computing.computeHumidex
@@ -1408,16 +1409,21 @@ internal fun completeCurrentFromHourlyData(
     val initialFeelsLike = newCurrent.temperature?.feelsLike?.toValidOrNull()
     val initialWind = newCurrent.wind?.validate()
     val newWind = if (initialWind?.speed != null || hourly.wind?.speed == null) initialWind else hourly.wind
-    val newRelativeHumidity = newCurrent.relativeHumidity?.toValidRangeOrNull()
-        ?: hourly.relativeHumidity
-    val newDewPoint = newCurrent.dewPoint?.toValidOrNull()
-        ?: if (newRelativeHumidity != null || initialTemp != null) {
-            // If current data is available, we compute this over hourly dewpoint
+    val currentHumidity = newCurrent.relativeHumidity?.toValidRangeOrNull()
+    val currentDewPoint = newCurrent.dewPoint?.toValidOrNull()
+    val newRelativeHumidity = currentHumidity ?: hourly.relativeHumidity
+    // PANaHON's hourly atmosphere is a coordinate-based model. Preserve its paired dew point
+    // when the current source supplied no humidity instead of combining temperatures from two sources.
+    val modelHumidity = location.forecastSource == "panahon" && currentHumidity == null && hourly.relativeHumidity != null
+    val modelOnlyAtmosphere = location.forecastSource == "panahon" &&
+        initialWind?.speed == null && currentHumidity == null && currentDewPoint == null &&
+        (hourly.wind?.speed != null || hourly.relativeHumidity != null || hourly.dewPoint != null)
+    val newDewPoint = currentDewPoint ?: when {
+        modelHumidity -> hourly.dewPoint
+        newRelativeHumidity != null || initialTemp != null ->
             computeDewPoint(initialTemp ?: hourly.temperature?.temperature, newRelativeHumidity)
-        } else {
-            // Already calculated earlier
-            hourly.dewPoint
-        }
+        else -> hourly.dewPoint
+    }
     val newTemperature = completeCurrentTemperatureFromHourly(
         initialTemp,
         initialFeelsLike,
@@ -1449,6 +1455,7 @@ internal fun completeCurrentFromHourlyData(
             newCurrent.weatherText
         },
         weatherCode = newCurrent.weatherCode ?: hourly.weatherCode,
+        windHumiditySource = if (modelOnlyAtmosphere) windHumidityAttribution(hourly.date) else newCurrent.windHumiditySource,
         temperature = newTemperature,
         wind = newWind,
         airQuality = currentAirQuality ?: hourly.airQuality,

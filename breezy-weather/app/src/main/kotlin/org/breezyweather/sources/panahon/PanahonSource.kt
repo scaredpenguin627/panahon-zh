@@ -6,6 +6,9 @@ import breezyweather.domain.source.SourceFeature
 import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.NonFreeNetSource
 import org.breezyweather.common.source.WeatherSource
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.TimeZone
 
 abstract class PanahonSource : HttpSource(), WeatherSource, NonFreeNetSource {
@@ -35,4 +38,12 @@ abstract class PanahonSource : HttpSource(), WeatherSource, NonFreeNetSource {
             city = "Manila", countryCode = "PH", forecastSource = id, currentSource = id, alertSource = id
         )
     )
+}
+
+internal fun windHumidityAttribution(time: Date, station: String? = null): String {
+    val clock = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).apply {
+        timeZone = TimeZone.getTimeZone("Asia/Manila")
+    }
+    val source = station?.let { "PAGASA AWS · $it" } ?: "Open-Meteo"
+    return "$source · ${clock.format(time)} PHT"
 }
