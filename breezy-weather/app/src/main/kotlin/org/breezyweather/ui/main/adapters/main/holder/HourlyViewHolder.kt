@@ -21,6 +21,7 @@ import org.breezyweather.ui.main.adapters.trend.hourly.HourlyWindAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyTemperatureAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyFeelsLikeAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyHumidityAdapter
+import org.breezyweather.common.extensions.getFormattedDate
 import org.breezyweather.sources.emb.EmbAirQualityService
 import android.view.LayoutInflater
 import android.view.View
@@ -87,6 +88,12 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
         }
 
+        val period = if (location.forecastSource == "panahon") {
+            val dates = weather.nextHourlyForecast.filter { it.weatherCode != null || it.temperature?.temperature != null }.map { it.date }
+            if (dates.isEmpty()) null else listOf(dates.first(), dates.last()).distinct().joinToString("–") {
+                it.getFormattedDate("MM/dd HH:mm", location, context)
+            }
+        } else null
         fun showSubtitle(index: Int) {
             val attribution = when (trendAdapter.adapters.getOrNull(index)) {
                 is HourlyAirQualityAdapter -> if (location.airQualitySource == EmbAirQualityService.ID) R.string.traveller_model_label else null
@@ -94,7 +101,11 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 is HourlyTemperatureAdapter, is HourlyFeelsLikeAdapter -> if (location.forecastSource == "panahon") R.string.traveller_hourly_period else null
                 else -> null
             }
-            subtitle.text = listOfNotNull(weather.current?.hourlyForecast, attribution?.let { context.getString(it) }).joinToString("\n")
+            val caption = attribution?.let {
+                val source = context.getString(it)
+                if (it == R.string.traveller_hourly_period && period != null) "$source · $period" else source
+            }
+            subtitle.text = listOfNotNull(weather.current?.hourlyForecast, caption).joinToString("\n")
             subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
         }
         showSubtitle(trendAdapter.selectedIndex)

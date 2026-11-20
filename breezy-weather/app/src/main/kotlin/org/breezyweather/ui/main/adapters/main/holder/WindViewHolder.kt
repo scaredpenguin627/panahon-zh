@@ -97,8 +97,13 @@ class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
 
         val source = location.weather?.current?.windHumiditySource?.let { context.localizedWindHumiditySource(it) }
         sourceView.isVisible = source != null
-        sourceView.text = source?.substringBefore(" · ")
-        if (source != null) talkBackBuilder.append(", ").append(source)
+        sourceView.text = source?.let {
+            if (it.startsWith("Open-Meteo")) {
+                val point = String.format(java.util.Locale.ROOT, "%.4f, %.4f", location.latitude, location.longitude)
+                it.substringBefore(" · ") + "\n" + context.getString(R.string.traveller_query_point, point)
+            } else it.substringBeforeLast(" · ")
+        }
+        if (source != null) talkBackBuilder.append(", ").append(sourceView.text).append(", ").append(source.substringAfterLast(" · "))
         itemView.contentDescription = talkBackBuilder.toString()
         itemView.setOnClickListener {
             IntentHelper.startDailyWeatherActivity(

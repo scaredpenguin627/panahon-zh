@@ -21,6 +21,7 @@ import org.breezyweather.ui.main.adapters.trend.daily.DailyAirQualityAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyWindAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyTemperatureAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyFeelsLikeAdapter
+import org.breezyweather.common.extensions.getFormattedDate
 import org.breezyweather.sources.emb.EmbAirQualityService
 import android.view.LayoutInflater
 import android.view.View
@@ -88,6 +89,12 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
         }
 
+        val period = if (location.forecastSource == "panahon") {
+            val dates = weather.dailyForecast.drop(weather.todayIndex ?: 0).filter { it.day?.weatherCode != null || it.day?.temperature?.temperature != null }.map { it.date }
+            if (dates.isEmpty()) null else listOf(dates.first(), dates.last()).distinct().joinToString("–") {
+                it.getFormattedDate("MM/dd", location, context)
+            }
+        } else null
         fun showSubtitle(index: Int) {
             val attribution = when (trendAdapter.adapters.getOrNull(index)) {
                 is DailyAirQualityAdapter -> if (location.airQualitySource == EmbAirQualityService.ID) R.string.traveller_model_label else null
@@ -95,7 +102,11 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 is DailyTemperatureAdapter, is DailyFeelsLikeAdapter -> if (location.forecastSource == "panahon") R.string.traveller_daily_period else null
                 else -> null
             }
-            subtitle.text = listOfNotNull(weather.current?.dailyForecast, attribution?.let { context.getString(it) }).joinToString("\n")
+            val caption = attribution?.let {
+                val source = context.getString(it)
+                if (it == R.string.traveller_daily_period && period != null) "$source · $period" else source
+            }
+            subtitle.text = listOfNotNull(weather.current?.dailyForecast, caption).joinToString("\n")
             subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
         }
         showSubtitle(trendAdapter.selectedIndex)

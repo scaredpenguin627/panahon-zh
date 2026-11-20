@@ -20,4 +20,5 @@
         <item quantity="one">%d day ago</item>
         <item quantity="other">%d days ago</item>
     </plurals>
+    <string name="traveller_query_point">Forecast point %1$s</string>
 </resources>

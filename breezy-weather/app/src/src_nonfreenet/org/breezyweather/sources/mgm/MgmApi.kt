@@ -59,8 +59,6 @@ interface MgmApi {
         @Path("day") day: String,
     ): Observable<List<MgmAlertResult>>
 
-    @Headers("Origin: $ORIGIN_URL")
-
     companion object {
         const val ORIGIN_URL = "https://www.mgm.gov.tr"
     }

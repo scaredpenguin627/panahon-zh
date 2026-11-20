@@ -124,6 +124,7 @@ object HourlyTrendWidgetIMP : AbstractRemoteViewsPresenter() {
                 i += 2
             }
         }
+        for (i in 0 until itemCount) {
             weather.nextHourlyForecast[i].temperature?.temperature?.value?.let {
                 if (highestTemperature == null || it > highestTemperature) {
                     highestTemperature = it.toFloat()

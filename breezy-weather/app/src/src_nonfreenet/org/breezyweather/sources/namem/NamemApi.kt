@@ -51,8 +51,6 @@ interface NamemApi {
     ): Observable<NamemDailyResult>
 
     @Headers("Origin: $ORIGIN_URL")
-
-    @Headers("Origin: $ORIGIN_URL")
     @POST("api/get/agaar/multi")
     fun getAirQuality(): Observable<NamemAirQualityResult>
 

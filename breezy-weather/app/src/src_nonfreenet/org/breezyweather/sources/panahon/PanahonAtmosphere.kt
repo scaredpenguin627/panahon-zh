@@ -64,7 +64,9 @@ internal data class AtmosphereReading(
 
 internal fun PanahonModelGrid.hourlyReadings(location: Location): Map<Date, AtmosphereReading> {
     // Open-Meteo returns the centre of a forecast grid cell, not the exact query coordinates.
-    if (distanceMeters(location, latitude, longitude) > 50_000) return emptyMap()
+    if (latitude !in -90.0..90.0 || longitude !in -180.0..180.0 ||
+        distanceMeters(location, latitude, longitude) > 50_000
+    ) return emptyMap()
     return hourly.time.mapIndexedNotNull { i, seconds ->
         val time = Date(seconds * 1000)
         val speed = hourly.speed.getOrNull(i)?.takeIf { it >= 0 }?.metersPerSecond

@@ -20,4 +20,5 @@
         <item quantity="one">%d 天前</item>
         <item quantity="other">%d 天前</item>
     </plurals>
+    <string name="traveller_query_point">预报点 %1$s</string>
 </resources>

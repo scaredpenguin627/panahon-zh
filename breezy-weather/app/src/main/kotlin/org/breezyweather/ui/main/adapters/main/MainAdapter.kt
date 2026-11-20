@@ -185,7 +185,7 @@ class MainAdapter(
                 if (aqi < 0) {
                     mViewTypeList.add(ViewType.EMB)
                 } else {
-                    val columns = if (host.width > 0) activity.getBlocksPerRow(host.width / activity.density)
+                    val columns = if (host.width > 0) activity.getBlocksPerRow(host.width.toFloat() / activity.density)
                         else activity.getBlocksPerRow()
                     val firstTile = mViewTypeList.subList(0, aqi).indexOfLast { ViewType.isHalfSizeableBlock(it) != true } + 1
                     var end = aqi + 1
