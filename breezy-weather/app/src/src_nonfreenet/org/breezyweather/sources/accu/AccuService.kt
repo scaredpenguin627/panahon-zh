@@ -953,7 +953,6 @@ class AccuService @Inject constructor(
             countryCode = "US",
             forecastSource = id,
             currentSource = id,
-            airQualitySource = id,
             pollenSource = id,
             minutelySource = id,
             alertSource = id,

@@ -124,17 +124,7 @@ class SearchActivityRepository @Inject internal constructor(
                         } else {
                             null
                         },
-                        airQualitySource = if (SourceFeature.AIR_QUALITY in
-                            source.supportedFeatures &&
-                            source.isFeatureSupportedForLocation(
-                                location,
-                                SourceFeature.AIR_QUALITY
-                            )
-                        ) {
-                            source.id
-                        } else {
-                            null
-                        },
+                        airQualitySource = mSourceManager.getBestSourceForFeature(location, SourceFeature.AIR_QUALITY)?.id,
                         pollenSource = if (SourceFeature.POLLEN in
                             source.supportedFeatures &&
                             source.isFeatureSupportedForLocation(
