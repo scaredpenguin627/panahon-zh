@@ -214,7 +214,7 @@ enum class PressureUnit(
         )
     }
 
-    companion object {
+    companion {
 
         const val STANDARD = 101325
 

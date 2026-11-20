@@ -186,7 +186,7 @@ enum class TemperatureUnit(
         )
     }
 
-    companion object {
+    companion {
         /**
          * Resolve in the following order:
          * - System regional preference

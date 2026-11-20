@@ -133,7 +133,7 @@ enum class RatioUnit(
         )
     }
 
-    companion object {
+    companion {
 
         fun getUnit(id: String): RatioUnit? {
             return entries.firstOrNull { it.id == id }

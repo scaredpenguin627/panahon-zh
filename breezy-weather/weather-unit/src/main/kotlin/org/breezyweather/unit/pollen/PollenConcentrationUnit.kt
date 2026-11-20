@@ -69,7 +69,7 @@ enum class PollenConcentrationUnit(
         ).trim()
     }
 
-    companion object {
+    companion {
 
         fun getUnit(id: String): PollenConcentrationUnit? {
             return entries.firstOrNull { it.id == id }

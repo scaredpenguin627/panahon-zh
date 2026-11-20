@@ -303,7 +303,7 @@ enum class SpeedUnit(
         )
     }
 
-    companion object {
+    companion {
 
         // In centimeters per second
         const val WIND_SPEED_1 = 30

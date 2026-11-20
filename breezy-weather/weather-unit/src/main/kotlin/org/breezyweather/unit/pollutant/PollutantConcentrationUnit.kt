@@ -137,7 +137,7 @@ enum class PollutantConcentrationUnit(
         )
     }
 
-    companion object {
+    companion {
 
         fun getUnit(id: String): PollutantConcentrationUnit? {
             return entries.firstOrNull { it.id == id }

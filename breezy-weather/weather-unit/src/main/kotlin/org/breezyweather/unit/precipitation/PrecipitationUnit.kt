@@ -285,7 +285,7 @@ enum class PrecipitationUnit(
         )
     }
 
-    companion object {
+    companion {
 
         /**
          * Copyright © 1991-Present Unicode, Inc.
