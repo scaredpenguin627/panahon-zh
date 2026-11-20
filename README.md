@@ -1,45 +1,43 @@
-# 菲律宾天气（中文）
+# 菲律宾天气
 
-这是一个用 Rust 和 egui 编写的 Android 天气应用。数据来自 PAGASA、DENR-EMB、Open-Meteo 和 CAMS 的公开接口。
+菲律宾天气是基于 Breezy Weather 的简体中文 Android 客户端。添加菲律宾城市后，应用会为预报、当前天气和预警推荐菲律宾气象局（PAGASA）的 PANaHON 数据源。手机直接向菲律宾气象局请求数据，无需部署本仓库的服务端。
 
-当前 Android 构建配置声明最低 SDK 29、目标 SDK 37，构建目标为 `aarch64-linux-android` 和 `x86_64-linux-android`。
+## 在手机上使用
 
-## 当前已实现范围
+1. 安装下方 `basicDebug` 构建生成的 APK。Pixel 10a 使用 `arm64-v8a` 版本。
+2. 打开应用，添加马尼拉、宿务或其他菲律宾地点。也可以授予定位权限，使用当前位置。
+3. 在地点的数据源设置中查看预报、当前天气和预警。三项均支持 **PAGASA PANaHON**。如需使用 PAGASA 网站的气象站和逐时预报，可选择另一项 **PAGASA**。
 
-当前版本包含以下功能：
+界面默认使用简体中文和霞鹜文楷精简版。可在设置中更改语言。预警标题和正文保留官方原文。
 
-- 天气首页和当前天气。
-- 逐小时预报和五日预报。
-- AQI 摘要和污染物状态。当前适配器可靠提供 PM2.5、PM10 的 AQI 子指数，其他污染物在数据缺失时显示不可用；监测站、趋势和历史属于当前版本排除范围。
-- 降水雷达地图和时间轴。
-- 预警列表、地点和全国范围过滤、有效期、官方原文和复制操作。
-- 城市搜索和单地点选择。
-- 中文和 English 切换。
-- 来源、更新时间、数据质量、加载、缓存、错误和不可用状态。
+## 在 Windows 上构建
 
-## 数据来源和离线行为
+构建需要 JDK 21、Android SDK Platform 37 和 Build Tools 37.0.0。设置好 `JAVA_HOME` 和 `ANDROID_HOME` 后，从仓库根目录运行：
 
-| 功能 | 来源 | 说明 |
+```powershell
+cd breezy-weather
+.\gradlew.bat :app:assembleBasicDebug
+.\gradlew.bat :app:testBasicDebugUnitTest --tests "*PanahonConverterTest"
+```
+
+构建产物位于 `app/build/outputs/apk/basic/debug/`。应用的目标为 Android 17（API 37）。调试包使用独立包名 `org.panahon.zh.weather.debug`，可与 Breezy Weather 同时安装。
+
+## 菲律宾数据源
+
+| 项目 | 官方接口 | 处理方式 |
 | --- | --- | --- |
-| 实时天气、逐小时、五日预报 | PAGASA PANaHON | JSON 接口；显示来源、更新时间和质量 |
-| 日出、日落、紫外线、能见度 | Open-Meteo | 位置模型预报 |
-| 空气质量 | DENR-EMB | Power BI 公开报表；读不到时回退到 CAMS |
-| AQI 趋势 | Open-Meteo / CAMS |  |
-| 降水雷达 | PAGASA | 降水时间帧 |
-| 预警 | PAGASA | 保留官方原文，并按当前地点和全国范围过滤 |
+| 逐时和逐日预报 | `nowcast/dashboard` | 用菲律宾当地时间解析逐时、最高温和最低温 |
+| 当前天气 | `nowcast/dashboard` | 显示所选地点两小时内的官方临近预报和体感温度 |
+| 天气预警 | `alerts` | 按官方地名和全国范围标记筛选，保留官方原文和有效期 |
 
-网络请求在后台线程执行。刷新失败时保留最近一次可信缓存，并显示失败原因。没有缓存时显示空状态。Android 另外保存地点、语言和最近的 AQI 历史记录。
+接口根地址为 `https://api.mobile.panahon.gov.ph/api/v1/`。启用 PANaHON 后，应用会将所选地点的经纬度发送至该地址。每个地点可单独选择其他天气源。详见[菲律宾气象局 PANaHON](https://panahon.gov.ph/) 和[隐私说明](breezy-weather/PRIVACY.md)。
 
-## 发布状态
+## 源码与许可
 
-当前仓库没有 GitHub Release，也没有可下载的官方 APK 链接。APK 发布需要单独的签名、产物检查和上传流程。签名文件、密码和 APK 不提交到 Git 仓库。
+| 目录 | 内容与许可 |
+| --- | --- |
+| [breezy-weather](breezy-weather/) | Android 融合版，基于 [Breezy Weather](https://github.com/breezy-weather/breezy-weather/tree/d91fcf41e4e5169024a564ea79981c75bf350250)。代码遵循 [LGPL-3.0](breezy-weather/LICENSE) 及[附加条款](breezy-weather/LICENSE_ADDITIONAL) |
+| [android-app](android-app/) | 原有 Android 客户端，使用本仓库的天气 API |
+| [services](services/) | 原有天气服务、移动端核心和 DENR-EMB 空气质量适配器，构建说明见各子目录 |
 
-## 兼容性状态
-
-当前构建配置声明 API 29 及以上，目标架构为 `aarch64` 和 `x86_64`。32 位 ARM-only 设备不属于当前构建目标。
-
-## 字体与布局限制
-
-## 字体子集
-
-## 许可
+字体来自[霞鹜文楷精简版](https://github.com/lxgw/LxgwWenKai-Lite)，遵循 SIL Open Font License 1.1。原项目的许可文件保留在仓库根目录。融合版为社区维护的衍生项目。

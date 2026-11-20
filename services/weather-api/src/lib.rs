@@ -376,7 +376,6 @@ fn weather(state: &AppState, request: &HttpRequest) -> HttpResponse {
                             .errors
                             .push(ApiError::new("pagasa_unavailable", primary.message));
                         fallback.quality = "forecast".into();
-                        fallback.source.push("Open-Meteo".into());
                         Ok(fallback)
                     }
                     Err(_) => Err(primary),
@@ -582,21 +581,11 @@ fn is_ncr(lat: f64, lon: f64) -> bool {
 
 fn fetch_pagasa_weather(state: &AppState, lat: f64, lon: f64) -> Result<ProviderPayload, ApiError> {
     let url = format!(
-        "{}/nowcast/dashboard?latitude={lat}&longitude={lon}",
+        "{}/nowcast/dashboard?lat={lat}&lon={lon}",
         state.config.pagasa_api
     );
     let value = get_json(&url, state.config.timeout)?;
-    let observation_url = format!(
-        "{}/observation/automatic?latitude={lat}&longitude={lon}",
-        state.config.pagasa_api
-    );
-    let observation = get_json(&observation_url, state.config.timeout).ok();
-    let mut normalized = normalize_pagasa_weather(&value, lat, lon);
-    if let Some(observation) = observation.as_ref() {
-        if let Some(current) = normalize_observation(observation) {
-            normalized["current"] = current;
-        }
-    }
+    let normalized = normalize_pagasa_weather(&value, lat, lon)?;
     Ok(payload(normalized, vec!["PAGASA".into()], "official"))
 }
 
@@ -1105,14 +1094,34 @@ fn sanitize_error(error: impl std::fmt::Display) -> String {
     }
 }
 
-fn normalize_pagasa_weather(value: &Value, lat: f64, lon: f64) -> Value {
+fn normalize_pagasa_weather(value: &Value, lat: f64, lon: f64) -> Result<Value, ApiError> {
+    let area = &value["meta"];
+    if value["success"] != true
+        || !number(area, &["lat"]).is_some_and(|v| (lat - v).abs() < 0.01)
+        || !number(area, &["lon"]).is_some_and(|v| (lon - v).abs() < 0.01)
+    {
+        return Err(ApiError::new(
+            "invalid_dashboard_area",
+            "PAGASA did not confirm the requested coordinates",
+        ));
+    }
+
     let current = object_from(
         value,
         &["/data/nc", "/data/nowcast", "/nowcast", "/current"],
     );
     let hourly = Value::Array(array_from(value, &["/data/hc", "/data/hourly", "/hourly"]));
     let daily = Value::Array(array_from(value, &["/data/dc", "/data/daily", "/daily"]));
-    json!({ "location": { "latitude": lat, "longitude": lon }, "current": normalize_current(&current), "hourly": normalize_hourly(&hourly), "daily": normalize_daily(&daily), "supplementary": {} })
+    let current = normalize_current(&current);
+    if current["temperatureC"].is_null() {
+        return Err(ApiError::new(
+            "invalid_dashboard",
+            "PAGASA nowcast has no temperature",
+        ));
+    }
+    Ok(
+        json!({ "location": { "latitude": lat, "longitude": lon }, "current": current, "hourly": normalize_hourly(&hourly), "daily": normalize_daily(&daily), "supplementary": {} }),
+    )
 }
 
 fn normalize_open_meteo_weather(value: &Value, lat: f64, lon: f64) -> Value {
@@ -1122,14 +1131,27 @@ fn normalize_open_meteo_weather(value: &Value, lat: f64, lon: f64) -> Value {
     json!({ "location": { "latitude": lat, "longitude": lon }, "current": normalize_current(&current), "hourly": normalize_open_meteo_hourly(&hourly), "daily": normalize_open_meteo_daily(&daily), "supplementary": { "sunrise": array_value(&daily, "sunrise", 0), "sunset": array_value(&daily, "sunset", 0), "uvIndex": number(&current, &["uv_index"]), "visibilityKm": number(&current, &["visibility"]).map(|v| v / 1000.0) } })
 }
 
+fn weather_number(value: &Value, fields: &[&str]) -> Option<f64> {
+    // PANaHON sends measurements as strings such as "30 °C" and "0.12 mm".
+    number(value, fields).or_else(|| {
+        fields.iter().find_map(|key| {
+            let measurement = value.get(key)?.as_str()?.trim();
+            let raw = measurement
+                .strip_suffix("°C")
+                .or_else(|| measurement.strip_suffix("mm"))?;
+            raw.trim().parse::<f64>().ok().filter(|n| n.is_finite())
+        })
+    })
+}
+
 fn normalize_current(value: &Value) -> Value {
     json!({
-        "temperatureC": number(value, &["tmp", "temperature_2m", "temperature", "temp"]),
-        "feelsLikeC": number(value, &["hindex", "apparent_temperature", "feels_like", "heat_index"]),
-        "humidityPercent": number(value, &["hum", "relative_humidity_2m", "humidity"]),
-        "windKph": number(value, &["ws", "wind_speed_10m", "wind_kph", "wind_speed"]),
+        "temperatureC": weather_number(value, &["tmp", "temperature_2m", "temperature", "temp"]),
+        "feelsLikeC": weather_number(value, &["hindex", "apparent_temperature", "feels_like", "heat_index"]),
+        "humidityPercent": weather_number(value, &["hum", "relative_humidity_2m", "humidity"]),
+        "windKph": weather_number(value, &["ws", "wind_speed_10m", "wind_kph", "wind_speed"]),
         "windDirection": text(value, &["wd", "wind_direction_10m", "wind_direction"]),
-        "precipitationMm": number(value, &["precip_1h", "precipitation", "precipitation_sum"]),
+        "precipitationMm": weather_number(value, &["tprecip", "precip_1h", "precipitation", "precipitation_sum"]),
         "condition": text(value, &["desc", "condition", "weather"]),
         "icon": text(value, &["icon", "weather_code"]),
         "updatedAt": text(value, &["time", "observed_at", "updated_at"])
@@ -1137,11 +1159,11 @@ fn normalize_current(value: &Value) -> Value {
 }
 
 fn normalize_hourly(value: &Value) -> Vec<Value> {
-    value.as_array().map(|items| items.iter().map(|item| json!({ "time": text(item, &["time"]), "temperatureC": number(item, &["tmp", "temperature", "temperature_2m"]), "precipitationMm": number(item, &["tprecip", "precipitation"]), "condition": text(item, &["desc", "condition"]), "icon": text(item, &["icon", "weather_code"]) })).collect()).unwrap_or_default()
+    value.as_array().map(|items| items.iter().map(|item| json!({ "time": text(item, &["time"]), "temperatureC": weather_number(item, &["tmp", "temperature", "temperature_2m"]), "precipitationMm": weather_number(item, &["tprecip", "precipitation"]), "condition": text(item, &["desc", "condition"]), "icon": text(item, &["icon", "weather_code"]) })).collect()).unwrap_or_default()
 }
 
 fn normalize_daily(value: &Value) -> Vec<Value> {
-    value.as_array().map(|items| items.iter().map(|item| json!({ "date": text(item, &["d", "date"]), "summary": text(item, &["desc", "summary"]), "lowC": number(item, &["tmin", "temperature_2m_min"]), "highC": number(item, &["tmax", "temperature_2m_max"]), "precipitationMm": number(item, &["tprecip", "precipitation_sum"]), "heatIndexC": number(item, &["hmax", "heat_index"]) })).collect()).unwrap_or_default()
+    value.as_array().map(|items| items.iter().map(|item| json!({ "date": text(item, &["dt", "date", "d"]), "summary": text(item, &["desc", "summary"]), "lowC": weather_number(item, &["tmin", "temperature_2m_min"]), "highC": weather_number(item, &["tmax", "temperature_2m_max"]), "precipitationMm": weather_number(item, &["tprecip", "precipitation_sum"]), "heatIndexC": weather_number(item, &["hmax", "heat_index"]) })).collect()).unwrap_or_default()
 }
 
 fn normalize_open_meteo_hourly(value: &Value) -> Vec<Value> {
@@ -1180,13 +1202,6 @@ fn normalize_alerts(value: &Value, lat: f64, lon: f64) -> Value {
     let items = array_from(value, &["/data", "/alerts", "/items"]);
     let alerts: Vec<Value> = items.iter().map(|item| json!({ "id": text(item, &["alert_id", "id"]), "kind": text(item, &["type", "kind"]), "title": text(item, &["title"]), "message": text(item, &["message", "detail"]), "area": area_text(item), "issuedAt": text(item, &["issued_at", "issued_at_at"]), "validUntil": text(item, &["valid_until_at", "valid_until"]) })).collect();
     json!({ "location": { "latitude": lat, "longitude": lon }, "items": alerts })
-}
-
-fn normalize_observation(value: &Value) -> Option<Value> {
-    let item = array_from(value, &["/data", "/stations", "/items"])
-        .into_iter()
-        .next()?;
-    Some(normalize_current(&item))
 }
 
 fn area_text(value: &Value) -> Option<String> {
@@ -1438,6 +1453,59 @@ mod tests {
     }
 
     #[test]
+    fn uses_local_dashboard_nowcast_and_rejects_unconfirmed_coordinates() {
+        let dashboard = json!({
+            "success": true,
+            "meta": { "lat": "10.3157", "lon": "123.8854" },
+            "data": { "nc": { "tmp": "30 °C", "tprecip": "0.12 mm" } }
+        });
+        let data = normalize_pagasa_weather(&dashboard, 10.3157, 123.8854).unwrap();
+        assert_eq!(data["current"]["temperatureC"], 30.0);
+        assert_eq!(data["current"]["precipitationMm"], 0.12);
+        assert!(normalize_pagasa_weather(&dashboard, 7.1907, 125.4553).is_err());
+        assert!(normalize_pagasa_weather(&json!({"success": true}), 10.3157, 123.8854).is_err());
+    }
+
+    #[test]
+    fn falls_back_when_pagasa_returns_manila_for_davao() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let root = format!("http://{}", listener.local_addr().unwrap());
+        let config = Config {
+            pagasa_api: root.clone(),
+            open_meteo: format!("{root}/forecast"),
+            timeout: Duration::from_secs(2),
+            ..Config::from_env()
+        };
+        let server = thread::spawn(move || {
+            for path in ["/nowcast/dashboard", "/forecast"] {
+                let (mut socket, _) = listener.accept().unwrap();
+                let req = read_request(&mut socket).unwrap();
+                assert_eq!(req.path, path);
+                let body = if path == "/nowcast/dashboard" {
+                    assert_eq!(req.query["lat"], "7.1907");
+                    assert_eq!(req.query["lon"], "125.4553");
+                    json!({"success": true, "meta": {"lat": 14.5995, "lon": 120.9842}, "data": {"nc": {"tmp": "34 °C"}}})
+                } else {
+                    assert_eq!(req.query["latitude"], "7.1907");
+                    assert_eq!(req.query["longitude"], "125.4553");
+                    json!({"current": {"temperature_2m": 28.0}})
+                };
+                write_response(&mut socket, HttpResponse::json(200, &body)).unwrap();
+            }
+        });
+        let response = handle_request(
+            &AppState::new(config),
+            &request("/api/v1/weather?lat=7.1907&lon=125.4553"),
+        );
+        let value: Value = serde_json::from_slice(&response.body).unwrap();
+        assert_eq!(response.status, 200);
+        assert_eq!(value["meta"]["source"], json!(["Open-Meteo"]));
+        assert_eq!(value["data"]["current"]["temperatureC"], 28.0);
+        assert_eq!(value["errors"][0]["code"], "pagasa_unavailable");
+        server.join().unwrap();
+    }
+
+    #[test]
     fn categories_match_denr_bands() {
         assert_eq!(aqi_category(50), "优");
         assert_eq!(aqi_category(51), "良");
@@ -1485,4 +1553,3 @@ mod tests {
         assert_eq!(rows[0]["Sum(CAMS.PM10AQI)"], 44);
     }
 }
-
