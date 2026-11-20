@@ -13,7 +13,6 @@ import org.breezyweather.sources.pagasa.json.PagasaCurrentResult
 import org.breezyweather.unit.computing.computeDewPoint
 import org.breezyweather.unit.ratio.Ratio
 import org.breezyweather.unit.ratio.Ratio.Companion.percent
-import org.breezyweather.unit.speed.Speed.Companion.kilometersPerHour
 import org.breezyweather.unit.speed.Speed.Companion.metersPerSecond
 import org.breezyweather.unit.temperature.Temperature
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
@@ -110,7 +109,7 @@ internal fun nearbyObservation(
             if (distance == nearest && selected?.time?.let { it >= time } == true) continue
             val name = row.siteName?.takeIf { it.isNotBlank() } ?: continue
             val humidity = row.humidity?.substringBefore(" ")?.toDoubleOrNull()?.takeIf { it in 1.0..100.0 }?.percent ?: continue
-            val speed = row.windSpeed?.substringBefore(" ")?.toDoubleOrNull()?.takeIf { it >= 0 }?.kilometersPerHour ?: continue
+            val speed = row.observedWindSpeed ?: continue
             val temperature = row.temperature?.substringBefore(" ")?.toDoubleOrNull()?.takeIf { it in -70.0..65.0 }?.celsius ?: continue
             selected = AtmosphereReading(
                 time, Wind(degree = getWindDegree(row.windDirection), speed = speed), humidity,

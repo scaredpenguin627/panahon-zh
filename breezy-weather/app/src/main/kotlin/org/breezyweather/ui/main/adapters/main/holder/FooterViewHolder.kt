@@ -56,6 +56,7 @@ import androidx.compose.ui.text.withLink
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
+import org.breezyweather.sources.panahon.localizedWindHumiditySource
 import org.breezyweather.R
 import org.breezyweather.common.extensions.splitKeeping
 import org.breezyweather.common.source.HttpSource
@@ -148,9 +149,13 @@ class FooterViewHolder(
                         append(stringResource(R.string.dot_separator))
                         withLink(moreClickableLinkAnnotation) { append(stringResource(R.string.action_more)) }
                     } ?: withLink(moreClickableLinkAnnotation) { append(stringResource(R.string.data_sources)) }
+                    if (location.alertSource == "panahon") {
+                        append("\n")
+                        append(stringResource(R.string.panahon_alert_scope))
+                    }
                     location.weather?.current?.windHumiditySource?.let {
                         append("\n")
-                        append(stringResource(R.string.wind_humidity_attribution, it))
+                        append(stringResource(R.string.wind_humidity_attribution, context.localizedWindHumiditySource(it)))
                     }
                 },
                 color = Color(

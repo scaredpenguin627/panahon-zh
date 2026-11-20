@@ -1,6 +1,7 @@
 package org.breezyweather.sources.panahon
 
 import breezyweather.domain.weather.reference.WeatherCode
+import org.breezyweather.common.exceptions.InvalidOrIncompleteDataException
 import org.breezyweather.common.exceptions.OutdatedServerDataException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -52,6 +53,26 @@ class PanahonConverterTest {
             local.copy(alert_id = "expired", valid_until_at = "December 31, 2026 10:00 PM")
         ))
         assertEquals(listOf("local", "national"), alerts.toAlerts(PanahonArea(region = "Metro Manila"), now).map { it.alertId })
+    }
+
+    @Test
+    fun verifiedOffshorePointWithoutAnAreaAcceptsOnlyValidNationwideAlerts() {
+        val offshore = PanahonArea(lat = "9.0439", lon = "119.8160", province = "", region = " ")
+        assertTrue(offshore.matches(9.04388, 119.81595))
+        val national = PanahonBulletin("national", "Official", locations = listOf("Philippines"), valid_until_at = "January 01, 2027 01:00 AM")
+        val feed = PanahonAlerts(true, listOf(
+            national.copy(alert_id = "nearby", locations = listOf("Palawan")),
+            national.copy(alert_id = "unknown", locations = listOf(" ")),
+            national.copy(alert_id = "expired", valid_until_at = "December 31, 2026 10:00 PM"),
+            national
+        ))
+        assertEquals(listOf("national"), feed.toAlerts(offshore, now).map { it.alertId })
+        assertThrows(InvalidOrIncompleteDataException::class.java) {
+            PanahonAlerts(true, listOf(national.copy(valid_until_at = null))).toAlerts(offshore, now)
+        }
+        assertThrows(InvalidOrIncompleteDataException::class.java) {
+            PanahonAlerts(true, listOf(national.copy(alert_id = ""))).toAlerts(offshore, now)
+        }
     }
 
     @Test

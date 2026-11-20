@@ -43,7 +43,6 @@ import org.breezyweather.sources.pagasa.json.PagasaLocationResult
 import org.breezyweather.unit.precipitation.Precipitation.Companion.millimeters
 import org.breezyweather.unit.pressure.Pressure.Companion.hectopascals
 import org.breezyweather.unit.ratio.Ratio.Companion.percent
-import org.breezyweather.unit.speed.Speed.Companion.kilometersPerHour
 import org.breezyweather.unit.speed.Speed.Companion.metersPerSecond
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
 import retrofit2.Retrofit
@@ -171,7 +170,7 @@ class PagasaService @Inject constructor(
                 ),
                 wind = Wind(
                     degree = getWindDegree(it.windDirection),
-                    speed = it.windSpeed?.substringBefore(" ")?.toDoubleOrNull()?.kilometersPerHour
+                    speed = it.observedWindSpeed
                 ),
                 relativeHumidity = it.humidity?.substringBefore(" ")?.toDoubleOrNull()?.percent,
                 pressure = it.pressure?.doubleOrNull?.hectopascals

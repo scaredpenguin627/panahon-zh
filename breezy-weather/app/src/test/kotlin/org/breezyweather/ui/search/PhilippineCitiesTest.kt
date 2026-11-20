@@ -17,7 +17,8 @@ class PhilippineCitiesTest {
             englishLocation.formattedId shouldBe location.formattedId
             englishLocation.city.startsWith(english) shouldBe true
         }
-        findOfflinePhilippineCities("", Locale.CHINA).size shouldBe 3
+        findOfflinePhilippineCities("", Locale.CHINA).map { it.cityId } shouldBe
+            listOf("panahon-manila", "panahon-cebu", "panahon-davao", "panahon-boracay")
         findOfflinePhilippineCities("Tokyo", Locale.ENGLISH).size shouldBe 0
     }
 

@@ -1,8 +1,10 @@
 package org.breezyweather.sources.panahon
 
+import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceContinent
 import breezyweather.domain.source.SourceFeature
+import org.breezyweather.R
 import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.NonFreeNetSource
 import org.breezyweather.common.source.WeatherSource
@@ -47,3 +49,11 @@ internal fun windHumidityAttribution(time: Date, station: String? = null): Strin
     val source = station?.let { "PAGASA AWS · $it" } ?: "Open-Meteo"
     return "$source · ${clock.format(time)} PHT"
 }
+
+/** Compose display text at render time so a language change also updates cached readings. */
+internal fun Context.localizedWindHumiditySource(source: String): String =
+    if (source.startsWith("Open-Meteo · ")) {
+        getString(R.string.current_wind_humidity_model) + source.removePrefix("Open-Meteo")
+    } else {
+        source
+    }

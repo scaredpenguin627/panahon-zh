@@ -19,6 +19,7 @@ package org.breezyweather.sources.pagasa.json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonPrimitive
+import org.breezyweather.unit.speed.Speed.Companion.kilometersPerHour
 
 @Serializable
 data class PagasaCurrentResult(
@@ -31,4 +32,11 @@ data class PagasaCurrentResult(
     val latitude: String,
     val longitude: String,
     @SerialName("site_name") val siteName: String? = null,
-)
+) {
+    val observedWindSpeed get() = windSpeed?.trim()
+        ?.let { windKph.matchEntire(it)?.groupValues?.get(1)?.toDoubleOrNull() }
+        ?.takeIf { it.isFinite() }
+        ?.kilometersPerHour
+}
+
+private val windKph = Regex("""(\d+(?:\.\d+)?)\s*km/(?:h|hr)""", RegexOption.IGNORE_CASE)

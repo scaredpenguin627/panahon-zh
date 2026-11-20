@@ -14,6 +14,7 @@ import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.NonFreeNetSource
 import org.breezyweather.common.source.WeatherSource
 import org.breezyweather.sources.openmeteo.OpenMeteoService
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EmbAirQualityService @Inject constructor(
@@ -45,11 +46,12 @@ class EmbAirQualityService @Inject constructor(
         if (SourceFeature.AIR_QUALITY !in requestedFeatures) return Observable.just(WeatherWrapper())
         // Station sub-indices have their own display and cache. The shared weather model only accepts concentrations.
         val stationReports = rxSingle { stations.forLocation(location) }
+            .timeout(10, TimeUnit.SECONDS)
             .onErrorReturn { emptyList() }
             .toObservable()
         val modelWeather = Observable.defer {
             model.requestWeather(context, location, listOf(SourceFeature.AIR_QUALITY))
-        }.onErrorReturn { WeatherWrapper(failedFeatures = mapOf(SourceFeature.AIR_QUALITY to it)) }
+        }.timeout(10, TimeUnit.SECONDS).onErrorReturn { WeatherWrapper(failedFeatures = mapOf(SourceFeature.AIR_QUALITY to it)) }
         return Observable.zip(stationReports, modelWeather) { _, concentrations -> concentrations }
     }
 

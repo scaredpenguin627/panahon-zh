@@ -451,8 +451,8 @@
     <string name="location_message_reverse_geocoding_failed">Weather source failed to find a matching location</string>
     <string name="location_dialog_failed_to_locate_action_select_source">Use another location service</string>
     <string name="location_dialog_failed_to_locate_action_add_manually">Add location manually and delete “%s”</string>
-    <string name="location_offline_philippines">Philippine cities available offline</string>
-    <string name="location_search_placeholder">Search for a location…</string>
+    <string name="location_offline_philippines">Philippine travel destinations · offline</string>
+    <string name="location_search_placeholder">Search for a city, island or dive site…</string>
     <string name="location_search_source">Location search source</string>
     <string name="location_search_change_source">Change location search source</string>
     <!-- Example: AccuWeather can’t find djglidfjg -->

@@ -48,6 +48,19 @@ class PanahonAtmosphereTest {
     }
 
     @Test
+    fun stationWindRequiresAnExplicitKilometresPerHourUnit() {
+        for (text in listOf("3.6 km/hr", "3.6 km/h", "3.6km/h")) {
+            assertEquals(3.6.kilometersPerHour, aws.copy(windSpeed = text).observedWindSpeed)
+        }
+        for (text in listOf("3.6 m/s", "3.6 mph", "3.6", "-- km/hr", "-1 km/h", null)) {
+            val station = aws.copy(windSpeed = text)
+            assertNull(station.observedWindSpeed)
+            assertNull(nearbyObservation(manila, mapOf("station" to listOf(station)), now))
+        }
+        assertEquals(0.0.kilometersPerHour, aws.copy(windSpeed = "0 km/hr").observedWindSpeed)
+    }
+
+    @Test
     fun forecastWindAndHumidityJoinByTimestampAndNeverReplacePagasaTemperature() {
         val hour = Instant.parse("2026-11-20T10:00:00Z").epochSecond
         val grid = PanahonModelGrid(

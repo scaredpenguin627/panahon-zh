@@ -23,6 +23,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.appcompat.content.res.AppCompatResources
 import breezyweather.domain.location.model.Location
+import org.breezyweather.sources.panahon.localizedWindHumiditySource
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.formatMeasure
@@ -87,7 +88,7 @@ class HumidityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
         }
 
-        val source = location.weather?.current?.windHumiditySource
+        val source = location.weather?.current?.windHumiditySource?.let { context.localizedWindHumiditySource(it) }
         sourceView.isVisible = source != null
         sourceView.text = source?.substringBefore(" · ")
         if (source != null) talkBackBuilder.append(", ").append(source)

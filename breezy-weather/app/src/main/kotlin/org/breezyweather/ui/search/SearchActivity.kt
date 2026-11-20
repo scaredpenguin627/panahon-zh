@@ -127,7 +127,13 @@ class SearchActivity : BreezyActivity() {
         val locationSearchSource = sourceManager.getLocationSearchSourceOrDefault(locationSearchSourceState.value)
 
         val locale = context.currentLocale
-        val offlineCities = remember(text, locale) { findOfflinePhilippineCities(text, locale) }
+        val places = remember(context.assets) {
+            originalPhilippinePlaces + listOf("luzon", "vismin").flatMap { region ->
+                readTourismPlaces(context.assets.open("tourism/$region.tsv").reader(Charsets.UTF_8))
+            }
+        }
+        val offlineCities = remember(text, locale, places) { findOfflinePhilippineCities(text, locale, places) }
+        val placesById = remember(places) { places.associateBy { it.cityId } }
         val listResourceState = viewModel.listResource.collectAsState()
         val remoteCities = if (text.isNotBlank() && text == latestTextSearch) {
             listResourceState.value.first
@@ -220,8 +226,9 @@ class SearchActivity : BreezyActivity() {
                                         .colors(containerColor = SearchBarDefaults.colors().containerColor),
                                     headlineContent = { Text(location.getPlace(context)) },
                                     supportingContent = {
-                                        if (offlineCities.contains(location) && remoteCities.isNotEmpty()) {
-                                            Text(stringResource(R.string.location_offline_philippines))
+                                        val place = placesById[location.cityId]
+                                        if (place != null) {
+                                            Text("${place.otherName(locale)} · ${location.country}")
                                         } else {
                                             Text(location.administrationLevels())
                                         }

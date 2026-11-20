@@ -133,14 +133,15 @@ internal fun PanahonAlerts.toAlerts(area: PanahonArea, now: Long): List<Alert> {
     val city = area.municipality?.takeIf { it.endsWith(" City", ignoreCase = true) || it.equals("Manila", ignoreCase = true) }
     val areas = listOfNotNull(area.province, area.region, city)
         .map { it.trim().lowercase(Locale.ROOT) }.filter { it.isNotEmpty() }.toSet()
-    if (areas.isEmpty()) throw InvalidOrIncompleteDataException()
+    // Some offshore coordinates have verified dashboard coordinates but no named
+    // province or region. Only explicitly nationwide bulletins can be matched there.
     val nationwide = setOf("all", "nationwide", "philippines", "entire philippines")
     val relevantAreas = areas + nationwide
     val stamp = formatter("MMMM d, yyyy hh:mm a")
     return data.mapNotNull { item ->
         // PAGASA can leave the locations list empty on a final advisory. The issuing
         // office or a national feed alone does not establish that it covers this location.
-        if (item.locations.orEmpty().none { it.trim().lowercase(Locale.ROOT) in relevantAreas }) return@mapNotNull null
+        if (item.locations.orEmpty().none { it.isNotBlank() && it.trim().lowercase(Locale.ROOT) in relevantAreas }) return@mapNotNull null
         val end = stamp.read(item.valid_until_at)
         if (end == null || item.alert_id.isBlank()) throw InvalidOrIncompleteDataException()
         if (end.time <= now) return@mapNotNull null

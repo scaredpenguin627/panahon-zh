@@ -21,14 +21,16 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class EmbRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val client: OkHttpClient,
+    httpClient: OkHttpClient,
 ) {
+    private val client = httpClient.newBuilder().callTimeout(10, TimeUnit.SECONDS).build()
     private val prefs by lazy { context.getSharedPreferences("emb-public-reports-v1", Context.MODE_PRIVATE) }
     private val latest = ConcurrentHashMap<String, EmbSnapshot>()
     private val locks = ConcurrentHashMap<String, Mutex>()

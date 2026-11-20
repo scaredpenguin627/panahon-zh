@@ -18,7 +18,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
+import io.reactivex.rxjava3.schedulers.TestScheduler
+import kotlinx.coroutines.awaitCancellation
 import java.io.IOException
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class EmbAirQualityServiceTest {
     private val context = mockk<Context>()
@@ -66,5 +71,31 @@ class EmbAirQualityServiceTest {
         val result = service.requestWeather(context, manila, features).blockingFirst()
         assertSame(unavailable, result.failedFeatures?.get(SourceFeature.AIR_QUALITY))
         coVerify(exactly = 1) { stations.forLocation(manila) }
+    }
+
+    @Test
+    fun aStalledEndpointDoesNotBlockTheOtherAirQualityResult() {
+        val timer = TestScheduler()
+        val previous = RxJavaPlugins.getComputationSchedulerHandler()
+        RxJavaPlugins.setComputationSchedulerHandler { timer }
+        try {
+            val features = listOf(SourceFeature.AIR_QUALITY)
+            val result = WeatherWrapper(airQuality = AirQualityWrapper(current = AirQuality(pM10 = 17.0.microgramsPerCubicMeter)))
+            coEvery { stations.forLocation(manila) } coAnswers { awaitCancellation() }
+            every { model.requestWeather(context, manila, features) } returns Observable.just(result)
+            val slowStations = service.requestWeather(context, manila, features).test()
+            timer.advanceTimeBy(10, TimeUnit.SECONDS)
+            slowStations.assertResult(result)
+
+            coEvery { stations.forLocation(manila) } returns emptyList()
+            every { model.requestWeather(context, manila, features) } returns Observable.never()
+            val slowModel = service.requestWeather(context, manila, features).test()
+            timer.advanceTimeBy(10, TimeUnit.SECONDS)
+            slowModel.awaitDone(2, TimeUnit.SECONDS).assertComplete().assertValue {
+                it.failedFeatures?.get(SourceFeature.AIR_QUALITY) is TimeoutException
+            }
+        } finally {
+            RxJavaPlugins.setComputationSchedulerHandler(previous)
+        }
     }
 }
