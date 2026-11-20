@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="traveller_model_label">Open-Meteo 模型</string>
-    <string name="traveller_emb_none">EMB · 附近无已核实站点</string>
-    <string name="traveller_emb_show">站点详情</string>
-    <string name="traveller_emb_hide">收起站点详情</string>
-    <string name="traveller_daily_period">PAGASA PANaHON · 全天概况、最高和最低气温</string>
-    <string name="traveller_hourly_period">PAGASA PANaHON · 逐小时预报</string>
-    <string name="traveller_scope_names">PAGASA 预警 · %1$s及全国公告</string>
-    <string name="traveller_scope_national">PAGASA 预警 · 此坐标仅能匹配全国公告</string>
-    <string name="traveller_scope_unverified">PAGASA 预警 · 当地覆盖范围待核实</string>
     <string name="traveller_daily_high_low">最高 %1$s · 最低 %2$s</string>
-    <string name="traveller_daily_high">全天概况 · 最高</string>
+    <string name="traveller_daily_high">最高</string>
     <string name="traveller_daily_low">最低</string>
-    <string name="traveller_wind_unknown">风向暂缺</string>
-    <string name="traveller_regional_alerts">PAGASA 区域公告</string>
-    <plurals name="traveller_days_ago">
-        <item quantity="one">%d 天前</item>
-        <item quantity="other">%d 天前</item>
-    </plurals>
-    <string name="traveller_query_point">预报点 %1$s</string>
-    <string name="traveller_alerts_checked">核对于 %1$s（菲律宾时间）</string>
 </resources>

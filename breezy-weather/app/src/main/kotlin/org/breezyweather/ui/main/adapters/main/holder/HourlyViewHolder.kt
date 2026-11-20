@@ -86,26 +86,8 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
         }
 
-        val period = if (location.forecastSource == "panahon") {
-            val dates = weather.nextHourlyForecast.filter { it.weatherCode != null || it.temperature?.temperature != null }.map { it.date }
-            if (dates.isEmpty()) null else listOf(dates.first(), dates.last()).distinct().joinToString("–") {
-                it.getFormattedDate("MM/dd HH:mm", location, context)
-            }
-        } else null
-        fun showSubtitle(index: Int) {
-            val attribution = when (trendAdapter.adapters.getOrNull(index)) {
-                is HourlyWindAdapter, is HourlyHumidityAdapter -> if (location.forecastSource == "panahon") R.string.traveller_model_label else null
-                is HourlyTemperatureAdapter, is HourlyFeelsLikeAdapter -> if (location.forecastSource == "panahon") R.string.traveller_hourly_period else null
-                else -> null
-            }
-            val caption = attribution?.let {
-                val source = context.getString(it)
-                if (it == R.string.traveller_hourly_period && period != null) "$source · $period" else source
-            }
-            subtitle.text = listOfNotNull(weather.current?.hourlyForecast, caption).joinToString("\n")
-            subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
-        }
-        showSubtitle(trendAdapter.selectedIndex)
+        subtitle.text = weather.current?.hourlyForecast
+        subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
         if (buttonList.size < 2) {
             buttonGroup.visibility = View.GONE
         } else {
@@ -139,7 +121,6 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                         isChecked = index == trendAdapter.selectedIndex
                         setOnClickListener {
                             trendAdapter.selectedIndex = index
-                            showSubtitle(index)
                             setSelectedTab(button.name)
                             buttonGroup.children
                                 .filter { it is MaterialButton && it.tag != MaterialButtonGroup.OVERFLOW_BUTTON_TAG }

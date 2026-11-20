@@ -24,6 +24,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.breezyweather.R
 import org.breezyweather.common.options.BaseEnum
+import org.breezyweather.domain.weather.model.validAirQuality
 
 enum class DetailScreen(
     override val id: String,
@@ -41,6 +42,7 @@ enum class DetailScreen(
     TAG_PRESSURE("pressure", R.string.pressure, R.drawable.ic_gauge),
     TAG_CLOUD_COVER("cloud_cover", R.string.cloud_cover, R.drawable.ic_cloud),
     TAG_VISIBILITY("visibility", R.string.visibility, R.drawable.ic_eye),
+    TAG_AIR_QUALITY("air_quality", R.string.air_quality, R.drawable.weather_haze_mini_xml),
     TAG_SUN_MOON("sun_moon", R.string.ephemeris, R.drawable.weather_clear_night_mini_xml),
     ;
 
@@ -84,6 +86,7 @@ enum class DetailScreen(
                             it.visibility?.min != null || it.visibility?.max != null
                         } == true ||
                             location.weather?.hourlyForecast?.any { it.visibility != null } == true
+                        TAG_AIR_QUALITY -> location.weather?.validAirQuality != null
                         TAG_SUN_MOON -> true // Should always be computed, no need to check
                     }
                 }.toImmutableList()

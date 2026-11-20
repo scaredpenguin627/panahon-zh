@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <bool name="use_wenkai">false</bool>
     <style name="PanahonThemeBase" parent="Theme.Material3Expressive.DayNight.NoActionBar" />
 
     <!-- app theme -->

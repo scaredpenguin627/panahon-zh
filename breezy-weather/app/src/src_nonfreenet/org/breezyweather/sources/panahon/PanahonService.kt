@@ -73,10 +73,6 @@ class PanahonService @Inject constructor(@Named("JsonClient") client: Retrofit.B
                     pressureSource = modelNow?.takeIf { it.pressure != null }?.attribution()
                 ),
                 alertList = warnings,
-                alertScope = warnings?.let {
-                    val areas = dashboard.getOrThrow()!!.meta!!.alertAreas().joinToString(", ")
-                    encodeAlertScope(location, areas)
-                },
                 failedFeatures = failures
             )
         }

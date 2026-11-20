@@ -23,14 +23,13 @@ configure<ApplicationExtension> {
 
     defaultConfig {
         applicationId = "org.panahon.zh.weather"
-        versionCode = 60207
-        versionName = "1.0.3"
+        versionCode = 60208
+        versionName = "1.0.4"
 
         buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")
         buildConfigField("boolean", "IS_BREEZY", "${Config.isBreezy}")
 
-        multiDexEnabled = true
         ndk {
             abiFilters += supportedAbi
         }
@@ -41,7 +40,7 @@ configure<ApplicationExtension> {
     }
 
     androidResources {
-        localeFilters += setOf("en", "zh-rCN", "zh-rTW", "b+zh+Hans")
+        localeFilters += setOf("en", "zh-rCN", "zh-rTW")
     }
 
     splits {

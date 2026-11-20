@@ -16,8 +16,6 @@
 
 package org.breezyweather.ui.main.adapters.main.holder
 
-import androidx.core.view.isVisible
-import org.breezyweather.sources.panahon.localizedWindHumiditySource
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
@@ -74,12 +72,6 @@ class PressureViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             talkBackBuilder.append(it.formatMeasure(context, unitWidth = UnitWidth.LONG))
         }
 
-        val source = location.weather?.current?.pressureSource?.let { context.localizedWindHumiditySource(it) }
-        itemView.findViewById<TextView>(R.id.pressure_source).apply {
-            isVisible = source != null
-            text = source
-        }
-        if (source != null) talkBackBuilder.append(", ").append(source)
         itemView.contentDescription = talkBackBuilder.toString()
         itemView.setOnClickListener {
             IntentHelper.startDailyWeatherActivity(

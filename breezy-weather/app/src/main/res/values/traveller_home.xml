@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="traveller_model_label">Open-Meteo model</string>
-    <string name="traveller_emb_none">EMB · No verified station nearby</string>
-    <string name="traveller_emb_show">Station details</string>
-    <string name="traveller_emb_hide">Hide station details</string>
-    <string name="traveller_daily_period">PAGASA PANaHON · All-day outlook, high and low</string>
-    <string name="traveller_hourly_period">PAGASA PANaHON · Hourly outlook</string>
-    <string name="traveller_scope_names">PAGASA alerts · %1$s and nationwide bulletins</string>
-    <string name="traveller_scope_national">PAGASA alerts · Only nationwide bulletins match this location</string>
-    <string name="traveller_scope_unverified">PAGASA alerts · Local coverage unverified</string>
     <string name="traveller_daily_high_low">High %1$s · Low %2$s</string>
-    <string name="traveller_daily_high">All-day outlook · High</string>
+    <string name="traveller_daily_high">High</string>
     <string name="traveller_daily_low">Low</string>
-    <string name="traveller_wind_unknown">Direction unavailable</string>
-    <string name="traveller_regional_alerts">PAGASA regional bulletins</string>
-    <plurals name="traveller_days_ago">
-        <item quantity="one">%d day ago</item>
-        <item quantity="other">%d days ago</item>
-    </plurals>
-    <string name="traveller_query_point">Forecast point %1$s</string>
-    <string name="traveller_alerts_checked">Checked %1$s PHT</string>
 </resources>

@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="traveller_model_label">Open-Meteo 模型</string>
-    <string name="traveller_emb_none">EMB · 附近無已核實測站</string>
-    <string name="traveller_emb_show">測站詳情</string>
-    <string name="traveller_emb_hide">收合測站詳情</string>
-    <string name="traveller_daily_period">PAGASA PANaHON · 全天概況、最高和最低氣溫</string>
-    <string name="traveller_hourly_period">PAGASA PANaHON · 逐小時預報</string>
-    <string name="traveller_scope_names">PAGASA 預警 · %1$s及全國公告</string>
-    <string name="traveller_scope_national">PAGASA 預警 · 此座標僅能比對全國公告</string>
-    <string name="traveller_scope_unverified">PAGASA 預警 · 當地涵蓋範圍待核實</string>
     <string name="traveller_daily_high_low">最高 %1$s · 最低 %2$s</string>
-    <string name="traveller_daily_high">全天概況 · 最高</string>
+    <string name="traveller_daily_high">最高</string>
     <string name="traveller_daily_low">最低</string>
-    <string name="traveller_wind_unknown">風向暫缺</string>
-    <string name="traveller_regional_alerts">PAGASA 區域公告</string>
-    <plurals name="traveller_days_ago">
-        <item quantity="one">%d 天前</item>
-        <item quantity="other">%d 天前</item>
-    </plurals>
-    <string name="traveller_query_point">預報點 %1$s</string>
-    <string name="traveller_alerts_checked">核對於 %1$s（菲律賓時間）</string>
 </resources>

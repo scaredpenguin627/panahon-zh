@@ -18,11 +18,9 @@ package org.breezyweather.ui.theme.compose
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import org.breezyweather.R
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -33,8 +31,4 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     )
-)
-
-val simplifiedChineseTypography = Typography(
-    fontFamily = FontFamily(Font(R.font.lxgw_wenkai_lite_regular))
 )

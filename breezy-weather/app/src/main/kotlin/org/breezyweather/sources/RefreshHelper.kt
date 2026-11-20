@@ -570,10 +570,10 @@ class RefreshHelper @Inject constructor(
                 .toDateNoHour(location.timeZone)!!
             var forecastUpdateTime = base.forecastUpdateTime
             var currentUpdateTime = base.currentUpdateTime
+            var airQualityUpdateTime = base.airQualityUpdateTime
             var pollenUpdateTime = base.pollenUpdateTime
             var minutelyUpdateTime = base.minutelyUpdateTime
             var alertsUpdateTime = base.alertsUpdateTime
-            var alertScope = base.alertScope.takeIf { location.alertSource == "panahon" }
 
             // TODO: Debug source is not online, don't use this check in that case
             // Can't return from inside `async`
@@ -815,6 +815,22 @@ class RefreshHelper @Inject constructor(
                     } else {
                         null
                     }, // Fallback will be handled later
+                    airQuality = if (!location.airQualitySource.isNullOrEmpty()) {
+                        if (errors.any {
+                                it.feature == SourceFeature.AIR_QUALITY &&
+                                    it.source == location.airQualitySource!!
+                            }
+                        ) {
+                            null
+                        } else {
+                            sourceCalls.getOrElse(location.airQualitySource!!) { null }?.airQuality?.let {
+                                airQualityUpdateTime = Date()
+                                it
+                            }
+                        }
+                    } else {
+                        null
+                    },
                     pollen = if (!location.pollenSource.isNullOrEmpty()) {
                         if (errors.any {
                                 it.feature == SourceFeature.POLLEN &&
@@ -858,7 +874,6 @@ class RefreshHelper @Inject constructor(
                         } else {
                             sourceCalls.getOrElse(location.alertSource!!) { null }?.alertList?.let {
                                 alertsUpdateTime = Date()
-                                alertScope = sourceCalls[location.alertSource!!]?.alertScope
                                 it
                             }
                         } ?: location.weather?.toAlertsWrapper()
@@ -880,7 +895,7 @@ class RefreshHelper @Inject constructor(
                 weatherWrapper,
                 location.weather,
                 yesterdayMidnight,
-                null, // EMB observations are kept outside the forecast cache.
+                location.airQualitySource,
                 location.pollenSource
             )
 
@@ -921,11 +936,10 @@ class RefreshHelper @Inject constructor(
                 base = base.copy(
                     forecastUpdateTime = forecastUpdateTime,
                     currentUpdateTime = currentUpdateTime,
-                    airQualityUpdateTime = null,
+                    airQualityUpdateTime = airQualityUpdateTime,
                     pollenUpdateTime = pollenUpdateTime,
                     minutelyUpdateTime = minutelyUpdateTime,
                     alertsUpdateTime = alertsUpdateTime,
-                    alertScope = alertScope,
                 ),
                 current = completeCurrentFromHourlyData(
                     weatherWrapperCompleted.current
@@ -937,7 +951,7 @@ class RefreshHelper @Inject constructor(
                         },
                     currentHour,
                     currentDay,
-                    null, // No model or previous forecast can supply station air quality.
+                    weatherWrapperCompleted.airQuality?.current,
                     location
                 ),
                 dailyForecast = dailyForecast,

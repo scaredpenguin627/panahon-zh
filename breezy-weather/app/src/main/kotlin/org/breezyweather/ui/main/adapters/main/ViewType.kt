@@ -38,8 +38,8 @@ interface ViewType {
 
         fun isHalfSizeableBlock(viewType: Int): Boolean? {
             return when (viewType) {
-                HEADER, ALERT, PRECIPITATION_NOWCAST, DAILY, HOURLY, AIR_QUALITY, FOOTER -> false
-                PRECIPITATION, WIND, POLLEN, HUMIDITY, UV, VISIBILITY, PRESSURE, SUN, MOON, CLOCK -> true
+                HEADER, ALERT, PRECIPITATION_NOWCAST, DAILY, HOURLY, FOOTER -> false
+                PRECIPITATION, WIND, AIR_QUALITY, POLLEN, HUMIDITY, UV, VISIBILITY, PRESSURE, SUN, MOON, CLOCK -> true
                 else -> null
             }
         }

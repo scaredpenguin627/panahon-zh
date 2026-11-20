@@ -59,7 +59,7 @@ fun BreezyWeatherTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = if (booleanResource(R.bool.use_wenkai)) simplifiedChineseTypography else Typography,
+        typography = Typography,
         content = content
     )
 }

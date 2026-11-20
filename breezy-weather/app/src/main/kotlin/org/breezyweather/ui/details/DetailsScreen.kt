@@ -86,9 +86,12 @@ import org.breezyweather.common.extensions.toTimezoneSpecificHour
 import org.breezyweather.common.options.appearance.CalendarHelper
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.common.source.PollenIndexSource
+import org.breezyweather.domain.weather.index.PollutantIndex
 import org.breezyweather.domain.weather.model.isToday
+import org.breezyweather.domain.weather.model.validPollutants
 import org.breezyweather.ui.common.widgets.Material3Scaffold
 import org.breezyweather.ui.common.widgets.insets.BWCenterAlignedTopAppBar
+import org.breezyweather.ui.details.components.DetailsAirQuality
 import org.breezyweather.ui.details.components.DetailsCloudCover
 import org.breezyweather.ui.details.components.DetailsConditions
 import org.breezyweather.ui.details.components.DetailsHumidity
@@ -467,6 +470,21 @@ fun DailyPagerContent(
                     current?.visibility?.let { visibility ->
                         Pair(currentUpdateTime, visibility)
                     }
+                )
+            }
+            DetailScreen.TAG_AIR_QUALITY -> {
+                val airQuality = daily.airQuality ?: current?.airQuality
+                var selectedPollutant by remember { mutableStateOf<PollutantIndex?>(null) }
+                DetailsAirQuality(
+                    location = location,
+                    supportedPollutants = remember(airQuality) {
+                        airQuality?.validPollutants?.toImmutableList() ?: persistentListOf()
+                    },
+                    selectedPollutant = selectedPollutant,
+                    setSelectedPollutant = { selectedPollutant = it },
+                    hourlyList = hourlyList,
+                    daily = daily,
+                    defaultValue = current?.airQuality?.let { Pair(currentUpdateTime, it) }
                 )
             }
             DetailScreen.TAG_SUN_MOON -> {

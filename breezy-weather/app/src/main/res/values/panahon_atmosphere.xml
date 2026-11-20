@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="wind_humidity_attribution">Current wind and humidity: %1$s</string>
-    <string name="hourly_wind_humidity_model">Hourly wind, humidity and dew point: Open-Meteo model</string>
-    <string name="current_wind_humidity_model">Open-Meteo model</string>
-    <string name="panahon_alert_scope">PANaHON alerts: when PAGASA supplies no matching area for these coordinates, only explicitly nationwide bulletins can be shown.</string>
-</resources>

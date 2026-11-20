@@ -58,6 +58,10 @@ internal fun Project.configureKotlin() {
             jvmTarget.set(AndroidConfig.JvmTarget)
             freeCompilerArgs.addAll(
                 "-opt-in=kotlin.RequiresOptIn",
+                // Kotlin 2.5.0-RC: opt in to the experimental stdlib APIs (Boolean.onTrue/onFalse/
+                // ifOrNull, CodePoint) and to companion extensions and blocks.
+                "-opt-in=kotlin.ExperimentalStdlibApi",
+                "-Xcompanion-blocks-and-extensions",
             )
 
             // Treat all Kotlin warnings as errors (disabled by default)

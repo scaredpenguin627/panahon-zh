@@ -1,22 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="emb_title">空氣品質 · 菲律賓環境管理局（EMB）</string>
-    <string name="emb_loading">正在讀取 EMB 官方測站報表…</string>
-    <string name="emb_uncovered">此地點暫無已核實的 EMB 測站數據。</string>
-    <string name="emb_missing">最新報表中沒有此地點的數據。</string>
-    <string name="emb_error">暫時無法更新 EMB 官方報表。</string>
-    <string name="emb_cached">尚無新數據，顯示最近一次的紀錄</string>
-    <string name="emb_report_time">報表更新：%1$s</string>
-    <string name="emb_station_time">監測時間：%1$s</string>
-    <string name="emb_old">距今已超過 24 小時</string>
-    <string name="emb_fetched">取得時間：%1$s</string>
-    <string name="emb_sub_index">%1$s 副指標 %2$s</string>
     <string name="emb_source_name">DENR-EMB 官方測站</string>
-    <string name="emb_official_link">查看官方監測報表</string>
-    <string name="emb_manual">人工採樣紀錄</string>
-    <string name="emb_annual">年度空氣品質摘要</string>
-    <string name="emb_year">統計年份：%1$s</string>
-    <string name="emb_historical">歷史監測紀錄</string>
-    <string name="emb_no_recent">此地點暫無已核實的即時測站數據。</string>
-    <string name="emb_scale">各污染物子指數按菲律賓空氣品質標準公布。</string>
+    <string name="emb_sub_index">%1$s 副指標 %2$s</string>
+    <string name="emb_report_time">測站更新：%1$s</string>
+    <string name="emb_station_time">監測時間：%1$s</string>
 </resources>

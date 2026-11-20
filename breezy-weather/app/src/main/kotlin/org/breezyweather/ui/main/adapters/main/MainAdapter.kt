@@ -22,20 +22,19 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import breezyweather.domain.location.model.Location
-import org.breezyweather.BuildConfig
 import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.options.appearance.CardDisplay
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.hasMinutelyPrecipitation
 import org.breezyweather.domain.weather.model.isIndexValid
-import org.breezyweather.sources.emb.EmbAirQualityService
+import org.breezyweather.domain.weather.model.validAirQuality
 import org.breezyweather.ui.main.MainActivity
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainCardViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainViewHolder
+import org.breezyweather.ui.main.adapters.main.holder.AirQualityViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.AlertViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.ClockViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.DailyViewHolder
-import org.breezyweather.ui.main.adapters.main.holder.EmbViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.FooterViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.HeaderViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.HourlyViewHolder
@@ -139,9 +138,7 @@ class MainAdapter(
                 if (c === CardDisplay.CARD_WIND && weather.current?.wind?.isValid != true) {
                     continue
                 }
-                if (c === CardDisplay.CARD_AIR_QUALITY &&
-                    (BuildConfig.FLAVOR != "basic" || location.airQualitySource != EmbAirQualityService.ID)
-                ) {
+                if (c === CardDisplay.CARD_AIR_QUALITY && weather.validAirQuality == null) {
                     continue
                 }
                 if (c === CardDisplay.CARD_POLLEN &&
@@ -195,7 +192,7 @@ class MainAdapter(
         ViewType.WIND -> WindViewHolder(parent)
         ViewType.HUMIDITY -> HumidityViewHolder(parent)
         ViewType.UV -> UvViewHolder(parent)
-        ViewType.AIR_QUALITY -> EmbViewHolder(parent)
+        ViewType.AIR_QUALITY -> AirQualityViewHolder(parent)
         ViewType.POLLEN -> PollenViewHolder(parent)
         ViewType.VISIBILITY -> VisibilityViewHolder(parent)
         ViewType.PRESSURE -> PressureViewHolder(parent)

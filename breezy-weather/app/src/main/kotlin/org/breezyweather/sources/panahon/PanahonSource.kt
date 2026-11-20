@@ -1,10 +1,8 @@
 package org.breezyweather.sources.panahon
 
-import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceContinent
 import breezyweather.domain.source.SourceFeature
-import org.breezyweather.R
 import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.NonFreeNetSource
 import org.breezyweather.common.source.WeatherSource
@@ -48,32 +46,4 @@ internal fun windHumidityAttribution(time: Date, station: String? = null): Strin
     }
     val source = station?.let { "PAGASA AWS · $it" } ?: "Open-Meteo"
     return "$source · ${clock.format(time)} PHT"
-}
-
-/** Compose display text at render time so a language change also updates cached readings. */
-internal fun Context.localizedWindHumiditySource(source: String): String =
-    if (source.startsWith("Open-Meteo · ")) {
-        getString(R.string.current_wind_humidity_model) + source.removePrefix("Open-Meteo")
-    } else {
-        source
-    }
-
-// Current-location rows can move between updates. Reuse a scope only at its original coordinates.
-internal fun encodeAlertScope(location: Location, names: String): String =
-    location.latitude.toString() + "|" + location.longitude.toString() + "|" + names
-
-internal fun Context.alertScopeText(location: Location): String {
-    val prefix = encodeAlertScope(location, "")
-    val scope = location.weather?.base?.alertScope?.takeIf { it.startsWith(prefix) }?.removePrefix(prefix)
-    val description = when {
-        scope == null -> getString(R.string.traveller_scope_unverified)
-        scope.isEmpty() -> getString(R.string.traveller_scope_national)
-        else -> getString(R.string.traveller_scope_names, scope)
-    }
-    val checked = location.weather?.base?.alertsUpdateTime
-    if (scope == null || checked == null) return description
-    val clock = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT).apply {
-        timeZone = TimeZone.getTimeZone("Asia/Manila")
-    }
-    return description + " · " + getString(R.string.traveller_alerts_checked, clock.format(checked))
 }

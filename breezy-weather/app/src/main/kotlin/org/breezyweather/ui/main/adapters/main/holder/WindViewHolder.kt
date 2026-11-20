@@ -21,10 +21,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.appcompat.content.res.AppCompatResources
 import breezyweather.domain.location.model.Location
-import org.breezyweather.sources.panahon.localizedWindHumiditySource
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.formatMeasure
@@ -39,7 +37,6 @@ import org.breezyweather.unit.formatting.UnitWidth
 class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.container_main_wind, parent, false)
 ) {
-    private val sourceView: TextView = itemView.findViewById(R.id.wind_humidity_source)
     private val windDirectionView: ImageView = itemView.findViewById(R.id.wind_direction)
     private val windSpeedValueView: TextView = itemView.findViewById(R.id.wind_speed_value)
     private val windDetailView: TextView = itemView.findViewById(R.id.visibility_description)
@@ -57,9 +54,8 @@ class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
 
         location.weather?.current?.wind?.let { wind ->
             talkBackBuilder.append(context.getString(R.string.colon_separator))
-            talkBackBuilder.append(wind.getContentDescription(context, withGusts = true))
+            talkBackBuilder.append(wind.getContentDescription(context))
 
-            windSpeedValueView.text = null
             wind.speed?.let { speed ->
                 windSpeedValueView.text = UnitUtils.formatUnitsHalfSize(
                     speed.formatMeasure(context, valueWidth = UnitWidth.NARROW)
@@ -83,27 +79,21 @@ class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 windDirectionView.visibility = View.GONE
             }
 
-            val gusts = wind.gusts?.let {
+            windDetailView.text = if (wind.speed != null && wind.gusts != null && wind.gusts!! > wind.speed!!) {
                 context.getString(R.string.wind_gusts_short) +
                     context.getString(R.string.colon_separator) +
-                    it.formatMeasure(context, valueWidth = UnitWidth.NARROW)
+                    wind.gusts!!.formatMeasure(context, valueWidth = UnitWidth.NARROW)
+            } else {
+                wind.getDirection(context, short = true)?.let {
+                    if (wind.degree!! in 0.0..360.0) {
+                        context.getString(R.string.wind_origin, it)
+                    } else {
+                        it
+                    }
+                } ?: ""
             }
-            val direction = wind.getDirection(context, short = true)?.let {
-                if (wind.degree!! in 0.0..360.0) context.getString(R.string.wind_origin, it) else it
-            } ?: context.getString(R.string.traveller_wind_unknown)
-            windDetailView.text = listOfNotNull(direction, gusts).joinToString("\n")
-            if (wind.degree == null) talkBackBuilder.append(", ").append(direction)
         }
 
-        val source = location.weather?.current?.windHumiditySource?.let { context.localizedWindHumiditySource(it) }
-        sourceView.isVisible = source != null
-        sourceView.text = source?.let {
-            if (it.startsWith("Open-Meteo")) {
-                val point = String.format(java.util.Locale.ROOT, "%.4f, %.4f", location.latitude, location.longitude)
-                it.substringBefore(" · ") + "\n" + context.getString(R.string.traveller_query_point, point)
-            } else it.substringBeforeLast(" · ")
-        }
-        if (source != null) talkBackBuilder.append(", ").append(sourceView.text).append(", ").append(source.substringAfterLast(" · "))
         itemView.contentDescription = talkBackBuilder.toString()
         itemView.setOnClickListener {
             IntentHelper.startDailyWeatherActivity(

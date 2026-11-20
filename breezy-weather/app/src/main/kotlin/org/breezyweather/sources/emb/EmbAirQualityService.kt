@@ -4,6 +4,7 @@ import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceContinent
 import breezyweather.domain.source.SourceFeature
+import breezyweather.domain.weather.wrappers.AirQualityWrapper
 import breezyweather.domain.weather.wrappers.WeatherWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
@@ -40,11 +41,16 @@ class EmbAirQualityService @Inject constructor(
         if (SourceFeature.AIR_QUALITY !in requestedFeatures || !location.countryCode.equals("PH", ignoreCase = true)) {
             return Observable.just(WeatherWrapper())
         }
-        // EMB observations retain their station, sampling period and original unit in the repository.
-        return rxSingle { stations.forLocation(location) }.map { WeatherWrapper() }.toObservable()
+        return rxSingle { stations.forLocation(location) }
+            .map { reports ->
+                WeatherWrapper(
+                    airQuality = reports.toAirQuality()?.let { AirQualityWrapper(current = it) }
+                )
+            }
+            .toObservable()
     }
 
-    companion object {
+    companion {
         const val ID = "denr_emb"
     }
 }

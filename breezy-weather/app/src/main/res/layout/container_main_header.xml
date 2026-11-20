@@ -136,16 +136,4 @@
         tools:text="Day: 30° • Night: 14°"
         tools:ignore="RelativeOverlap,RtlHardcoded" />
 
-    <TextView
-        android:id="@+id/panahon_alert_scope"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" android:gravity="center"
-        android:textAppearance="?attr/textAppearanceLabelMedium" android:textColor="?attr/colorSurfaceInverse"
-        android:visibility="gone" />
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/panahon_bulletins"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" android:textColor="?attr/colorSurfaceInverse"
-        android:text="@string/traveller_regional_alerts" android:visibility="gone" />
 </LinearLayout>
