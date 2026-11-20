@@ -29,7 +29,7 @@ class UV(
     val isValid: Boolean
         get() = index != null
 
-    companion object {
+    companion {
         const val UV_INDEX_LOW = 3.0
         const val UV_INDEX_MIDDLE = 6.0
         const val UV_INDEX_HIGH = 8.0

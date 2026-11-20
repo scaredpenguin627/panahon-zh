@@ -24,7 +24,7 @@ enum class AlertSeverity(val id: Int) {
     UNKNOWN(0),
     ;
 
-    companion object {
+    companion {
         fun getInstance(
             value: Int?,
         ): AlertSeverity = AlertSeverity.entries.firstOrNull {

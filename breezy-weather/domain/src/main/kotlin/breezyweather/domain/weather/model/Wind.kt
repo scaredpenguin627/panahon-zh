@@ -54,7 +54,7 @@ data class Wind(
             else -> "↓"
         }
 
-    companion object {
+    companion {
 
         fun validateDegree(degree: Double?): Double? {
             return degree?.let { if (it == -1.0 || it in 0.0..360.0) it else null }

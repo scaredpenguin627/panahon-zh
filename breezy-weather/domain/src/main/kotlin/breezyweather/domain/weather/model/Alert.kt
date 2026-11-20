@@ -46,7 +46,7 @@ data class Alert(
     @ColorInt val color: Int,
 ) : Serializable {
 
-    companion object {
+    companion {
         @ColorInt
         fun colorFromSeverity(severity: AlertSeverity): Int {
             return when (severity) {

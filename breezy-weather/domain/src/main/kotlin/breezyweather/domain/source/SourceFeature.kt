@@ -28,7 +28,7 @@ enum class SourceFeature(
     REVERSE_GEOCODING("reverseGeocoding"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

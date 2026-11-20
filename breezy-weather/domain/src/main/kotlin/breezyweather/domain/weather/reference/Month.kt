@@ -177,7 +177,7 @@ enum class Month {
         }
     }
 
-    companion object {
+    companion {
         /**
          * Obtains an instance of {@code Month} from an {@code int} value.
          * <p>

@@ -44,7 +44,7 @@ data class Minutely(
         )
     }
 
-    companion object {
+    companion {
 
         private fun precipitationIntensityToDBZ(intensity: Double?): Int? {
             return intensity?.let {

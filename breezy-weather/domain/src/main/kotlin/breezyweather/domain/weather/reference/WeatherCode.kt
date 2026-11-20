@@ -32,7 +32,7 @@ enum class WeatherCode(val id: String) {
     THUNDERSTORM("thunderstorm"),
     ;
 
-    companion object {
+    companion {
         fun getInstance(
             value: String?,
         ): WeatherCode? = WeatherCode.entries.firstOrNull {

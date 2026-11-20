@@ -28,7 +28,7 @@ enum class SourceContinent(
     SOUTH_AMERICA("south_america"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,
