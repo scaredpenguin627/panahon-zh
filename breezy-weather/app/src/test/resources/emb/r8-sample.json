@@ -1,0 +1,128 @@
+{
+  "r8-tacloban": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Tacloban Today.Timestamp",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Tacloban Today.PM 10 (µg/m³)",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Tacloban Today.PM 2.5 (µg/m³)",
+                  "Value": "G2"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            }
+                          ],
+                          "C": [
+                            1795128900000,
+                            15.37,
+                            3.17
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r8-ormoc": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Ormoc Today.Timestamp",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Ormoc Today.PM10 (µg/m³)",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Ormoc Today.PM 2.5 (µg/m³)",
+                  "Value": "G2"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            }
+                          ],
+                          "C": [
+                            1795182900000,
+                            17.84,
+                            6.66
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

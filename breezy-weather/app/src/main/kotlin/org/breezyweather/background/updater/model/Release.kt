@@ -36,26 +36,12 @@ data class Release(
     private val assets: List<String>,
 ) {
 
-    /**
-     * Get download link of latest release from the assets.
-     * @return download link of latest release.
-     */
-    fun getDownloadLink(): String {
-        val apkVariant = when (Build.SUPPORTED_ABIS[0]) {
-            "arm64-v8a" -> "-arm64-v8a"
-            "armeabi-v7a" -> "-armeabi-v7a"
-            "x86" -> "-x86"
-            "x86_64" -> "-x86_64"
-            else -> ""
+    fun getDownloadLink(supportedAbis: List<String> = Build.SUPPORTED_ABIS.toList()): String {
+        val prefix = BuildConfig.GITHUB_RELEASE_PREFIX
+        val byName = assets.associateBy { it.substringBefore('?').substringBefore('#').substringAfterLast('/') }
+        for (abi in supportedAbis + "universal") {
+            byName["$prefix-$abi-$version.apk"]?.let { return it }
         }
-
-        return assets.find {
-            it.startsWith("${BuildConfig.GITHUB_RELEASE_PREFIX}$apkVariant-") && !it.contains("freenet")
-        } ?: assets[0] // FIXME
+        return releaseLink
     }
-
-    /**
-     * Assets class containing download url.
-     */
-    data class Assets(val downloadLink: String)
 }

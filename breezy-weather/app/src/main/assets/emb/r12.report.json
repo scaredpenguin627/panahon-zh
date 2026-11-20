@@ -1,0 +1,96 @@
+{
+  "key": "522838c0-da64-4521-94e0-5f5a2aa05db9",
+  "page": "https://r12.emb.gov.ph/air-quality-monitoring-stations/",
+  "tables": [
+    {
+      "recipe": "r12-gensan",
+      "stationField": "Results.Station",
+      "timeField": "Results.Date",
+      "columns": [
+        {
+          "field": "Results.AQI_10",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "Results.Category_10"
+        },
+        {
+          "field": "Results.AQI_2.5",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "Results.Category_2.5"
+        }
+      ],
+      "dateOnly": true
+    },
+    {
+      "recipe": "r12-koronadal",
+      "stationField": "Results.Station",
+      "timeField": "Results.Date",
+      "columns": [
+        {
+          "field": "Results.AQI_10",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "Results.Category_10"
+        },
+        {
+          "field": "Results.AQI_2.5",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "Results.Category_2.5"
+        }
+      ],
+      "dateOnly": true
+    },
+    {
+      "recipe": "r12-tupi",
+      "stationField": "Results.Station",
+      "timeField": "Results.Date",
+      "columns": [
+        {
+          "field": "Results.AQI_10",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "Results.Category_10"
+        },
+        {
+          "field": "Results.AQI_2.5",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "Results.Category_2.5"
+        }
+      ],
+      "dateOnly": true
+    }
+  ],
+  "sites": [
+    {
+      "station": "Gensan Station",
+      "city": "General Santos",
+      "latitude": 6.073833,
+      "longitude": 125.14083,
+      "aliases": [
+        "General Santos City"
+      ]
+    },
+    {
+      "station": "Koronadal Station",
+      "city": "Koronadal",
+      "latitude": 6.478266,
+      "longitude": 124.864549,
+      "aliases": [
+        "Koronadal City"
+      ]
+    },
+    {
+      "station": "Tupi Station",
+      "city": "Tupi",
+      "latitude": 6.331911,
+      "longitude": 124.950801,
+      "aliases": [
+        "Tupi City"
+      ]
+    }
+  ],
+  "kind": "historical"
+}

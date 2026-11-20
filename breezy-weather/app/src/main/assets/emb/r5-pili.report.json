@@ -1,0 +1,35 @@
+{
+  "key": "19c4ac26-85f5-49a0-8aa5-869a2823c895",
+  "page": "https://r5.emb.gov.ph/continuous-ambient-air-quality-monitoring/",
+  "tables": [
+    {
+      "recipe": "r5pili",
+      "stationField": "",
+      "timeField": "Pili.Timestamp",
+      "columns": [
+        {
+          "field": "Pili.PM10",
+          "label": "PM10",
+          "unit": "µg/m³"
+        },
+        {
+          "field": "Pili.PM25",
+          "label": "PM2.5",
+          "unit": "µg/m³"
+        }
+      ],
+      "fixedStation": "Pili CAAMS"
+    }
+  ],
+  "sites": [
+    {
+      "station": "Pili CAAMS",
+      "city": "Pili",
+      "latitude": 13.58,
+      "longitude": 123.27,
+      "aliases": [
+        "Pili City"
+      ]
+    }
+  ]
+}

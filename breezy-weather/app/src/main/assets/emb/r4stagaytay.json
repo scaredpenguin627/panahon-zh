@@ -1,0 +1,133 @@
+{
+  "version": "1.0.0",
+  "queries": [
+    {
+      "Query": {
+        "Commands": [
+          {
+            "SemanticQueryDataShapeCommand": {
+              "Query": {
+                "Version": 2,
+                "From": [
+                  {
+                    "Name": "a",
+                    "Entity": "sensors_ftp tagaytay",
+                    "Type": 0
+                  }
+                ],
+                "Select": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Stamptime"
+                    },
+                    "Name": "sensors_ftp tagaytay.Stamptime"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "aqi_pm25"
+                    },
+                    "Name": "sensors_ftp tagaytay.aqi_pm25"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "aqi_pm10"
+                    },
+                    "Name": "sensors_ftp tagaytay.aqi_pm10"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "cat_pm25"
+                    },
+                    "Name": "sensors_ftp tagaytay.cat_pm25"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "cat_pm10"
+                    },
+                    "Name": "sensors_ftp tagaytay.cat_pm10"
+                  }
+                ],
+                "OrderBy": [
+                  {
+                    "Direction": 2,
+                    "Expression": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "a"
+                          }
+                        },
+                        "Property": "Stamptime"
+                      }
+                    }
+                  }
+                ]
+              },
+              "Binding": {
+                "Primary": {
+                  "Groupings": [
+                    {
+                      "Projections": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    }
+                  ]
+                },
+                "DataReduction": {
+                  "DataVolume": 3,
+                  "Primary": {
+                    "Window": {
+                      "Count": 1
+                    }
+                  }
+                },
+                "Version": 1
+              },
+              "ExecutionMetricsKind": 1
+            }
+          }
+        ]
+      },
+      "QueryId": "",
+      "ApplicationContext": {
+        "DatasetId": "d247037c-9938-4767-b326-a5efb007ea08",
+        "Sources": [
+          {
+            "ReportId": "e0b2205e-bd25-4815-8301-64737fd26ae3"
+          }
+        ]
+      }
+    }
+  ],
+  "cancelQueries": [],
+  "modelId": null
+}

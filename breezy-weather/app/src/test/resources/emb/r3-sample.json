@@ -1,0 +1,25 @@
+{
+  "province": "meycauayan",
+  "pollutant": "pm25",
+  "row": {
+    "Date & Time": "11/20/2026 3:00 PM",
+    "Concentration (µg/Ncm)": "3.70",
+    "Rolling Average": 28.86,
+    "AQI": 70,
+    "Status": "Fair"
+  },
+  "time": 1795158000000,
+  "dateKey": "Date & Time",
+  "fetchedAt": 1795158302298,
+  "source": "mongodb-latest-snapshot",
+  "backupMeta": {
+    "lastBackupAt": "2026-11-20T07:05:02.298Z",
+    "lastCheckedAt": "2026-11-20T08:01:01.675Z",
+    "rowCount": 9627,
+    "rawRowCount": 9723,
+    "erraticRows": 96,
+    "syncProtection": null
+  },
+  "sheetSyncing": false,
+  "latestAqiVerified": true
+}

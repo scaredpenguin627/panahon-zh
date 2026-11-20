@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import breezyweather.domain.location.model.Location
+import org.breezyweather.BuildConfig
 import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.options.appearance.CardDisplay
 import org.breezyweather.domain.settings.SettingsManager
@@ -35,6 +36,7 @@ import org.breezyweather.ui.main.adapters.main.holder.AirQualityViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.AlertViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.ClockViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.DailyViewHolder
+import org.breezyweather.ui.main.adapters.main.holder.EmbViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.FooterViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.HeaderViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.HourlyViewHolder
@@ -138,6 +140,11 @@ class MainAdapter(
                 if (c === CardDisplay.CARD_WIND && weather.current?.wind?.isValid != true) {
                     continue
                 }
+                if (c === CardDisplay.CARD_AIR_QUALITY && BuildConfig.FLAVOR == "basic" &&
+                    location.countryCode.equals("PH", ignoreCase = true)
+                ) {
+                    mViewTypeList.add(ViewType.EMB)
+                }
                 if (c === CardDisplay.CARD_AIR_QUALITY && weather.validAirQuality == null) {
                     continue
                 }
@@ -193,6 +200,7 @@ class MainAdapter(
         ViewType.HUMIDITY -> HumidityViewHolder(parent)
         ViewType.UV -> UvViewHolder(parent)
         ViewType.AIR_QUALITY -> AirQualityViewHolder(parent)
+        ViewType.EMB -> EmbViewHolder(parent)
         ViewType.POLLEN -> PollenViewHolder(parent)
         ViewType.VISIBILITY -> VisibilityViewHolder(parent)
         ViewType.PRESSURE -> PressureViewHolder(parent)
@@ -276,6 +284,7 @@ class MainAdapter(
             ViewType.HEADER,
             ViewType.ALERT,
             ViewType.FOOTER,
+            ViewType.EMB,
 
             // TODO: #1972 - Remove below when we have figured out how to avoid the touch conflict with the chart
             ViewType.DAILY,

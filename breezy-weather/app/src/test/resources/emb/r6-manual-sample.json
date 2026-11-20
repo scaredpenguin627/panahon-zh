@@ -1,0 +1,450 @@
+{
+  "r6-manual-oton-pm10": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM.Date ",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM.Parameter",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM.Location",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "PM.Concentration",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "PM.Air Quality Index",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D4"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1793059200000,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Oton Ambient AQMS"
+                    ],
+                    "D1": [
+                      "PM10"
+                    ],
+                    "D2": [
+                      "Oton Evacuation Center, Oton, Iloilo"
+                    ],
+                    "D3": [
+                      " 27 ug/NCM"
+                    ],
+                    "D4": [
+                      "Good"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r6-manual-pavia-pm10": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM.Date ",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM.Parameter",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM.Location",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "PM.Concentration",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "PM.Air Quality Index",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D4"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1793059200000,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Pavia Ambient AQMS"
+                    ],
+                    "D1": [
+                      "PM10"
+                    ],
+                    "D2": [
+                      "Pavia NHS Evangelista St., Pavia, Iloilo"
+                    ],
+                    "D3": [
+                      " 35ug/NCM"
+                    ],
+                    "D4": [
+                      "Good"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r6-manual-pavia-pm25": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM.Date ",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM.Parameter",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM.Location",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "PM.Concentration",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "PM.Air Quality Index",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D4"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1793059200000,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Pavia Ambient AQMS"
+                    ],
+                    "D1": [
+                      "PM2.5"
+                    ],
+                    "D2": [
+                      "Pavia NHS Evangelista St., Pavia, Iloilo"
+                    ],
+                    "D3": [
+                      "17 ug/NCM"
+                    ],
+                    "D4": [
+                      "Good"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r6-manual-san-pm10": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM.Date ",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM.Parameter",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM.Location",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "PM.Concentration",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "PM.Air Quality Index",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D4"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1793059200000,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "San Miguel Ambient AQMS"
+                    ],
+                    "D1": [
+                      "PM10"
+                    ],
+                    "D2": [
+                      "Public Market, San Miguel, Iloilo"
+                    ],
+                    "D3": [
+                      " 11ug/NCM"
+                    ],
+                    "D4": [
+                      "Good"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

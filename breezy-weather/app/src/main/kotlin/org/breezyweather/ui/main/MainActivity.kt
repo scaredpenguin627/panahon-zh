@@ -101,6 +101,9 @@ import javax.inject.Inject
 class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment.Callback {
 
     @Inject
+    lateinit var embRepository: org.breezyweather.sources.emb.EmbRepository
+
+    @Inject
     lateinit var sourceManager: SourceManager
 
     @Inject
@@ -888,9 +891,7 @@ class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment
 
     override fun onOpenInOtherAppIconClicked() {
         viewModel.currentLocation.value?.location?.let {
-            try {
-                IntentHelper.startBreezyActivity(this@MainActivity, it)
-            } catch (ignored: Exception) {
+            if (!IntentHelper.openLocationInOtherApp(this, it)) {
                 SnackbarHelper.showSnackbar(getString(R.string.action_open_in_other_app_no_app))
             }
         }

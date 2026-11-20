@@ -1,0 +1,109 @@
+{
+  "version": "1.0.0",
+  "queries": [
+    {
+      "Query": {
+        "Commands": [
+          {
+            "SemanticQueryDataShapeCommand": {
+              "Query": {
+                "Version": 2,
+                "From": [
+                  {
+                    "Name": "a",
+                    "Entity": "Ormoc Today",
+                    "Type": 0
+                  }
+                ],
+                "Select": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Timestamp"
+                    },
+                    "Name": "Ormoc Today.Timestamp"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "PM10 (µg/m³)"
+                    },
+                    "Name": "Ormoc Today.PM10 (µg/m³)"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "PM 2.5 (µg/m³)"
+                    },
+                    "Name": "Ormoc Today.PM 2.5 (µg/m³)"
+                  }
+                ],
+                "OrderBy": [
+                  {
+                    "Direction": 2,
+                    "Expression": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "a"
+                          }
+                        },
+                        "Property": "Timestamp"
+                      }
+                    }
+                  }
+                ]
+              },
+              "Binding": {
+                "Primary": {
+                  "Groupings": [
+                    {
+                      "Projections": [
+                        0,
+                        1,
+                        2
+                      ]
+                    }
+                  ]
+                },
+                "DataReduction": {
+                  "DataVolume": 3,
+                  "Primary": {
+                    "Window": {
+                      "Count": 1
+                    }
+                  }
+                },
+                "Version": 1
+              },
+              "ExecutionMetricsKind": 1
+            }
+          }
+        ]
+      },
+      "QueryId": "",
+      "ApplicationContext": {
+        "DatasetId": "13554cc0-5d74-4e6c-8ed0-e92ec914553d",
+        "Sources": [
+          {
+            "ReportId": "eefe8499-03a8-4cd0-bd5e-fc78710cc3db"
+          }
+        ]
+      }
+    }
+  ],
+  "cancelQueries": [],
+  "modelId": null
+}

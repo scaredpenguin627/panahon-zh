@@ -1,0 +1,249 @@
+{
+  "ncr-ateneo-gas": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "Ateneo_Gas.Date_Time"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "Ateneo_Gas.SO2AQI"
+                },
+                {
+                  "Value": "G2",
+                  "Name": "Ateneo_Gas.O3AQI"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            }
+                          ],
+                          "C": [
+                            1773277200000,
+                            "326.35191174381936",
+                            "-25903.5263155776"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-namria-gas": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "NAMRIA_Gas.Date_Time"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "NAMRIA_Gas.SO2AQI"
+                },
+                {
+                  "Value": "G2",
+                  "Name": "NAMRIA_Gas.O3AQI"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            }
+                          ],
+                          "C": [
+                            1733918400000,
+                            35.266055046,
+                            "-25903.5263155776"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-makati-gas": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "Makati_Gas.Date_Time"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "Makati_Gas.SO2AQI"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            }
+                          ],
+                          "C": [
+                            1772413200000,
+                            "31.257176468587772"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-paranaque-gas": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "Paranaque_Gas.Date_Time"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "Paranaque_Gas.SO2AQI"
+                },
+                {
+                  "Value": "G2",
+                  "Name": "Paranaque_Gas.O3AQI"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            }
+                          ],
+                          "C": [
+                            1775829600000,
+                            "61.346661760779696",
+                            30.15190625
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

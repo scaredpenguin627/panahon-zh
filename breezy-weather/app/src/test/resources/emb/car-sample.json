@@ -1,0 +1,65 @@
+{
+  "car-burnham": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "RAW_S001T01.Date_Time",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "RAW_S001T01.PM10AQI",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "RAW_S001T01.PM25AQI",
+                  "Value": "G2"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            }
+                          ],
+                          "C": [
+                            1795187400000,
+                            22,
+                            60
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

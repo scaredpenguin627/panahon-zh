@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="emb_title">Station air quality · DENR-EMB</string>
+    <string name="emb_loading">Checking official station reports…</string>
+    <string name="emb_uncovered">No verified EMB station readings for this location.</string>
+    <string name="emb_missing">No readings for this location in the latest report.</string>
+    <string name="emb_error">The official report could not be refreshed.</string>
+    <string name="emb_cached">No new readings; showing the last available report</string>
+    <string name="emb_report_time">Report updated: %1$s</string>
+    <string name="emb_station_time">Observation: %1$s</string>
+    <string name="emb_old">More than 24 hours old</string>
+    <string name="emb_fetched">Retrieved: %1$s</string>
+    <string name="emb_sub_index">%1$s sub-index %2$s</string>
+    <string name="emb_other_source">Other air quality data: %1$s</string>
+    <string name="emb_model">Air quality model: %1$s</string>
+    <string name="emb_official_link">Official monitoring report</string>
+    <string name="emb_manual">Manual sampling</string>
+    <string name="emb_annual">Annual monitoring summary</string>
+    <string name="emb_year">Year: %1$s</string>
+    <string name="emb_historical">Historical monitoring record</string>
+    <string name="emb_no_recent">No verified current station readings for this location.</string>
+</resources>

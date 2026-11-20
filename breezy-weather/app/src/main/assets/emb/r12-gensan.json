@@ -1,0 +1,174 @@
+{
+  "version": "1.0.0",
+  "queries": [
+    {
+      "Query": {
+        "Commands": [
+          {
+            "SemanticQueryDataShapeCommand": {
+              "Query": {
+                "Version": 2,
+                "From": [
+                  {
+                    "Name": "a",
+                    "Entity": "Results",
+                    "Type": 0
+                  }
+                ],
+                "Select": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Station"
+                    },
+                    "Name": "Results.Station"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Date"
+                    },
+                    "Name": "Results.Date"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "AQI_10"
+                    },
+                    "Name": "Results.AQI_10"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "AQI_2.5"
+                    },
+                    "Name": "Results.AQI_2.5"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Category_10"
+                    },
+                    "Name": "Results.Category_10"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Category_2.5"
+                    },
+                    "Name": "Results.Category_2.5"
+                  }
+                ],
+                "OrderBy": [
+                  {
+                    "Direction": 2,
+                    "Expression": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "a"
+                          }
+                        },
+                        "Property": "Date"
+                      }
+                    }
+                  }
+                ],
+                "Where": [
+                  {
+                    "Condition": {
+                      "In": {
+                        "Expressions": [
+                          {
+                            "Column": {
+                              "Expression": {
+                                "SourceRef": {
+                                  "Source": "a"
+                                }
+                              },
+                              "Property": "Station"
+                            }
+                          }
+                        ],
+                        "Values": [
+                          [
+                            {
+                              "Literal": {
+                                "Value": "'Gensan Station'"
+                              }
+                            }
+                          ]
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "Binding": {
+                "Primary": {
+                  "Groupings": [
+                    {
+                      "Projections": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                      ]
+                    }
+                  ]
+                },
+                "DataReduction": {
+                  "DataVolume": 3,
+                  "Primary": {
+                    "Window": {
+                      "Count": 1
+                    }
+                  }
+                },
+                "Version": 1
+              },
+              "ExecutionMetricsKind": 1
+            }
+          }
+        ]
+      },
+      "QueryId": "",
+      "ApplicationContext": {
+        "DatasetId": "075c3c4b-f506-4df9-a4de-42f4fe2c46bc",
+        "Sources": [
+          {
+            "ReportId": "e5587ff5-85f9-4ce8-9a5d-1b6f99c8821d"
+          }
+        ]
+      }
+    }
+  ],
+  "cancelQueries": [],
+  "modelId": null
+}

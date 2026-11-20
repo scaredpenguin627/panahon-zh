@@ -61,41 +61,27 @@ internal class AppUpdateNotifier(
 
     @SuppressLint("LaunchActivityFromNotification")
     fun promptUpdate(release: Release) {
-        /*val updateIntent = NotificationReceiver.downloadAppUpdatePendingBroadcast(
+        fun open(link: String): PendingIntent = PendingIntent.getActivity(
             context,
-            release.getDownloadLink(),
-            release.version,
-        )*/
-
-        val releaseIntent = Intent(Intent.ACTION_VIEW, release.releaseLink.toUri()).run {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            PendingIntent.getActivity(
-                context,
-                release.hashCode(),
-                this,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        }
+            release.hashCode(),
+            Intent(Intent.ACTION_VIEW, link.toUri()).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         with(notificationBuilder) {
             setContentTitle(context.getString(R.string.notification_app_update_available))
             setContentText(release.version)
             setSmallIcon(android.R.drawable.stat_sys_download_done)
-            // setContentIntent(updateIntent)
-            setContentIntent(releaseIntent)
+            setContentIntent(open(release.releaseLink))
 
             clearActions()
             addAction(
                 android.R.drawable.stat_sys_download_done,
                 context.getString(R.string.action_download),
-                // updateIntent,
-                releaseIntent
+                open(release.getDownloadLink())
             )
-            /*addAction(
-                R.drawable.ic_info_24dp,
-                context.getString(R.string.whats_new),
-                releaseIntent,
-            )*/
         }
         notificationBuilder.show()
     }

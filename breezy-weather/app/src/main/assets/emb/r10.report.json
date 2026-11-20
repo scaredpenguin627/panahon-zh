@@ -1,0 +1,37 @@
+{
+  "key": "emb-r10",
+  "page": "https://app.bpit-inc.com/embregionx",
+  "tables": [],
+  "sites": [
+    {
+      "station": "R10 PENRO",
+      "city": "Tagoloan",
+      "latitude": 8.544558,
+      "longitude": 124.76848,
+      "displayName": "R10 PENRO · Santa Cruz"
+    },
+    {
+      "station": "Iligan City",
+      "city": "Iligan",
+      "latitude": 8.237232,
+      "longitude": 124.252956,
+      "aliases": [
+        "Iligan City",
+        "伊利甘"
+      ],
+      "displayName": "Iligan City Wet Park"
+    },
+    {
+      "station": "Puntod - Cagayan De Oro",
+      "city": "Cagayan de Oro",
+      "latitude": 8.4964231,
+      "longitude": 124.6600899,
+      "aliases": [
+        "Cagayan de Oro City",
+        "卡加延德奥罗",
+        "卡加延德奧羅"
+      ],
+      "displayName": "Puntod · EMB Region 10 Office Compound"
+    }
+  ]
+}

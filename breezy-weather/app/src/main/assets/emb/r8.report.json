@@ -1,0 +1,64 @@
+{
+  "key": "8e5daf2b-4f76-4d1b-a963-0910f8121eea",
+  "page": "https://app.powerbi.com/view?r=eyJrIjoiOGU1ZGFmMmItNGY3Ni00ZDFiLWE5NjMtMDkxMGY4MTIxZWVhIiwidCI6ImY2ZjRhNjkyLTQzYjMtNDMzYi05MmIyLTY1YzRlNmNjZDkyMCIsImMiOjEwfQ%3D%3D",
+  "tables": [
+    {
+      "recipe": "r8-tacloban",
+      "stationField": "",
+      "timeField": "Tacloban Today.Timestamp",
+      "columns": [
+        {
+          "field": "Tacloban Today.PM 10 (µg/m³)",
+          "label": "PM10",
+          "unit": "µg/m³"
+        },
+        {
+          "field": "Tacloban Today.PM 2.5 (µg/m³)",
+          "label": "PM2.5",
+          "unit": "µg/m³"
+        }
+      ],
+      "fixedStation": "Tacloban"
+    },
+    {
+      "recipe": "r8-ormoc",
+      "stationField": "",
+      "timeField": "Ormoc Today.Timestamp",
+      "columns": [
+        {
+          "field": "Ormoc Today.PM10 (µg/m³)",
+          "label": "PM10",
+          "unit": "µg/m³"
+        },
+        {
+          "field": "Ormoc Today.PM 2.5 (µg/m³)",
+          "label": "PM2.5",
+          "unit": "µg/m³"
+        }
+      ],
+      "fixedStation": "Ormoc"
+    }
+  ],
+  "sites": [
+    {
+      "station": "Tacloban",
+      "city": "Tacloban",
+      "latitude": 11.207674,
+      "longitude": 125.008282,
+      "aliases": [
+        "塔克洛班",
+        "Tacloban City"
+      ]
+    },
+    {
+      "station": "Ormoc",
+      "city": "Ormoc",
+      "latitude": 11.023821,
+      "longitude": 124.604881,
+      "aliases": [
+        "奥尔莫克",
+        "Ormoc City"
+      ]
+    }
+  ]
+}

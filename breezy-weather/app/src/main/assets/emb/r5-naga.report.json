@@ -1,0 +1,35 @@
+{
+  "key": "42096727-0a07-4677-84d3-a99e80a403b0",
+  "page": "https://r5.emb.gov.ph/continuous-ambient-air-quality-monitoring/",
+  "tables": [
+    {
+      "recipe": "r5naga",
+      "stationField": "",
+      "timeField": "Naga.TimeStamp",
+      "columns": [
+        {
+          "field": "Naga.PM10",
+          "label": "PM10",
+          "unit": "µg/m³"
+        },
+        {
+          "field": "Naga.PM25",
+          "label": "PM2.5",
+          "unit": "µg/m³"
+        }
+      ],
+      "fixedStation": "Naga CAAMS"
+    }
+  ],
+  "sites": [
+    {
+      "station": "Naga CAAMS",
+      "city": "Naga",
+      "latitude": 13.62,
+      "longitude": 123.18,
+      "aliases": [
+        "Naga City"
+      ]
+    }
+  ]
+}

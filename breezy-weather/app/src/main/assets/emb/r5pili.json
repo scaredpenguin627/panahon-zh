@@ -1,0 +1,109 @@
+{
+  "version": "1.0.0",
+  "queries": [
+    {
+      "Query": {
+        "Commands": [
+          {
+            "SemanticQueryDataShapeCommand": {
+              "Query": {
+                "Version": 2,
+                "From": [
+                  {
+                    "Name": "a",
+                    "Entity": "Pili",
+                    "Type": 0
+                  }
+                ],
+                "Select": [
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "Timestamp"
+                    },
+                    "Name": "Pili.Timestamp"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "PM25"
+                    },
+                    "Name": "Pili.PM25"
+                  },
+                  {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Source": "a"
+                        }
+                      },
+                      "Property": "PM10"
+                    },
+                    "Name": "Pili.PM10"
+                  }
+                ],
+                "OrderBy": [
+                  {
+                    "Direction": 2,
+                    "Expression": {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "a"
+                          }
+                        },
+                        "Property": "Timestamp"
+                      }
+                    }
+                  }
+                ]
+              },
+              "Binding": {
+                "Primary": {
+                  "Groupings": [
+                    {
+                      "Projections": [
+                        0,
+                        1,
+                        2
+                      ]
+                    }
+                  ]
+                },
+                "DataReduction": {
+                  "DataVolume": 3,
+                  "Primary": {
+                    "Window": {
+                      "Count": 1
+                    }
+                  }
+                },
+                "Version": 1
+              },
+              "ExecutionMetricsKind": 1
+            }
+          }
+        ]
+      },
+      "QueryId": "",
+      "ApplicationContext": {
+        "DatasetId": "ebd24679-e549-49a0-b9ce-43f17d3eaf6f",
+        "Sources": [
+          {
+            "ReportId": "587c7c1e-8cf0-4e86-915f-2c3d7a497359"
+          }
+        ]
+      }
+    }
+  ],
+  "cancelQueries": [],
+  "modelId": null
+}

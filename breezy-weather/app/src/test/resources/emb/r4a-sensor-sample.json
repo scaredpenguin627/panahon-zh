@@ -1,0 +1,184 @@
+{
+  "r4stagaytay": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "sensors_ftp tagaytay.Stamptime",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "sensors_ftp tagaytay.aqi_pm25",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "sensors_ftp tagaytay.aqi_pm10",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "sensors_ftp tagaytay.cat_pm25",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "sensors_ftp tagaytay.cat_pm10",
+                  "Value": "G4"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D1"
+                            }
+                          ],
+                          "C": [
+                            1790006340000,
+                            8,
+                            7,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "GOOD"
+                    ],
+                    "D1": [
+                      "GOOD"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r4ssan": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "sensors_ftp san_nicolas.Stamptime",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "sensors_ftp san_nicolas.aqi_pm25",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "sensors_ftp san_nicolas.aqi_pm10",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "sensors_ftp san_nicolas.cat_pm25",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "sensors_ftp san_nicolas.cat_pm10",
+                  "Value": "G4"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 3
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D1"
+                            }
+                          ],
+                          "C": [
+                            1788220680000,
+                            205,
+                            74,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "ACUTELY-UNHEALTHY"
+                    ],
+                    "D1": [
+                      "FAIR"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

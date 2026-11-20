@@ -1,0 +1,119 @@
+{
+  "key": "e415def4-6c03-41ac-8a12-7698f910a08d",
+  "page": "https://app.fabric.microsoft.com/view?r=eyJrIjoiZTQxNWRlZjQtNmMwMy00MWFjLThhMTItNzY5OGY5MTBhMDhkIiwidCI6ImY2ZjRhNjkyLTQzYjMtNDMzYi05MmIyLTY1YzRlNmNjZDkyMCIsImMiOjEwfQ%3D%3D",
+  "tables": [
+    {
+      "recipe": "r2-1",
+      "stationField": "PM 2025.Monitoring Station",
+      "timeField": "PM 2025.Date",
+      "columns": [
+        {
+          "field": "PM 2025.Concentration (ug/Ncm)",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ],
+      "dateOnly": true
+    },
+    {
+      "recipe": "r2-2",
+      "stationField": "PM 2025.Monitoring Station",
+      "timeField": "PM 2025.Date",
+      "columns": [
+        {
+          "field": "PM 2025.Concentration (ug/Ncm)",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ],
+      "dateOnly": true
+    },
+    {
+      "recipe": "r2-3",
+      "stationField": "PM 2025.Monitoring Station",
+      "timeField": "PM 2025.Date",
+      "columns": [
+        {
+          "field": "PM 2025.Concentration (ug/Ncm)",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ],
+      "dateOnly": true
+    },
+    {
+      "recipe": "r2-4",
+      "stationField": "PM 2025.Monitoring Station",
+      "timeField": "PM 2025.Date",
+      "columns": [
+        {
+          "field": "PM 2025.Concentration (ug/Ncm)",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ],
+      "dateOnly": true
+    },
+    {
+      "recipe": "r2-5",
+      "stationField": "PM 2025.Monitoring Station",
+      "timeField": "PM 2025.Date",
+      "columns": [
+        {
+          "field": "PM 2025.Concentration (ug/Ncm)",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ],
+      "dateOnly": true
+    }
+  ],
+  "sites": [
+    {
+      "station": "City Hall Rooftop (Cauayan City)",
+      "city": "Cauayan",
+      "latitude": 16.93,
+      "longitude": 121.77,
+      "aliases": [
+        "Cauayan City"
+      ]
+    },
+    {
+      "station": "City Hall Rooftop (City of Ilagan)",
+      "city": "Ilagan",
+      "latitude": 17.15,
+      "longitude": 121.89,
+      "aliases": [
+        "Ilagan City"
+      ]
+    },
+    {
+      "station": "EMB Region 02 Rooftop",
+      "city": "Tuguegarao",
+      "latitude": 17.651389,
+      "longitude": 121.753611,
+      "aliases": [
+        "Tuguegarao City"
+      ]
+    },
+    {
+      "station": "Grand Victoria Heights",
+      "city": "Tuguegarao",
+      "latitude": 17.602222,
+      "longitude": 121.756667,
+      "aliases": [
+        "Tuguegarao City"
+      ]
+    },
+    {
+      "station": "Santiago City Hall",
+      "city": "Santiago",
+      "latitude": 16.703611,
+      "longitude": 121.558056,
+      "aliases": [
+        "Santiago City"
+      ]
+    }
+  ],
+  "kind": "historical"
+}

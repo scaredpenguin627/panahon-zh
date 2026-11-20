@@ -1,0 +1,226 @@
+{
+  "r6-pm10": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM.Date ",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM.Parameter",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM.Location",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "PM.Concentration",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "PM.Air Quality Index",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D4"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1794960000000,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Garden of Love CAAQMS"
+                    ],
+                    "D1": [
+                      "PM10"
+                    ],
+                    "D2": [
+                      "Brgy Nabitasan LaPaz, Iloilo City"
+                    ],
+                    "D3": [
+                      "13 ug/NCM"
+                    ],
+                    "D4": [
+                      "Good"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r6-pm25": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM.Date ",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM.Parameter",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM.Location",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "PM.Concentration",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "PM.Air Quality Index",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D4"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1794960000000,
+                            0,
+                            0,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Garden of Love CAAQMS"
+                    ],
+                    "D1": [
+                      "PM2.5"
+                    ],
+                    "D2": [
+                      "Brgy Nabitasan LaPaz, Iloilo City"
+                    ],
+                    "D3": [
+                      " 6.2 ug/NCM"
+                    ],
+                    "D4": [
+                      "Good"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

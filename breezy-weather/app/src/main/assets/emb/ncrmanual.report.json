@@ -1,0 +1,212 @@
+{
+  "key": "e1287f74-472f-4def-802b-19ce33ff0982",
+  "page": "https://air.emb.gov.ph/ambient-air-quality-monitoring/",
+  "kind": "manual",
+  "tables": [
+    {
+      "recipe": "ncr-manual-ateneo",
+      "stationField": "",
+      "fixedStation": "Ateneo Station",
+      "timeField": "ATENEO.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "ATENEO.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-doh",
+      "stationField": "",
+      "fixedStation": "DOH Station",
+      "timeField": "DOH.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "DOH.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-east-avenue",
+      "stationField": "",
+      "fixedStation": "East Avenue Station",
+      "timeField": "EAST AVENUE.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "EAST AVENUE.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-mandaluyong",
+      "stationField": "",
+      "fixedStation": "Mandaluyong Station",
+      "timeField": "MANDALUYONG.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "MANDALUYONG.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-marikina",
+      "stationField": "",
+      "fixedStation": "Marikina Station",
+      "timeField": "MARIKINA.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "MARIKINA.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm"
+        },
+        {
+          "field": "MARIKINA.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-mmda",
+      "stationField": "",
+      "fixedStation": "MMDA Station",
+      "timeField": "MMDA.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "MMDA.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-muntinlupa",
+      "stationField": "",
+      "fixedStation": "Muntinlupa Station",
+      "timeField": "MUNTINLUPA.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "MUNTINLUPA.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-npo",
+      "stationField": "",
+      "fixedStation": "NPO Station",
+      "timeField": "NPO.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "NPO.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-manual-valenzuela",
+      "stationField": "",
+      "fixedStation": "Valenzuela Station",
+      "timeField": "VALENZUELA.DATE",
+      "dateOnly": true,
+      "columns": [
+        {
+          "field": "VALENZUELA.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm"
+        }
+      ]
+    }
+  ],
+  "sites": [
+    {
+      "station": "Ateneo Station",
+      "city": "Quezon City",
+      "latitude": 14.635556,
+      "longitude": 121.078333,
+      "aliases": [
+        "奎松市"
+      ]
+    },
+    {
+      "station": "DOH Station",
+      "city": "Manila",
+      "latitude": 14.615278,
+      "longitude": 120.9825,
+      "aliases": [
+        "马尼拉",
+        "馬尼拉"
+      ]
+    },
+    {
+      "station": "East Avenue Station",
+      "city": "Quezon City",
+      "latitude": 14.645,
+      "longitude": 121.0475,
+      "aliases": [
+        "奎松市"
+      ]
+    },
+    {
+      "station": "Mandaluyong Station",
+      "city": "Mandaluyong",
+      "latitude": 14.576667,
+      "longitude": 121.040833,
+      "aliases": []
+    },
+    {
+      "station": "Marikina Station",
+      "city": "Marikina",
+      "latitude": 14.635278,
+      "longitude": 121.097778,
+      "aliases": []
+    },
+    {
+      "station": "MMDA Station",
+      "city": "Makati",
+      "latitude": 14.561111,
+      "longitude": 121.043056,
+      "aliases": []
+    },
+    {
+      "station": "Muntinlupa Station",
+      "city": "Muntinlupa",
+      "latitude": 14.383333,
+      "longitude": 121.033611,
+      "aliases": []
+    },
+    {
+      "station": "NPO Station",
+      "city": "Quezon City",
+      "latitude": 14.639167,
+      "longitude": 121.040833,
+      "aliases": [
+        "奎松市"
+      ]
+    },
+    {
+      "station": "Valenzuela Station",
+      "city": "Valenzuela",
+      "latitude": 14.693056,
+      "longitude": 120.968333,
+      "aliases": []
+    }
+  ]
+}

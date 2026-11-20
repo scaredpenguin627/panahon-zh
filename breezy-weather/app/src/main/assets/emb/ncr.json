@@ -1,0 +1,140 @@
+{
+  "key": "156a380e-4084-4645-8a01-6a1e845d7416",
+  "page": "https://ncr.emb.gov.ph/realtimeairmonitoring/",
+  "timeQuery": "cams-updated",
+  "timeField": "Min(CAMS.Date_Time)",
+  "tables": [
+    {
+      "recipe": "cams-pm10",
+      "stationField": "CAMS.Station",
+      "addressField": "CAMS.Address",
+      "columns": [
+        {
+          "field": "Sum(CAMS.PM10AQI)",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "CAMS.PM10REMARKS"
+        }
+      ]
+    },
+    {
+      "recipe": "cams-pm25",
+      "stationField": "CAMS.Station",
+      "addressField": "CAMS.Address",
+      "columns": [
+        {
+          "field": "Sum(CAMS.PM25AQI)",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "CAMS.PM25REMARKS"
+        }
+      ]
+    }
+  ],
+  "sites": [
+    {
+      "station": "Manila",
+      "city": "Manila",
+      "latitude": 14.6,
+      "longitude": 120.98,
+      "aliases": [
+        "马尼拉",
+        "馬尼拉",
+        "City of Manila"
+      ]
+    },
+    {
+      "station": "Navotas",
+      "city": "Navotas",
+      "latitude": 14.65,
+      "longitude": 120.95
+    },
+    {
+      "station": "Marikina (Parang)",
+      "city": "Marikina",
+      "latitude": 14.65,
+      "longitude": 121.1
+    },
+    {
+      "station": "Marikina CEMO",
+      "city": "Marikina",
+      "latitude": 14.65,
+      "longitude": 121.1
+    },
+    {
+      "station": "Makati",
+      "city": "Makati",
+      "latitude": 14.56,
+      "longitude": 121.03
+    },
+    {
+      "station": "Valenzuela",
+      "city": "Valenzuela",
+      "latitude": 14.7,
+      "longitude": 120.98
+    },
+    {
+      "station": "Caloocan (Univ. of East)",
+      "city": "Caloocan",
+      "latitude": 14.66,
+      "longitude": 120.97
+    },
+    {
+      "station": "Quezon City (Ateneo)",
+      "city": "Quezon City",
+      "latitude": 14.65,
+      "longitude": 121.05,
+      "aliases": [
+        "奎松市"
+      ]
+    },
+    {
+      "station": "San Juan City",
+      "city": "San Juan",
+      "latitude": 14.6,
+      "longitude": 121.03
+    },
+    {
+      "station": "Pasay",
+      "city": "Pasay",
+      "latitude": 14.54,
+      "longitude": 121
+    },
+    {
+      "station": "Parañaque (PEATC)",
+      "city": "Parañaque",
+      "latitude": 14.48,
+      "longitude": 121.02
+    },
+    {
+      "station": "Parañaque (Don Bosco)",
+      "city": "Parañaque",
+      "latitude": 14.48,
+      "longitude": 121.02
+    },
+    {
+      "station": "Mandaluyong",
+      "city": "Mandaluyong",
+      "latitude": 14.58,
+      "longitude": 121.04
+    },
+    {
+      "station": "Muntinlupa (Filinvest City)",
+      "city": "Muntinlupa",
+      "latitude": 14.42,
+      "longitude": 121.04
+    },
+    {
+      "station": "Muntinlupa (Bilibid)",
+      "city": "Muntinlupa",
+      "latitude": 14.42,
+      "longitude": 121.04
+    },
+    {
+      "station": "Taguig (TUP)",
+      "city": "Taguig",
+      "latitude": 14.52,
+      "longitude": 121.05
+    }
+  ]
+}

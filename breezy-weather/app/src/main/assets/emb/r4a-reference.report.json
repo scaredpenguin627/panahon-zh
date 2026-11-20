@@ -1,0 +1,66 @@
+{
+  "key": "fc10b6e9-ce13-4b56-8d0e-bd0632cc8ff9",
+  "page": "https://calabarzon.emb.gov.ph/air-quality-data/",
+  "tables": [
+    {
+      "recipe": "r4tagaytay",
+      "stationField": "",
+      "timeField": "tagaytay.timestamp",
+      "columns": [
+        {
+          "field": "tagaytay.aqi_pm10",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "tagaytay.aqi_pm10_category"
+        },
+        {
+          "field": "tagaytay.aqi_pm25",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "tagaytay.aqi_pm25_category"
+        }
+      ],
+      "fixedStation": "Tagaytay (reference)"
+    },
+    {
+      "recipe": "r4mauban",
+      "stationField": "",
+      "timeField": "mauban_ftp mauban.timestamp",
+      "columns": [
+        {
+          "field": "mauban_ftp mauban.aqi_pm10",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "mauban_ftp mauban.aqi_pm10_category"
+        },
+        {
+          "field": "mauban_ftp mauban.aqi_pm25",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "mauban_ftp mauban.aqi_pm25_category"
+        }
+      ],
+      "fixedStation": "Mauban (reference)"
+    }
+  ],
+  "sites": [
+    {
+      "station": "Tagaytay (reference)",
+      "city": "Tagaytay",
+      "latitude": 14.11,
+      "longitude": 120.96,
+      "aliases": [
+        "Tagaytay City"
+      ]
+    },
+    {
+      "station": "Mauban (reference)",
+      "city": "Mauban",
+      "latitude": 14.19,
+      "longitude": 121.73,
+      "aliases": [
+        "Mauban City"
+      ]
+    }
+  ]
+}

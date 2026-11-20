@@ -1,0 +1,568 @@
+{
+  "cams-pm10": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "CAMS.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "CAMS.Address",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Sum(CAMS.PM10AQI)",
+                  "Value": "M0"
+                },
+                {
+                  "Name": "CAMS.PM10REMARKS",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "CAMS.AQI Current 10 1",
+                  "Value": "M1"
+                }
+              ]
+            },
+            "dsr": {
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "M0",
+                              "T": 4
+                            },
+                            {
+                              "N": "M1",
+                              "T": 13,
+                              "DN": "D3"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            0,
+                            37,
+                            "37L"
+                          ]
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            39,
+                            "39L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            2,
+                            2,
+                            25,
+                            "25L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            3,
+                            3,
+                            22,
+                            "22L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            4,
+                            4,
+                            43,
+                            "43L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            5,
+                            5,
+                            45,
+                            "45L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            6,
+                            6,
+                            14,
+                            "14L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            7,
+                            7,
+                            20,
+                            "20L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            8,
+                            8,
+                            1,
+                            53,
+                            "53L"
+                          ]
+                        },
+                        {
+                          "C": [
+                            9,
+                            9,
+                            0,
+                            25,
+                            "25L"
+                          ]
+                        },
+                        {
+                          "C": [
+                            10,
+                            10
+                          ],
+                          "R": 28
+                        },
+                        {
+                          "C": [
+                            11,
+                            11,
+                            30,
+                            "30L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            12,
+                            12,
+                            32,
+                            "32L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            13,
+                            13,
+                            29,
+                            "29L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            14,
+                            14,
+                            19,
+                            "19L"
+                          ],
+                          "R": 4
+                        },
+                        {
+                          "C": [
+                            15,
+                            15,
+                            30,
+                            "30L"
+                          ],
+                          "R": 4
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "Caloocan (Univ. of East)",
+                      "Makati",
+                      "Mandaluyong",
+                      "Manila",
+                      "Marikina (Parang)",
+                      "Marikina CEMO",
+                      "Muntinlupa (Bilibid)",
+                      "Muntinlupa (Filinvest City)",
+                      "Navotas",
+                      "Parañaque (Don Bosco)",
+                      "Parañaque (PEATC)",
+                      "Pasay",
+                      "Quezon City (Ateneo)",
+                      "San Juan City",
+                      "Taguig (TUP)",
+                      "Valenzuela"
+                    ],
+                    "D1": [
+                      "105 Samson Rd, Caloocan",
+                      "University of Makati",
+                      "National Center for Mental Health",
+                      "Mehan Garden, Manila City",
+                      "Parang Brgy. Hall cmpd.",
+                      "G Fernando Street, Marikina",
+                      "Muntinlupa Bilibid Prison Open Ground",
+                      "South Station Terminal, Muntinlupa",
+                      "Navotas City Hall",
+                      "Don Bosco Barangay Hall",
+                      "PEATC cmpd., Pinaglabanan St.",
+                      "Phil. Airlines Cmpd., Andrew Ave",
+                      "Manila Observatory Cmpd. ADMU",
+                      "Pinaglabanan Shrine, San Juan",
+                      "TUP Taguig Campus",
+                      "Punturin Senior High School"
+                    ],
+                    "D2": [
+                      "Good",
+                      "Fair"
+                    ],
+                    "D3": []
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "cams-pm25": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "CAMS.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Sum(CAMS.PM25AQI)",
+                  "Value": "M0"
+                },
+                {
+                  "Name": "CAMS.PM25REMARKS",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "CAMS.Address",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "CAMS.AQI Current 25 1",
+                  "Value": "M1"
+                }
+              ]
+            },
+            "dsr": {
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "M0",
+                              "T": 4
+                            },
+                            {
+                              "N": "M1",
+                              "T": 13,
+                              "DN": "D3"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            0,
+                            37,
+                            "37L"
+                          ]
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            26,
+                            "26L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            2,
+                            2
+                          ],
+                          "R": 26
+                        },
+                        {
+                          "C": [
+                            3,
+                            3,
+                            18,
+                            "18L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            4,
+                            4,
+                            44,
+                            "44L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            5,
+                            5,
+                            41,
+                            "41L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            6,
+                            6,
+                            19,
+                            "19L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            7,
+                            7
+                          ],
+                          "R": 26
+                        },
+                        {
+                          "C": [
+                            8,
+                            8,
+                            41,
+                            "41L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            9,
+                            9,
+                            14,
+                            "14L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            10,
+                            10,
+                            27,
+                            "27L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            11,
+                            11,
+                            23,
+                            "23L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            12,
+                            12,
+                            37,
+                            "37L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            13,
+                            13,
+                            33,
+                            "33L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            14,
+                            14,
+                            14,
+                            "14L"
+                          ],
+                          "R": 2
+                        },
+                        {
+                          "C": [
+                            15,
+                            15,
+                            39,
+                            "39L"
+                          ],
+                          "R": 2
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "Caloocan (Univ. of East)",
+                      "Makati",
+                      "Mandaluyong",
+                      "Manila",
+                      "Marikina (Parang)",
+                      "Marikina CEMO",
+                      "Muntinlupa (Bilibid)",
+                      "Muntinlupa (Filinvest City)",
+                      "Navotas",
+                      "Parañaque (Don Bosco)",
+                      "Parañaque (PEATC)",
+                      "Pasay",
+                      "Quezon City (Ateneo)",
+                      "San Juan City",
+                      "Taguig (TUP)",
+                      "Valenzuela"
+                    ],
+                    "D1": [
+                      "Good"
+                    ],
+                    "D2": [
+                      "105 Samson Rd, Caloocan",
+                      "University of Makati",
+                      "National Center for Mental Health",
+                      "Mehan Garden, Manila City",
+                      "Parang Brgy. Hall cmpd.",
+                      "G Fernando Street, Marikina",
+                      "Muntinlupa Bilibid Prison Open Ground",
+                      "South Station Terminal, Muntinlupa",
+                      "Navotas City Hall",
+                      "Don Bosco Barangay Hall",
+                      "PEATC cmpd., Pinaglabanan St.",
+                      "Phil. Airlines Cmpd., Andrew Ave",
+                      "Manila Observatory Cmpd. ADMU",
+                      "Pinaglabanan Shrine, San Juan",
+                      "TUP Taguig Campus",
+                      "Punturin Senior High School"
+                    ],
+                    "D3": []
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "cams-updated": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Min(CAMS.Date_Time)",
+                  "Value": "M0"
+                }
+              ]
+            },
+            "dsr": {
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "M0",
+                              "T": 7
+                            }
+                          ],
+                          "M0": 1795176000000
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "Msg": [
+                    {
+                      "Code": "IgnoredDataReductionAlgorithm",
+                      "Severity": "Warning",
+                      "Message": "A data reduction algorithm was specified but the corresponding grouping does not exist. The data reduction will be ignored for primary, secondary, intersection and scoped."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

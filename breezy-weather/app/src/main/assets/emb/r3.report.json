@@ -1,0 +1,38 @@
+{
+  "key": "emb-r3",
+  "page": "https://embr3-onlinesystems.cloud/air-quality-monitoring/",
+  "tables": [],
+  "sites": [
+    {
+      "station": "meycauayan",
+      "city": "Meycauayan",
+      "latitude": 14.7367,
+      "longitude": 120.96,
+      "aliases": [
+        "Meycauayan City"
+      ],
+      "displayName": "Meycauayan"
+    },
+    {
+      "station": "san-fernando",
+      "city": "San Fernando",
+      "latitude": 15.03,
+      "longitude": 120.69,
+      "aliases": [
+        "City of San Fernando"
+      ],
+      "displayName": "San Fernando (Pampanga)"
+    },
+    {
+      "station": "clark",
+      "city": "Clark",
+      "latitude": 15.18,
+      "longitude": 120.55,
+      "aliases": [
+        "Clark Freeport Zone"
+      ],
+      "displayName": "Clark",
+      "maxDistanceKm": 10
+    }
+  ]
+}

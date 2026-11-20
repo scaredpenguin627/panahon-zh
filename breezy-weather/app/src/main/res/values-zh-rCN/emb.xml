@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="emb_title">站点空气质量 · 菲律宾环境管理局</string>
+    <string name="emb_loading">正在读取 EMB 官方站点报表…</string>
+    <string name="emb_uncovered">此地点暂无已核实的 EMB 站点读数。</string>
+    <string name="emb_missing">最新报表中暂无此地点的读数。</string>
+    <string name="emb_error">暂时无法刷新 EMB 官方报表。</string>
+    <string name="emb_cached">本次未取得新读数，显示最近一次记录</string>
+    <string name="emb_report_time">报表更新：%1$s</string>
+    <string name="emb_station_time">监测时间：%1$s</string>
+    <string name="emb_old">距今已超过 24 小时</string>
+    <string name="emb_fetched">读取时间：%1$s</string>
+    <string name="emb_sub_index">%1$s 子指数 %2$s</string>
+    <string name="emb_other_source">其他空气质量数据来源：%1$s</string>
+    <string name="emb_model">空气质量模型来源：%1$s</string>
+    <string name="emb_official_link">查看官方监测报表</string>
+    <string name="emb_manual">手工采样记录</string>
+    <string name="emb_annual">年度空气质量汇总</string>
+    <string name="emb_year">统计年份：%1$s</string>
+    <string name="emb_historical">历史监测记录</string>
+    <string name="emb_no_recent">此地点暂无已核实的实时站点读数。</string>
+</resources>

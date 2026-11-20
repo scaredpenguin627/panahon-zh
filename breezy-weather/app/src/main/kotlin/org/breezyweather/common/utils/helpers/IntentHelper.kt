@@ -17,6 +17,7 @@
 package org.breezyweather.common.utils.helpers
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -215,13 +216,17 @@ object IntentHelper {
         context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
     }
 
-    fun startBreezyActivity(activity: Activity, location: Location) {
-        activity.startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                "geo:${location.latitude},${location.longitude}".toUri()
+    fun openLocationInOtherApp(activity: Activity, location: Location): Boolean {
+        return try {
+            activity.startActivity(
+                Intent(Intent.ACTION_VIEW, "geo:${location.latitude},${location.longitude}".toUri())
             )
-        )
+            true
+        } catch (_: ActivityNotFoundException) {
+            false
+        } catch (_: SecurityException) {
+            false
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -1,0 +1,412 @@
+{
+  "r2-1": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM 2025.Monitoring Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM 2025.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM 2025.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM 2025.Concentration (ug/Ncm)",
+                  "Value": "G3"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 7
+                            },
+                            {
+                              "N": "G3",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            1762300800000,
+                            20
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "City Hall Rooftop (Cauayan City)"
+                    ],
+                    "D1": [
+                      "San Fermin, Cauayan City"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r2-2": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM 2025.Monitoring Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM 2025.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM 2025.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM 2025.Concentration (ug/Ncm)",
+                  "Value": "G3"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 7
+                            },
+                            {
+                              "N": "G3",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            1764720000000,
+                            2
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "City Hall Rooftop (City of Ilagan)"
+                    ],
+                    "D1": [
+                      "San Vicente, City of Ilagan"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r2-3": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM 2025.Monitoring Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM 2025.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM 2025.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM 2025.Concentration (ug/Ncm)",
+                  "Value": "G3"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 7
+                            },
+                            {
+                              "N": "G3",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            1765324800000,
+                            25
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "EMB Region 02 Rooftop"
+                    ],
+                    "D1": [
+                      "Carig Sur, Tuguegarao City"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r2-4": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM 2025.Monitoring Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM 2025.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM 2025.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM 2025.Concentration (ug/Ncm)",
+                  "Value": "G3"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 7
+                            },
+                            {
+                              "N": "G3",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            1765324800000,
+                            21
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Grand Victoria Heights"
+                    ],
+                    "D1": [
+                      "Libag Sur, Tuguegarao City"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r2-5": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "PM 2025.Monitoring Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "PM 2025.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "PM 2025.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "PM 2025.Concentration (ug/Ncm)",
+                  "Value": "G3"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 7
+                            },
+                            {
+                              "N": "G3",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            1765324800000,
+                            15
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Santiago City Hall"
+                    ],
+                    "D1": [
+                      "San Andres, Santiago City"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

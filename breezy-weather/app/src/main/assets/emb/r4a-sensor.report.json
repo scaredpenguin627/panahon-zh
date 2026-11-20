@@ -1,0 +1,66 @@
+{
+  "key": "36faee6c-228d-4716-a629-ecc12b2b5af5",
+  "page": "https://calabarzon.emb.gov.ph/air-quality-data/",
+  "tables": [
+    {
+      "recipe": "r4stagaytay",
+      "stationField": "",
+      "timeField": "sensors_ftp tagaytay.Stamptime",
+      "columns": [
+        {
+          "field": "sensors_ftp tagaytay.aqi_pm10",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "sensors_ftp tagaytay.cat_pm10"
+        },
+        {
+          "field": "sensors_ftp tagaytay.aqi_pm25",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "sensors_ftp tagaytay.cat_pm25"
+        }
+      ],
+      "fixedStation": "Tagaytay (sensor)"
+    },
+    {
+      "recipe": "r4ssan",
+      "stationField": "",
+      "timeField": "sensors_ftp san_nicolas.Stamptime",
+      "columns": [
+        {
+          "field": "sensors_ftp san_nicolas.aqi_pm10",
+          "label": "PM10",
+          "unit": "AQI",
+          "ratingField": "sensors_ftp san_nicolas.cat_pm10"
+        },
+        {
+          "field": "sensors_ftp san_nicolas.aqi_pm25",
+          "label": "PM2.5",
+          "unit": "AQI",
+          "ratingField": "sensors_ftp san_nicolas.cat_pm25"
+        }
+      ],
+      "fixedStation": "San Nicolas (sensor)"
+    }
+  ],
+  "sites": [
+    {
+      "station": "Tagaytay (sensor)",
+      "city": "Tagaytay",
+      "latitude": 14.11,
+      "longitude": 120.96,
+      "aliases": [
+        "Tagaytay City"
+      ]
+    },
+    {
+      "station": "San Nicolas (sensor)",
+      "city": "San Nicolas",
+      "latitude": 13.93,
+      "longitude": 120.95,
+      "aliases": [
+        "San Nicolas City"
+      ]
+    }
+  ]
+}

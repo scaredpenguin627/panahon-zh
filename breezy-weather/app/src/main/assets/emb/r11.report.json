@@ -1,0 +1,146 @@
+{
+  "key": "dad3cdb1-ed21-4def-ac1e-6bf049df7328",
+  "page": "https://r11.emb.gov.ph/air-quality-monitoring-data-2/",
+  "tables": [
+    {
+      "recipe": "r11-pm10",
+      "stationField": "Query2.Station",
+      "timeField": "Query2.Date",
+      "columns": [
+        {
+          "field": "Query2.Annual Concentrationµg/NCM ",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "Query2.Air Quality Index"
+        }
+      ],
+      "addressField": "Query2.Address"
+    },
+    {
+      "recipe": "r11-pm25",
+      "stationField": "Query2.Station",
+      "timeField": "Query2.Date",
+      "columns": [
+        {
+          "field": "Query2.Annual Concentrationµg/NCM ",
+          "label": "PM2.5",
+          "unit": "µg/Ncm",
+          "ratingField": "Query2.Air Quality Index"
+        }
+      ],
+      "addressField": "Query2.Address"
+    },
+    {
+      "recipe": "r11-no2",
+      "stationField": "Query2.Station",
+      "timeField": "Query2.Date",
+      "columns": [
+        {
+          "field": "Query2.Annual Concentrationµg/NCM ",
+          "label": "NO2",
+          "unit": "µg/Ncm",
+          "ratingField": "Query2.Air Quality Index"
+        }
+      ],
+      "addressField": "Query2.Address"
+    },
+    {
+      "recipe": "r11-so2",
+      "stationField": "Query2.Station",
+      "timeField": "Query2.Date",
+      "columns": [
+        {
+          "field": "Query2.Annual Concentrationµg/NCM ",
+          "label": "SO2",
+          "unit": "µg/Ncm",
+          "ratingField": "Query2.Air Quality Index"
+        }
+      ],
+      "addressField": "Query2.Address"
+    }
+  ],
+  "sites": [
+    {
+      "station": "DC Station No. 02",
+      "city": "Davao City",
+      "latitude": 7.182036,
+      "longitude": 125.64515,
+      "aliases": [
+        "达沃",
+        "達沃",
+        "Davao"
+      ]
+    },
+    {
+      "station": "DC Station No. 11",
+      "city": "Davao City",
+      "latitude": 7.065781,
+      "longitude": 125.58555,
+      "aliases": [
+        "达沃",
+        "達沃",
+        "Davao"
+      ]
+    },
+    {
+      "station": "DC Station No. 14",
+      "city": "Davao City",
+      "latitude": 7.018775,
+      "longitude": 125.496797,
+      "aliases": [
+        "达沃",
+        "達沃",
+        "Davao"
+      ]
+    },
+    {
+      "station": "DC Station No. 15",
+      "city": "Davao City",
+      "latitude": 7.118039,
+      "longitude": 125.634025,
+      "aliases": [
+        "达沃",
+        "達沃",
+        "Davao"
+      ]
+    },
+    {
+      "station": "DC Station No. 16",
+      "city": "Davao City",
+      "latitude": 7.184992,
+      "longitude": 125.456811,
+      "aliases": [
+        "达沃",
+        "達沃",
+        "Davao"
+      ]
+    },
+    {
+      "station": "DC Station No. 17",
+      "city": "Davao City",
+      "latitude": 7.081086,
+      "longitude": 125.602011,
+      "aliases": [
+        "达沃",
+        "達沃",
+        "Davao"
+      ]
+    },
+    {
+      "station": "MLT Station No. 01",
+      "city": "Malita",
+      "latitude": 6.398378,
+      "longitude": 125.618106
+    },
+    {
+      "station": "TC Station No. 01",
+      "city": "Tagum City",
+      "latitude": 7.419389,
+      "longitude": 125.827308,
+      "aliases": [
+        "Tagum"
+      ]
+    }
+  ],
+  "kind": "annual"
+}

@@ -1,0 +1,87 @@
+{
+  "key": "8a0cc81d-5a64-4673-be5d-88b9f4b96a0f",
+  "page": "https://r6.emb.gov.ph/ra-8749/",
+  "tables": [
+    {
+      "recipe": "r6-manual-oton-pm10",
+      "stationField": "PM.Station",
+      "timeField": "PM.Date ",
+      "columns": [
+        {
+          "field": "PM.Concentration",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "PM.Air Quality Index"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "PM.Location"
+    },
+    {
+      "recipe": "r6-manual-pavia-pm10",
+      "stationField": "PM.Station",
+      "timeField": "PM.Date ",
+      "columns": [
+        {
+          "field": "PM.Concentration",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "PM.Air Quality Index"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "PM.Location"
+    },
+    {
+      "recipe": "r6-manual-pavia-pm25",
+      "stationField": "PM.Station",
+      "timeField": "PM.Date ",
+      "columns": [
+        {
+          "field": "PM.Concentration",
+          "label": "PM2.5",
+          "unit": "µg/Ncm",
+          "ratingField": "PM.Air Quality Index"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "PM.Location"
+    },
+    {
+      "recipe": "r6-manual-san-pm10",
+      "stationField": "PM.Station",
+      "timeField": "PM.Date ",
+      "columns": [
+        {
+          "field": "PM.Concentration",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "PM.Air Quality Index"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "PM.Location"
+    }
+  ],
+  "sites": [
+    {
+      "station": "Oton Ambient AQMS",
+      "city": "Oton",
+      "latitude": 10.6981,
+      "longitude": 122.4761
+    },
+    {
+      "station": "Pavia Ambient AQMS",
+      "city": "Pavia",
+      "latitude": 10.7789,
+      "longitude": 122.5392
+    },
+    {
+      "station": "San Miguel Ambient AQMS",
+      "city": "San Miguel",
+      "latitude": 10.788279,
+      "longitude": 122.468303
+    }
+  ],
+  "kind": "manual"
+}

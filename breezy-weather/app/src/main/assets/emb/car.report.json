@@ -1,0 +1,37 @@
+{
+  "key": "b868857c-8c87-4943-a62a-c49d611ca403",
+  "page": "https://car.emb.gov.ph/air-quality-monitoring/",
+  "tables": [
+    {
+      "recipe": "car-burnham",
+      "stationField": "",
+      "timeField": "RAW_S001T01.Date_Time",
+      "columns": [
+        {
+          "field": "RAW_S001T01.PM10AQI",
+          "label": "PM10",
+          "unit": "AQI"
+        },
+        {
+          "field": "RAW_S001T01.PM25AQI",
+          "label": "PM2.5",
+          "unit": "AQI"
+        }
+      ],
+      "fixedStation": "Burnham Park"
+    }
+  ],
+  "sites": [
+    {
+      "station": "Burnham Park",
+      "city": "Baguio",
+      "latitude": 16.410524,
+      "longitude": 120.594186,
+      "aliases": [
+        "碧瑶",
+        "碧瑤",
+        "Baguio City"
+      ]
+    }
+  ]
+}

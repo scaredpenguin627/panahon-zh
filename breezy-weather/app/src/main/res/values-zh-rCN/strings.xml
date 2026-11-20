@@ -713,8 +713,8 @@
     <string name="message_outdated_server_data">从服务器收到了过时数据</string>
     <string name="action_enable">启用</string>
     <string name="action_allow">允许</string>
-    <string name="action_open_in_other_app_description">在另一应用中打开该位置</string>
-    <string name="action_open_in_other_app">在另一应用中打开</string>
+    <string name="action_open_in_other_app_description">用其他应用查看此地点</string>
+    <string name="action_open_in_other_app">用其他应用查看此地点</string>
     <string name="ephemeris_about">关于日月升落时间</string>
     <string name="ephemeris_about_rise">升起时间是当太阳或月亮完全现身在地平线上方的时候。</string>
     <string name="ephemeris_about_set">落下时间是当太阳或月亮完全消失在地平线以下的时候。</string>
@@ -821,7 +821,7 @@
     <string name="temperature_normals_deviation_explanation_minimum">当前温度与%s平均最低温度的差异</string>
     <string name="widget_custom_subtitle_help_content_description">显示自定义小标题关键词帮助</string>
     <string name="widget_custom_subtitle_alert_box_title">自定义小标题帮助</string>
-    <string name="action_open_in_other_app_no_app">未找到地图应用</string>
+    <string name="action_open_in_other_app_no_app">未找到能打开此地点的应用</string>
     <string name="action_share_no_app">未找到分享应用</string>
     <string name="action_translate">翻译</string>
     <string name="action_translate_no_app">未找到翻译应用</string>

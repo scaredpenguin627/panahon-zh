@@ -1,8 +1,6 @@
 /target/
 /target2/
-services/emb-aqi/captured/
-android-app/.gradle/
-android-app/build/
-android-app/app/build/
-
-
+/.claude-cli/
+/claude.cmd
+*.jks
+*.keystore

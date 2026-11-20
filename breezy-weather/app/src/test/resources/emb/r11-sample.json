@@ -1,0 +1,1119 @@
+{
+  "r11-pm10": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Query2.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Query2.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Query2.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "Query2.Address",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "Query2.Parameter",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "Query2.Annual Concentrationµg/NCM ",
+                  "Value": "G5"
+                },
+                {
+                  "Name": "Query2.Air Quality Index",
+                  "Value": "G6"
+                },
+                {
+                  "Name": "Query2.Latitude",
+                  "Value": "G7"
+                },
+                {
+                  "Name": "Query2.Longitude",
+                  "Value": "G8"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 3
+                            },
+                            {
+                              "N": "G6",
+                              "T": 1,
+                              "DN": "D4"
+                            },
+                            {
+                              "N": "G7",
+                              "T": 1,
+                              "DN": "D5"
+                            },
+                            {
+                              "N": "G8",
+                              "T": 1,
+                              "DN": "D6"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            2026,
+                            0,
+                            0,
+                            17.55,
+                            0,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            15.59,
+                            1,
+                            1,
+                            1
+                          ],
+                          "R": 22
+                        },
+                        {
+                          "C": [
+                            2,
+                            2,
+                            18.18,
+                            0,
+                            2,
+                            2
+                          ],
+                          "R": 22
+                        },
+                        {
+                          "C": [
+                            3,
+                            3,
+                            0.99,
+                            3,
+                            3
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            4,
+                            4,
+                            17.77,
+                            4,
+                            4
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            5,
+                            5,
+                            13.08,
+                            5,
+                            5
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            6,
+                            1,
+                            6,
+                            10.88,
+                            6,
+                            6
+                          ],
+                          "R": 84
+                        },
+                        {
+                          "C": [
+                            7,
+                            2,
+                            7,
+                            9.44,
+                            7,
+                            7
+                          ],
+                          "R": 84
+                        },
+                        {
+                          "C": [
+                            0,
+                            0,
+                            2025,
+                            0,
+                            17.93,
+                            1,
+                            0,
+                            0
+                          ],
+                          "R": 16
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            16,
+                            1,
+                            1
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            2,
+                            2,
+                            30.97,
+                            2,
+                            2
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            3,
+                            3,
+                            16.32,
+                            3,
+                            3
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            4,
+                            4,
+                            23.52,
+                            4,
+                            4
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            5,
+                            5,
+                            18.79,
+                            5,
+                            5
+                          ],
+                          "R": 86
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "DC Station No. 02",
+                      "DC Station No. 11",
+                      "DC Station No. 14",
+                      "DC Station No. 15",
+                      "DC Station No. 16",
+                      "DC Station No. 17",
+                      "MLT Station No. 01",
+                      "TC Station No. 01",
+                      "DC Station No. 07"
+                    ],
+                    "D1": [
+                      "Davao City",
+                      "Minicipality of Malita",
+                      "Tagum City"
+                    ],
+                    "D2": [
+                      "Pagasa Village Phase II, Bugac, Ilang, Davao City",
+                      "Davao Memorial Park, Phase II, McArthur Highway, Davao City",
+                      "Toril Open Park Area, Agton St., Toril, Davao City",
+                      "Davao City International Airport, AGL Open Area, Davao City",
+                      "Calinan National High School, Calinan, Davao City",
+                      "Davao Botanical Garden, Marfori, Davao City",
+                      "Inside Malita Power Inc. ,Sitio Inaburan, Brgy. Culaman, Malita, Davao Occidental",
+                      "Tagum National Trade School, Apokon, Tagum City, Davao del Norte",
+                      "J.P. Laurel Avenue and V. Mapa Street"
+                    ],
+                    "D3": [
+                      "PM 10"
+                    ],
+                    "D4": [
+                      "GOOD",
+                      "GOOD AND FAIR"
+                    ],
+                    "D5": [
+                      "  7°10'55.33\"N​",
+                      "  7° 3'56.81\"N​",
+                      "  7° 1'7.59\"N​",
+                      "  7° 7'4.94\"N​",
+                      "  7°11'5.97\"N​",
+                      "  7° 4'51.91\"N​",
+                      "  6°23'54.16\"N​",
+                      "  7°25'9.80\"N​",
+                      "    7° 4'45.96\"N"
+                    ],
+                    "D6": [
+                      "125°38'42.54\"E​",
+                      "125°35'7.98\"E​",
+                      "125°29'48.47\"E​",
+                      "125°38'2.49\"E​",
+                      "125°27'24.52\"E​",
+                      "125°36'7.24\"E​",
+                      "125°37'5.18\"E​",
+                      "125°49'38.31\"E​",
+                      "125°36'43.56\"E"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r11-pm25": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Query2.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Query2.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Query2.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "Query2.Address",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "Query2.Parameter",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "Query2.Annual Concentrationµg/NCM ",
+                  "Value": "G5"
+                },
+                {
+                  "Name": "Query2.Air Quality Index",
+                  "Value": "G6"
+                },
+                {
+                  "Name": "Query2.Latitude",
+                  "Value": "G7"
+                },
+                {
+                  "Name": "Query2.Longitude",
+                  "Value": "G8"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 3
+                            },
+                            {
+                              "N": "G6",
+                              "T": 1,
+                              "DN": "D4"
+                            },
+                            {
+                              "N": "G7",
+                              "T": 1,
+                              "DN": "D5"
+                            },
+                            {
+                              "N": "G8",
+                              "T": 1,
+                              "DN": "D6"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            2026,
+                            0,
+                            0,
+                            0.97,
+                            0,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            9.51,
+                            1,
+                            1
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            2,
+                            1,
+                            2,
+                            5.21,
+                            2,
+                            2
+                          ],
+                          "R": 84
+                        },
+                        {
+                          "C": [
+                            3,
+                            2,
+                            3,
+                            8.49,
+                            3,
+                            3
+                          ],
+                          "R": 84
+                        },
+                        {
+                          "C": [
+                            0,
+                            0,
+                            2025,
+                            0,
+                            7.25,
+                            1,
+                            0,
+                            0
+                          ],
+                          "R": 16
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            10.25,
+                            1,
+                            1
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            2,
+                            1,
+                            2,
+                            3.97,
+                            0,
+                            2,
+                            2
+                          ],
+                          "R": 20
+                        },
+                        {
+                          "C": [
+                            0,
+                            0,
+                            2024,
+                            0,
+                            10.23,
+                            1,
+                            0,
+                            0
+                          ],
+                          "R": 16
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            18.37,
+                            1,
+                            1
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            3,
+                            2,
+                            3,
+                            9.94,
+                            0,
+                            3,
+                            3
+                          ],
+                          "R": 20
+                        },
+                        {
+                          "C": [
+                            0,
+                            0,
+                            2023,
+                            0,
+                            12.68,
+                            1,
+                            0,
+                            0
+                          ],
+                          "R": 16
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            18.18,
+                            1,
+                            1
+                          ],
+                          "R": 86
+                        },
+                        {
+                          "C": [
+                            0,
+                            2022,
+                            0,
+                            13.4,
+                            0,
+                            0
+                          ],
+                          "R": 82
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            15.77,
+                            1,
+                            1
+                          ],
+                          "R": 86
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "DC Station No. 15",
+                      "DC Station No. 16",
+                      "MLT Station No. 01",
+                      "TC Station No. 01"
+                    ],
+                    "D1": [
+                      "Davao City",
+                      "Minicipality of Malita",
+                      "Tagum City"
+                    ],
+                    "D2": [
+                      "Davao City International Airport, AGL Open Area, Davao City",
+                      "Calinan National High School, Calinan, Davao City",
+                      "Inside Malita Power Inc. ,Sitio Inaburan, Brgy. Culaman, Malita, Davao Occidental",
+                      "Tagum National Trade School, Apokon, Tagum City, Davao del Norte"
+                    ],
+                    "D3": [
+                      "PM 2.5"
+                    ],
+                    "D4": [
+                      "GOOD",
+                      "GOOD AND FAIR"
+                    ],
+                    "D5": [
+                      "  7° 7'4.94\"N​",
+                      "  7°11'5.97\"N​",
+                      "  6°23'54.16\"N​",
+                      "  7°25'9.80\"N​"
+                    ],
+                    "D6": [
+                      "125°38'2.49\"E​",
+                      "125°27'24.52\"E​",
+                      "125°37'5.18\"E​",
+                      "125°49'38.31\"E​"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r11-no2": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Query2.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Query2.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Query2.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "Query2.Address",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "Query2.Parameter",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "Query2.Annual Concentrationµg/NCM ",
+                  "Value": "G5"
+                },
+                {
+                  "Name": "Query2.Air Quality Index",
+                  "Value": "G6"
+                },
+                {
+                  "Name": "Query2.Latitude",
+                  "Value": "G7"
+                },
+                {
+                  "Name": "Query2.Longitude",
+                  "Value": "G8"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 3
+                            },
+                            {
+                              "N": "G6",
+                              "T": 1,
+                              "DN": "D4"
+                            },
+                            {
+                              "N": "G7",
+                              "T": 1,
+                              "DN": "D5"
+                            },
+                            {
+                              "N": "G8",
+                              "T": 1,
+                              "DN": "D6"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            2026,
+                            0,
+                            0,
+                            5.23,
+                            0,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            2025,
+                            1,
+                            5.66,
+                            1,
+                            1
+                          ],
+                          "R": 80
+                        },
+                        {
+                          "C": [
+                            0,
+                            0,
+                            0,
+                            11.97,
+                            0,
+                            0
+                          ],
+                          "R": 84
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            2024,
+                            1,
+                            43.12,
+                            1,
+                            1
+                          ],
+                          "R": 80
+                        },
+                        {
+                          "C": [
+                            2023,
+                            14.79
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2022,
+                            18.65
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2021,
+                            4.15
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2020,
+                            13.1
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2019,
+                            11.13
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2018,
+                            6.35
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2017,
+                            16.54
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2016,
+                            12.19
+                          ],
+                          "R": 475
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "MLT Station No. 01",
+                      "DC Station No. 15"
+                    ],
+                    "D1": [
+                      "Minicipality of Malita",
+                      "Davao City"
+                    ],
+                    "D2": [
+                      "Inside Malita Power Inc. ,Sitio Inaburan, Brgy. Culaman, Malita, Davao Occidental",
+                      "Davao City International Airport, AGL Open Area, Davao City"
+                    ],
+                    "D3": [
+                      "NO2"
+                    ],
+                    "D4": [
+                      "GOOD"
+                    ],
+                    "D5": [
+                      "  6°23'54.16\"N​",
+                      "  7° 7'4.94\"N​"
+                    ],
+                    "D6": [
+                      "125°37'5.18\"E​",
+                      "125°38'2.49\"E​"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r11-so2": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Query2.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Query2.City/Municipality",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Query2.Date",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "Query2.Address",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "Query2.Parameter",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "Query2.Annual Concentrationµg/NCM ",
+                  "Value": "G5"
+                },
+                {
+                  "Name": "Query2.Air Quality Index",
+                  "Value": "G6"
+                },
+                {
+                  "Name": "Query2.Latitude",
+                  "Value": "G7"
+                },
+                {
+                  "Name": "Query2.Longitude",
+                  "Value": "G8"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            },
+                            {
+                              "N": "G3",
+                              "T": 1,
+                              "DN": "D2"
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D3"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 3
+                            },
+                            {
+                              "N": "G6",
+                              "T": 1,
+                              "DN": "D4"
+                            },
+                            {
+                              "N": "G7",
+                              "T": 1,
+                              "DN": "D5"
+                            },
+                            {
+                              "N": "G8",
+                              "T": 1,
+                              "DN": "D6"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            0,
+                            2026,
+                            0,
+                            0,
+                            10.96,
+                            0,
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            2025,
+                            1,
+                            2.76,
+                            1,
+                            1
+                          ],
+                          "R": 80
+                        },
+                        {
+                          "C": [
+                            0,
+                            0,
+                            0,
+                            1.37,
+                            0,
+                            0
+                          ],
+                          "R": 84
+                        },
+                        {
+                          "C": [
+                            1,
+                            1,
+                            2024,
+                            1,
+                            7.02,
+                            1,
+                            1
+                          ],
+                          "R": 80
+                        },
+                        {
+                          "C": [
+                            2023,
+                            6.83
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2022,
+                            14.41
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2021,
+                            4.82
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2020,
+                            10.78
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2019,
+                            9.84
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2018,
+                            2.1
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2017,
+                            19.81
+                          ],
+                          "R": 475
+                        },
+                        {
+                          "C": [
+                            2016,
+                            4.24
+                          ],
+                          "R": 475
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "MLT Station No. 01",
+                      "DC Station No. 15"
+                    ],
+                    "D1": [
+                      "Minicipality of Malita",
+                      "Davao City"
+                    ],
+                    "D2": [
+                      "Inside Malita Power Inc. ,Sitio Inaburan, Brgy. Culaman, Malita, Davao Occidental",
+                      "Davao City International Airport, AGL Open Area, Davao City"
+                    ],
+                    "D3": [
+                      "SO2"
+                    ],
+                    "D4": [
+                      "GOOD"
+                    ],
+                    "D5": [
+                      "  6°23'54.16\"N​",
+                      "  7° 7'4.94\"N​"
+                    ],
+                    "D6": [
+                      "125°37'5.18\"E​",
+                      "125°38'2.49\"E​"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

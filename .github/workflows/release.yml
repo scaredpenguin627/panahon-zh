@@ -1,0 +1,55 @@
+name: Draft signed Android release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'scaredpenguin627/panahon-zh' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c
+      - name: Install Android SDK
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" "build-tools;37.0.0"'
+      - name: Run unit tests and build release APKs
+        working-directory: breezy-weather
+        run: ./gradlew :app:testBasicDebugUnitTest :app:assembleBasicRelease
+      - name: Sign and check all five packages
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: bash .github/scripts/sign-release.sh
+      - name: Create or refresh the release draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$GITHUB_REF_NAME"
+          if gh release view "$tag" --json isDraft > "$RUNNER_TEMP/release-status.json"; then
+            jq --exit-status '.isDraft' "$RUNNER_TEMP/release-status.json" > /dev/null
+          else
+            gh release create "$tag" --draft --verify-tag --title "菲律宾天气 $tag" --notes-file "$RUNNER_TEMP/release-notes.md"
+          fi
+          gh release upload "$tag" "$RUNNER_TEMP/panahon-apks/"*.apk "$RUNNER_TEMP/panahon-apks/SHA256SUMS" --clobber

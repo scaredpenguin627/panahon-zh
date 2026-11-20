@@ -236,7 +236,7 @@ internal fun AboutScreen(
                                                             ),
                                                             context.getString(R.string.action_download)
                                                         ) {
-                                                            uriHandler.openUri(result.release.releaseLink)
+                                                            uriHandler.openUri(result.release.getDownloadLink())
                                                         }
                                                     }
 

@@ -1,0 +1,159 @@
+{
+  "key": "bed78db9-dfe0-4122-a06d-245557dbe730",
+  "page": "https://caraga.emb.gov.ph/envi-dashboard/",
+  "tables": [
+    {
+      "recipe": "r13-butuan",
+      "stationField": "BXU.STATION",
+      "timeField": "BXU.DATE",
+      "columns": [
+        {
+          "field": "BXU.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "BXU.AQI"
+        },
+        {
+          "field": "BXU.PM2.5",
+          "label": "PM2.5",
+          "unit": "µg/Ncm",
+          "ratingField": "BXU.AQI_2"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "BXU.ADDRESS"
+    },
+    {
+      "recipe": "r13-cabadbaran",
+      "stationField": "CBR.STATION",
+      "timeField": "CBR.DATE",
+      "columns": [
+        {
+          "field": "CBR.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "CBR.AQI"
+        },
+        {
+          "field": "CBR.PM2.5",
+          "label": "PM2.5",
+          "unit": "µg/Ncm",
+          "ratingField": "CBR.AQI_2"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "CBR.ADDRESS"
+    },
+    {
+      "recipe": "r13-csu",
+      "stationField": "CSU Main.STATION",
+      "timeField": "CSU Main.DATE",
+      "columns": [
+        {
+          "field": "CSU Main.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "CSU Main.AQI"
+        },
+        {
+          "field": "CSU Main.PM2.5",
+          "label": "PM2.5",
+          "unit": "µg/Ncm",
+          "ratingField": "CSU Main.AQI_2"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "CSU Main.ADDRESS"
+    },
+    {
+      "recipe": "r13-magallanes",
+      "stationField": "Magallanes.STATION",
+      "timeField": "Magallanes.DATE",
+      "columns": [
+        {
+          "field": "Magallanes.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "Magallanes.AQI"
+        },
+        {
+          "field": "Magallanes.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm",
+          "ratingField": "Magallanes.AQI_2"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "Magallanes.ADDRESS"
+    },
+    {
+      "recipe": "r13-nasipit",
+      "stationField": "Petron Nasipit.STATION",
+      "timeField": "Petron Nasipit.DATE",
+      "columns": [
+        {
+          "field": "Petron Nasipit.PM10",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "Petron Nasipit.AQI"
+        },
+        {
+          "field": "Petron Nasipit.TSP",
+          "label": "TSP",
+          "unit": "µg/Ncm",
+          "ratingField": "Petron Nasipit.AQI_2"
+        }
+      ],
+      "dateOnly": true,
+      "addressField": "Petron Nasipit.ADDRESS"
+    }
+  ],
+  "sites": [
+    {
+      "station": "BUTUAN CITY ENRO PMS STATION",
+      "city": "Butuan",
+      "latitude": 8.954998,
+      "longitude": 125.526737,
+      "aliases": [
+        "Butuan City"
+      ]
+    },
+    {
+      "station": "CABADBARAN CITY  PMS STATION",
+      "city": "Cabadbaran",
+      "latitude": 9.117068,
+      "longitude": 125.548039,
+      "aliases": [
+        "Cabadbaran City"
+      ]
+    },
+    {
+      "station": "CARAGA STATE UNIVERSITY (CSU) - MAIN CAMPUS",
+      "city": "Butuan",
+      "latitude": 8.956125,
+      "longitude": 125.59689,
+      "aliases": [
+        "Butuan City"
+      ]
+    },
+    {
+      "station": "MAGALLANES STATION",
+      "city": "Magallanes",
+      "latitude": 9.026712,
+      "longitude": 125.519015,
+      "aliases": [
+        "Magallanes City"
+      ]
+    },
+    {
+      "station": "PETRON DEPOT NASIPIT",
+      "city": "Nasipit",
+      "latitude": 8.979334,
+      "longitude": 125.3372883,
+      "aliases": [
+        "Nasipit City"
+      ]
+    }
+  ],
+  "kind": "historical"
+}

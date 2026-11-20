@@ -1,0 +1,65 @@
+{
+  "r5pili": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Pili.Timestamp",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Pili.PM25",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Pili.PM10",
+                  "Value": "G2"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 7
+                            },
+                            {
+                              "N": "G1",
+                              "T": 3
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            1794564000000,
+                            13,
+                            15
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

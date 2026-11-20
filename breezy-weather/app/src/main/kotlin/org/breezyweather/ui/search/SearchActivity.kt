@@ -134,7 +134,7 @@ class SearchActivity : BreezyActivity() {
         } else {
             emptyList()
         }
-        val cities = (offlineCities + remoteCities).distinctBy { it.latitude to it.longitude }
+        val cities = mergeSearchLocations(offlineCities, remoteCities)
 
         Material3Scaffold(
             bottomBar = {

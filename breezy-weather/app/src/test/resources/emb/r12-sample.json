@@ -1,0 +1,308 @@
+{
+  "r12-gensan": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Results.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Results.Date",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Results.AQI_10",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "Results.AQI_2.5",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "Results.Category_10",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "Results.Category_2.5",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            },
+                            {
+                              "N": "G3",
+                              "T": 3
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D2"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1791590400000,
+                            23,
+                            0
+                          ],
+                          "Ø": 40
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Gensan Station"
+                    ],
+                    "D1": [
+                      "GOOD"
+                    ],
+                    "D2": []
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r12-koronadal": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Results.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Results.Date",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Results.AQI_10",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "Results.AQI_2.5",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "Results.Category_10",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "Results.Category_2.5",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            },
+                            {
+                              "N": "G3",
+                              "T": 3
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D2"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1791763200000,
+                            32,
+                            42,
+                            0,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Koronadal Station"
+                    ],
+                    "D1": [
+                      "GOOD"
+                    ],
+                    "D2": [
+                      "GOOD"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "r12-tupi": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Name": "Results.Station",
+                  "Value": "G0"
+                },
+                {
+                  "Name": "Results.Date",
+                  "Value": "G1"
+                },
+                {
+                  "Name": "Results.AQI_10",
+                  "Value": "G2"
+                },
+                {
+                  "Name": "Results.AQI_2.5",
+                  "Value": "G3"
+                },
+                {
+                  "Name": "Results.Category_10",
+                  "Value": "G4"
+                },
+                {
+                  "Name": "Results.Category_2.5",
+                  "Value": "G5"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 7
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            },
+                            {
+                              "N": "G3",
+                              "T": 3
+                            },
+                            {
+                              "N": "G4",
+                              "T": 1,
+                              "DN": "D1"
+                            },
+                            {
+                              "N": "G5",
+                              "T": 1,
+                              "DN": "D2"
+                            }
+                          ],
+                          "C": [
+                            0,
+                            1791417600000,
+                            42,
+                            0
+                          ],
+                          "Ø": 40
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": false,
+                  "ValueDicts": {
+                    "D0": [
+                      "Tupi Station"
+                    ],
+                    "D1": [
+                      "GOOD"
+                    ],
+                    "D2": []
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

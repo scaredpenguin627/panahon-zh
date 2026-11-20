@@ -1,0 +1,49 @@
+{
+  "key": "8a0cc81d-5a64-4673-be5d-88b9f4b96a0f",
+  "page": "https://r6.emb.gov.ph/ra-8749/",
+  "tables": [
+    {
+      "recipe": "r6-pm10",
+      "stationField": "PM.Station",
+      "timeField": "PM.Date ",
+      "columns": [
+        {
+          "field": "PM.Concentration",
+          "label": "PM10",
+          "unit": "µg/Ncm",
+          "ratingField": "PM.Air Quality Index"
+        }
+      ],
+      "addressField": "PM.Location",
+      "dateOnly": true
+    },
+    {
+      "recipe": "r6-pm25",
+      "stationField": "PM.Station",
+      "timeField": "PM.Date ",
+      "columns": [
+        {
+          "field": "PM.Concentration",
+          "label": "PM2.5",
+          "unit": "µg/Ncm",
+          "ratingField": "PM.Air Quality Index"
+        }
+      ],
+      "addressField": "PM.Location",
+      "dateOnly": true
+    }
+  ],
+  "sites": [
+    {
+      "station": "Garden of Love CAAQMS",
+      "city": "Iloilo City",
+      "latitude": 10.702,
+      "longitude": 122.56,
+      "aliases": [
+        "Iloilo",
+        "伊洛伊洛",
+        "怡朗"
+      ]
+    }
+  ]
+}

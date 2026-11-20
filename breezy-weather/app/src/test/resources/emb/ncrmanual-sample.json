@@ -1,0 +1,560 @@
+{
+  "ncr-manual-ateneo": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "ATENEO.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "ATENEO.TSP"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            47
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-doh": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "DOH.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "DOH.TSP"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            129
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-east-avenue": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "EAST AVENUE.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "EAST AVENUE.TSP"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            84
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-mandaluyong": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "MANDALUYONG.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "MANDALUYONG.TSP"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            52
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-marikina": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "MARIKINA.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "MARIKINA.TSP"
+                },
+                {
+                  "Value": "G2",
+                  "Name": "MARIKINA.PM10"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            },
+                            {
+                              "N": "G2",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            76,
+                            36
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-mmda": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "MMDA.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "MMDA.PM10"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            28
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-muntinlupa": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "MUNTINLUPA.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "MUNTINLUPA.PM10"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            14
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-npo": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "NPO.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "NPO.PM10"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            34
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "ncr-manual-valenzuela": {
+    "results": [
+      {
+        "result": {
+          "data": {
+            "descriptor": {
+              "Select": [
+                {
+                  "Value": "G0",
+                  "Name": "VALENZUELA.DATE"
+                },
+                {
+                  "Value": "G1",
+                  "Name": "VALENZUELA.TSP"
+                }
+              ]
+            },
+            "dsr": {
+              "Version": 2,
+              "MinorVersion": 1,
+              "DS": [
+                {
+                  "N": "DS0",
+                  "PH": [
+                    {
+                      "DM0": [
+                        {
+                          "S": [
+                            {
+                              "N": "G0",
+                              "T": 1,
+                              "DN": "D0"
+                            },
+                            {
+                              "N": "G1",
+                              "T": 4
+                            }
+                          ],
+                          "C": [
+                            0,
+                            80
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "IC": true,
+                  "HAD": true,
+                  "ValueDicts": {
+                    "D0": [
+                      "10/28/2026"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "key": "92487219-adb0-465a-b67f-3e4977860565",
+  "page": "https://air.emb.gov.ph/ambient-air-quality-monitoring/",
+  "tables": [
+    {
+      "recipe": "ncr-ateneo-gas",
+      "stationField": "",
+      "fixedStation": "Manila Observatory, Ateneo de Manila University",
+      "timeField": "Ateneo_Gas.Date_Time",
+      "columns": [
+        {
+          "field": "Ateneo_Gas.SO2AQI",
+          "label": "SO₂",
+          "unit": "AQI"
+        },
+        {
+          "field": "Ateneo_Gas.O3AQI",
+          "label": "O₃",
+          "unit": "AQI"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-namria-gas",
+      "stationField": "",
+      "fixedStation": "NAMRIA, Lawton Avenue, Fort Bonifacio",
+      "timeField": "NAMRIA_Gas.Date_Time",
+      "columns": [
+        {
+          "field": "NAMRIA_Gas.SO2AQI",
+          "label": "SO₂",
+          "unit": "AQI"
+        },
+        {
+          "field": "NAMRIA_Gas.O3AQI",
+          "label": "O₃",
+          "unit": "AQI"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-makati-gas",
+      "stationField": "",
+      "fixedStation": "Makati Gas",
+      "timeField": "Makati_Gas.Date_Time",
+      "columns": [
+        {
+          "field": "Makati_Gas.SO2AQI",
+          "label": "SO₂",
+          "unit": "AQI"
+        }
+      ]
+    },
+    {
+      "recipe": "ncr-paranaque-gas",
+      "stationField": "",
+      "fixedStation": "Parañaque Gas",
+      "timeField": "Paranaque_Gas.Date_Time",
+      "columns": [
+        {
+          "field": "Paranaque_Gas.SO2AQI",
+          "label": "SO₂",
+          "unit": "AQI"
+        },
+        {
+          "field": "Paranaque_Gas.O3AQI",
+          "label": "O₃",
+          "unit": "AQI"
+        }
+      ]
+    }
+  ],
+  "sites": [
+    {
+      "station": "Manila Observatory, Ateneo de Manila University",
+      "city": "Quezon City",
+      "latitude": 14.65,
+      "longitude": 121.05,
+      "aliases": [
+        "奎松市"
+      ]
+    },
+    {
+      "station": "NAMRIA, Lawton Avenue, Fort Bonifacio",
+      "city": "Taguig",
+      "latitude": 14.52,
+      "longitude": 121.05,
+      "aliases": []
+    },
+    {
+      "station": "Makati Gas",
+      "city": "Makati",
+      "latitude": 14.56,
+      "longitude": 121.03,
+      "aliases": []
+    },
+    {
+      "station": "Parañaque Gas",
+      "city": "Parañaque",
+      "latitude": 14.48,
+      "longitude": 121.02,
+      "aliases": []
+    }
+  ]
+}
