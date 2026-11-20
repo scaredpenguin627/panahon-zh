@@ -50,7 +50,7 @@ done
 cat > "$RUNNER_TEMP/release-notes.md" <<EOF
 简体中文 Android 正式版，基于 Breezy Weather。Pixel 10a 请选择 **arm64-v8a**；不确定设备架构时请选择 **universal**。其他架构可选择 armeabi-v7a、x86 或 x86_64。
 
-正式版包名为 \`org.panahon.zh.weather\`。首次使用正式版时，可在调试版导出设置和地点，再在正式版导入。
+正式版包名为 \`org.panahon.zh.weather\`。正式版可与调试版共存，两者分别保存数据。从调试版迁移时，请在正式版重新添加地点并设置偏好。
 
 发布证书 SHA-256：\`$fingerprint\`
 

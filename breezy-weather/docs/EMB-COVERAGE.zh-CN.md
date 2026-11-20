@@ -8,6 +8,8 @@
 - **宿务市**与同在宿务岛的 Talisay、Toledo 是不同城市。本次没有核实宿务市的官方实时读数。
 - **达沃市**有具名站点的年度汇总。应用显示年份、浓度和单位。地区办公室另行发布日通告，可直接查看通告中的统计区间。[地区监测页](https://r11.emb.gov.ph/air-quality-monitoring-data-2/) · [11 月 18 日官方简报](https://r11.emb.gov.ph/wp-content/uploads/2026/11/AMS-Station-11-18-2026.pdf)
 
+NCR 气体报表在核查时把 Quezon City（Ateneo）和 Taguig 的卡片标为维修中。Ateneo 的 SO₂ 子指数 326.35 对应 2026 年 3 月 12 日 01:00，为历史读数；判断当前空气状况时应查看其他有效观测。
+
 ## 逐区结果
 
 | 行政区 | 实测结果和应用覆盖 | 官方入口 |
