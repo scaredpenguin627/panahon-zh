@@ -68,6 +68,7 @@ import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.source.SelectableSource
 import org.breezyweather.domain.source.resourceName
 import org.breezyweather.sources.SourceManager
+import org.breezyweather.sources.emb.embAirQualitySource
 import org.breezyweather.ui.common.widgets.Material3ExpressiveCardListItem
 import org.breezyweather.ui.main.MainActivity
 import org.breezyweather.ui.settings.preference.composables.EditTextPreferenceView
@@ -372,7 +373,7 @@ fun SecondarySourcesPreference(
     val forecastSource = remember { mutableStateOf(location.forecastSource) }
     val isLocationDuplicate = remember { mutableStateOf(false) }
     val currentSource = remember { mutableStateOf(location.currentSource ?: "") }
-    val airQualitySource = remember { mutableStateOf(location.airQualitySource ?: "") }
+    val airQualitySource = remember { mutableStateOf(location.embAirQualitySource.orEmpty()) }
     val pollenSource = remember { mutableStateOf(location.pollenSource ?: "") }
     val minutelySource = remember { mutableStateOf(location.minutelySource ?: "") }
     val alertSource = remember { mutableStateOf(location.alertSource ?: "") }
@@ -610,33 +611,8 @@ fun SecondarySourcesPreference(
                     sourceList = buildMap {
                         put(
                             null,
-                            buildList {
-                                if (airQualitySource.value.isNotEmpty() &&
-                                    !compatibleAirQualitySources.values.any { l ->
-                                        l.any { it.id == airQualitySource.value }
-                                    }
-                                ) {
-                                    add(
-                                        SelectableSource(
-                                            airQualitySource.value,
-                                            stringResource(
-                                                R.string.settings_weather_source_unavailable,
-                                                airQualitySource.value
-                                            ),
-                                            false,
-                                            null
-                                        )
-                                    )
-                                }
-                                add(
-                                    SelectableSource(
-                                        "",
-                                        stringResource(R.string.settings_weather_source_none),
-                                        true,
-                                        null
-                                    )
-                                )
-                            }.toImmutableList()
+                            listOf(SelectableSource("", stringResource(R.string.settings_weather_source_none), true, null))
+                                .toImmutableList()
                         )
                         putAll(compatibleAirQualitySources)
                     }.toImmutableMap(),

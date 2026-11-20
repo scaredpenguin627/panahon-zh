@@ -25,7 +25,6 @@ import org.breezyweather.common.options.appearance.DailyTrendDisplay
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
 import org.breezyweather.ui.main.adapters.trend.daily.AbsDailyTrendAdapter
-import org.breezyweather.ui.main.adapters.trend.daily.DailyAirQualityAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyFeelsLikeAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyPrecipitationAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailySunshineAdapter
@@ -57,7 +56,6 @@ class DailyTrendAdapter(
         adapters = SettingsManager.getInstance(activity).dailyTrendDisplayList.map {
             when (it) {
                 DailyTrendDisplay.TAG_TEMPERATURE -> DailyTemperatureAdapter(activity, location, provider, tempUnit)
-                DailyTrendDisplay.TAG_AIR_QUALITY -> DailyAirQualityAdapter(activity, location)
                 DailyTrendDisplay.TAG_WIND -> DailyWindAdapter(activity, location)
                 DailyTrendDisplay.TAG_UV_INDEX -> DailyUVAdapter(activity, location)
                 DailyTrendDisplay.TAG_PRECIPITATION -> DailyPrecipitationAdapter(activity, location, provider)

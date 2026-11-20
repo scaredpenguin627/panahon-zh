@@ -43,6 +43,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.rx3.awaitFirstOrElse
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import org.breezyweather.sources.emb.embAirQualitySource
 import org.breezyweather.BreezyWeather
 import org.breezyweather.BuildConfig
 import org.breezyweather.R
@@ -537,7 +538,7 @@ class RefreshHelper @Inject constructor(
                 listOf(
                     Pair(forecastSource, SourceFeature.FORECAST),
                     Pair(currentSource, SourceFeature.CURRENT),
-                    Pair(airQualitySource, SourceFeature.AIR_QUALITY),
+                    Pair(embAirQualitySource, SourceFeature.AIR_QUALITY),
                     Pair(pollenSource, SourceFeature.POLLEN),
                     Pair(minutelySource, SourceFeature.MINUTELY),
                     Pair(alertSource, SourceFeature.ALERT),
@@ -569,7 +570,6 @@ class RefreshHelper @Inject constructor(
                 .toDateNoHour(location.timeZone)!!
             var forecastUpdateTime = base.forecastUpdateTime
             var currentUpdateTime = base.currentUpdateTime
-            var airQualityUpdateTime = base.airQualityUpdateTime
             var pollenUpdateTime = base.pollenUpdateTime
             var minutelyUpdateTime = base.minutelyUpdateTime
             var alertsUpdateTime = base.alertsUpdateTime
@@ -815,22 +815,6 @@ class RefreshHelper @Inject constructor(
                     } else {
                         null
                     }, // Fallback will be handled later
-                    airQuality = if (!location.airQualitySource.isNullOrEmpty()) {
-                        if (errors.any {
-                                it.feature == SourceFeature.AIR_QUALITY &&
-                                    it.source == location.airQualitySource!!
-                            }
-                        ) {
-                            null
-                        } else {
-                            sourceCalls.getOrElse(location.airQualitySource!!) { null }?.airQuality?.let {
-                                airQualityUpdateTime = Date()
-                                it
-                            }
-                        } ?: location.weather?.toAirQualityWrapperList(yesterdayMidnight)
-                    } else {
-                        null
-                    },
                     pollen = if (!location.pollenSource.isNullOrEmpty()) {
                         if (errors.any {
                                 it.feature == SourceFeature.POLLEN &&
@@ -896,7 +880,7 @@ class RefreshHelper @Inject constructor(
                 weatherWrapper,
                 location.weather,
                 yesterdayMidnight,
-                location.airQualitySource,
+                null, // EMB observations are kept outside the forecast cache.
                 location.pollenSource
             )
 
@@ -924,23 +908,6 @@ class RefreshHelper @Inject constructor(
                 location
             )
 
-            // Detect incompatible times between forecast hourly and air quality hourly
-            // No need to do this for pollen at the moment, as we don't store hourly pollen
-            if (weatherWrapperCompleted.airQuality?.hourlyForecast?.isNotEmpty() == true &&
-                hourlyForecast.isNotEmpty() &&
-                !hourlyForecast.any { hourly ->
-                    weatherWrapperCompleted.airQuality!!.hourlyForecast!!.contains(hourly.date)
-                }
-            ) {
-                errors.add(
-                    RefreshError(
-                        RefreshErrorType.INCOMPATIBLE_FORECAST_TIMES,
-                        location.airQualitySource,
-                        SourceFeature.AIR_QUALITY
-                    )
-                )
-            }
-
             // Example: 15:01 -> starts at 15:00, 15:59 -> starts at 15:00
             val currentHour = hourlyForecast.firstOrNull {
                 it.date.time >= System.currentTimeMillis() - 1.hours.inWholeMilliseconds
@@ -954,7 +921,7 @@ class RefreshHelper @Inject constructor(
                 base = base.copy(
                     forecastUpdateTime = forecastUpdateTime,
                     currentUpdateTime = currentUpdateTime,
-                    airQualityUpdateTime = airQualityUpdateTime,
+                    airQualityUpdateTime = null,
                     pollenUpdateTime = pollenUpdateTime,
                     minutelyUpdateTime = minutelyUpdateTime,
                     alertsUpdateTime = alertsUpdateTime,
@@ -970,15 +937,7 @@ class RefreshHelper @Inject constructor(
                         },
                     currentHour,
                     currentDay,
-                    weatherWrapperCompleted.airQuality?.current?.toValid()
-                        ?: if (isUpdateStillValid(base.currentUpdateTime, wait = 30)) {
-                            // Allow to re-use current data if it was successfully refreshed less than 30 min ago
-                            location.weather?.current?.airQuality
-                        } else {
-                            null
-                        } ?: weatherWrapperCompleted.airQuality?.hourlyForecast?.entries?.firstOrNull {
-                        it.key.time >= System.currentTimeMillis() - 1.hours.inWholeMilliseconds
-                    }?.value, // Workaround for incompatibility with hourly forecast times
+                    null, // No model or previous forecast can supply station air quality.
                     location
                 ),
                 dailyForecast = dailyForecast,

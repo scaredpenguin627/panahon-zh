@@ -17,9 +17,9 @@
 
 ## 空气质量
 
-在“编辑此位置 → 天气数据源 → 空气质量”选择包含 **DENR-EMB** 的来源并保存，即可同时查看当地官方站点和 Open-Meteo 模型。已有地点可分别更改。选择单独的 Open-Meteo 时，首页仅显示模型空气质量。
+空气质量只采用菲律宾环境管理局（DENR-EMB）的官方站点数据。在“编辑此位置 → 天气数据源 → 空气质量”可以选择 EMB 或关闭空气质量。升级时，菲律宾已启用空气质量的地点自动使用 EMB。
 
-首页的 EMB 站点读数标明站名、地点、数据时间和官方来源。报表只给出统一更新时间时，界面标为“报表更新”。菲律宾 AQI 子指数与以 µg/m³ 等单位发布的浓度分开显示。缺少本地站点、报表缺测或暂时断网时，界面会说明状态；其他空气质量提供方的数据另标来源。
+马尼拉等有已核实站点的地点显示站名、污染物、指标和时间。报表只给出统一更新时间时，界面标为“报表更新”。PM2.5、PM10 子指数沿用菲律宾口径，官方浓度保留其公布单位。长滩岛附近没有已核实站点时，首页显示覆盖情况。断网时，已有的官方缓存会注明数据时间。
 
 各地区实际可读的报表、站点、污染物及时间见[全国 EMB 覆盖清单](breezy-weather/docs/EMB-COVERAGE.zh-CN.md)。官方入口包括 [NCR 监测站](https://ncr.emb.gov.ph/realtimeairmonitoring/)、[环境空气监测](https://air.emb.gov.ph/ambient-air-quality-monitoring/)和[全国区域目录](https://air.emb.gov.ph/national-air-quality-data/)。天气数据见 [PAGASA PANaHON](https://panahon.gov.ph/)。应用访问的位置及服务见[隐私说明](breezy-weather/PRIVACY.md)。
 

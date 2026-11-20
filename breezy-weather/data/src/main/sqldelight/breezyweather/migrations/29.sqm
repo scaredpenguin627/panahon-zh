@@ -1,0 +1,10 @@
+-- Older versions stored modeled concentrations even for the combined DENR-EMB source.
+-- Official station readings have a separate cache and retain their original units.
+UPDATE weathers SET pm25 = NULL, pm10 = NULL, so2 = NULL, no2 = NULL, o3 = NULL, co = NULL,
+    air_quality_update_time = NULL;
+UPDATE dailys SET pm25 = NULL, pm10 = NULL, so2 = NULL, no2 = NULL, o3 = NULL, co = NULL;
+UPDATE hourlys SET pm25 = NULL, pm10 = NULL, so2 = NULL, no2 = NULL, o3 = NULL, co = NULL;
+
+UPDATE locations
+SET air_quality_source = CASE WHEN upper(country_code) = 'PH' THEN 'denr_emb' ELSE '' END
+WHERE air_quality_source IS NOT NULL AND air_quality_source != '';

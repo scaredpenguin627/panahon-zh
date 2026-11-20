@@ -123,7 +123,7 @@ object WeatherMapper {
                 no2,
                 o3,
                 co
-            ),
+            ).takeIf { it.isValid },
             relativeHumidity,
             dewPoint,
             pressure,
@@ -334,7 +334,7 @@ object WeatherMapper {
             no2,
             o3,
             co
-        ),
+        ).takeIf { it.isValid },
         Pollen(
             alder = alder,
             ash = ash,
@@ -460,7 +460,7 @@ object WeatherMapper {
             no2,
             o3,
             co
-        ),
+        ).takeIf { it.isValid },
         UV(uvIndex),
         relativeHumidity,
         dewPoint,

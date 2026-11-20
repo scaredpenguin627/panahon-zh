@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="traveller_model_aqi">Model AQI</string>
     <string name="traveller_model_label">Open-Meteo model</string>
     <string name="traveller_emb_none">EMB · No verified station nearby</string>
     <string name="traveller_emb_show">Station details</string>
     <string name="traveller_emb_hide">Hide station details</string>
-    <string name="traveller_emb_scale">EMB reports Philippine pollutant sub-indices. The model chart uses the Breezy Weather index.</string>
     <string name="traveller_daily_period">PAGASA PANaHON · All-day outlook, high and low</string>
     <string name="traveller_hourly_period">PAGASA PANaHON · Hourly outlook</string>
     <string name="traveller_scope_names">PAGASA alerts · %1$s and nationwide bulletins</string>

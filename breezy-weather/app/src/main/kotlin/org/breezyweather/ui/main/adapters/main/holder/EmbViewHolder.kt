@@ -16,7 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
-import org.breezyweather.domain.weather.model.validAirQuality
+import org.breezyweather.sources.emb.EmbMeasurement
 import org.breezyweather.sources.emb.EmbLocalReport
 import org.breezyweather.sources.emb.reportAgeMillis
 import org.breezyweather.sources.emb.hasRecentMonitoring
@@ -32,7 +32,6 @@ class EmbViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     private val summary: MaterialButton = itemView.findViewById(R.id.emb_summary)
     private val details: LinearLayout = itemView.findViewById(R.id.emb_details)
     private val readings: TextView = itemView.findViewById(R.id.emb_readings)
-    private val model: TextView = itemView.findViewById(R.id.emb_model_source)
     private val links: LinearLayout = itemView.findViewById(R.id.emb_official_pages)
     private var update: Job? = null
 
@@ -55,14 +54,8 @@ class EmbViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         }
         summary.setOnClickListener { setExpanded(!details.isVisible) }
         summary.setText(R.string.emb_loading)
+        summary.maxLines = Int.MAX_VALUE
         setExpanded(false)
-        val updated = location.weather?.base?.airQualityUpdateTime
-        model.text = when {
-            location.weather?.validAirQuality == null -> context.getString(R.string.emb_model_missing)
-            updated == null -> context.getString(R.string.emb_model)
-            else -> context.getString(R.string.emb_model_updated, DateFormat.getDateTimeInstance().format(updated))
-        }
-        model.text = listOf(model.text, context.getString(R.string.traveller_emb_scale)).joinToString("\n")
         readings.setText(R.string.emb_loading)
         links.removeAllViews()
         update = host.lifecycleScope.launch {
@@ -78,25 +71,32 @@ class EmbViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 return@launch
             }
             val now = System.currentTimeMillis()
-            // Only the latest local automated reading belongs in the collapsed summary.
-            val station = reports.asSequence().filter { it.feed.kind == "station" }.flatMap { report ->
-                report.snapshot?.stations.orEmpty().asSequence().map { site -> report to site }
-            }.filter { (report, site) -> site.readings.isNotEmpty() && reportAgeMillis(site.observed ?: report.snapshot?.reported, now) != null }
-                .maxByOrNull { (report, site) -> site.observed ?: report.snapshot?.reported.orEmpty() }
+            // Prefer automated stations. In districts with only sampling or annual reports,
+            // show the official record with its period rather than implying a live observation.
+            val candidates = reports.flatMap { report ->
+                report.snapshot?.stations.orEmpty().filter { it.readings.isNotEmpty() }.map { report to it }
+            }
+            val station = candidates.filter { (report, site) ->
+                report.feed.kind == "station" && reportAgeMillis(site.observed ?: report.snapshot?.reported, now) != null
+            }.maxByOrNull { (report, site) -> site.observed ?: report.snapshot?.reported.orEmpty() }
+                ?: candidates.filter { it.first.feed.kind != "station" }
+                    .maxByOrNull { (report, site) -> site.observed ?: report.snapshot?.reported.orEmpty() }
             summary.text = when {
                 station != null -> {
                     val (report, site) = station
-                    val observed = site.observed
-                    val time = observed ?: report.snapshot?.reported.orEmpty()
                     val name = report.feed.sites.find { it.station == site.name }?.displayName ?: site.name
-                    val reading = site.readings.firstOrNull { it.name == "PM2.5" } ?: site.readings.first()
-                    val value = NumberFormat.getNumberInstance().format(reading.value)
-                    val measure = if (reading.unit == "AQI") context.getString(R.string.emb_sub_index, reading.name, value)
-                        else listOf(reading.name, value, reading.unit).joinToString(" ")
-                    listOfNotNull("EMB", name, measure,
-                        context.getString(if (observed == null) R.string.emb_report_time else R.string.emb_station_time, time),
-                        ageLabel(time, now),
-                        context.getString(R.string.emb_cached).takeIf { report.cachedOnError }).joinToString(" · ")
+                    val measures = site.readings.joinToString(" · ") { formatMeasurement(it) }
+                    val time = site.observed ?: report.snapshot?.reported
+                    val timeLabel = when {
+                        site.observed == null -> R.string.emb_report_time
+                        report.feed.kind == "annual" -> R.string.emb_year
+                        else -> R.string.emb_station_time
+                    }
+                    val stamp = time?.let { context.getString(timeLabel, it) }
+                        ?: report.snapshot?.let { context.getString(R.string.emb_fetched, DateFormat.getDateTimeInstance().format(Date(it.fetchedAt))) }
+                    val kind = kindLabel(report)
+                    listOfNotNull(kind, name, measures, stamp, time?.let { ageLabel(it, now) },
+                        context.getString(R.string.emb_cached).takeIf { report.cachedOnError }).joinToString("\n")
                 }
                 reports.isEmpty() -> context.getString(R.string.traveller_emb_none)
                 reports.all { it.unavailable } -> "EMB · " + context.getString(R.string.emb_error)
@@ -137,15 +137,24 @@ class EmbViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         return if (days < 1) null else context.resources.getQuantityString(R.plurals.traveller_days_ago, days, days)
     }
 
+    private fun formatMeasurement(measurement: EmbMeasurement): String {
+        val value = NumberFormat.getNumberInstance().format(measurement.value)
+        return if (measurement.unit == "AQI") context.getString(R.string.emb_sub_index, measurement.name, value)
+        else listOf(measurement.name, value, measurement.unit).joinToString(" ")
+    }
+
+    private fun kindLabel(report: EmbLocalReport): String? = when (report.feed.kind) {
+        "manual" -> context.getString(R.string.emb_manual)
+        "annual" -> context.getString(R.string.emb_annual)
+        "historical" -> context.getString(R.string.emb_historical)
+        else -> null
+    }
+
     private fun format(report: EmbLocalReport): String {
         val snapshot = report.snapshot ?: return context.getString(R.string.emb_error)
         if (snapshot.stations.isEmpty()) return context.getString(R.string.emb_missing)
         val lines = mutableListOf<String>()
-        when (report.feed.kind) {
-            "manual" -> lines += context.getString(R.string.emb_manual)
-            "annual" -> lines += context.getString(R.string.emb_annual)
-            "historical" -> lines += context.getString(R.string.emb_historical)
-        }
+        kindLabel(report)?.let { lines += it }
         if (report.cachedOnError) lines += context.getString(R.string.emb_cached)
         val now = System.currentTimeMillis()
         fun clock(label: Int, time: String): String {
@@ -153,16 +162,13 @@ class EmbViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             return listOfNotNull(text, ageLabel(time, now)).joinToString(" · ")
         }
         snapshot.reported?.let { lines += clock(R.string.emb_report_time, it) }
-        val number = NumberFormat.getNumberInstance()
         for (site in snapshot.stations) {
             val station = report.feed.sites.find { it.station == site.name }
             val place = listOfNotNull(station?.displayName ?: site.name, station?.city, site.address).distinct()
             lines += place.joinToString(" · ")
             site.observed?.let { lines += clock(if (report.feed.kind == "annual") R.string.emb_year else R.string.emb_station_time, it) }
             for (measurement in site.readings) {
-                val value = number.format(measurement.value)
-                val text = if (measurement.unit == "AQI") context.getString(R.string.emb_sub_index, measurement.name, value)
-                    else "${measurement.name} $value ${measurement.unit}"
+                val text = formatMeasurement(measurement)
                 lines += listOfNotNull(text, measurement.rating).joinToString(" · ")
             }
         }

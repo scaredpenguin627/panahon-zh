@@ -25,7 +25,6 @@ import org.breezyweather.common.options.appearance.HourlyTrendDisplay
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
 import org.breezyweather.ui.main.adapters.trend.hourly.AbsHourlyTrendAdapter
-import org.breezyweather.ui.main.adapters.trend.hourly.HourlyAirQualityAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyCloudCoverAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyFeelsLikeAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyHumidityAdapter
@@ -61,7 +60,6 @@ class HourlyTrendAdapter(
         adapters = SettingsManager.getInstance(activity).hourlyTrendDisplayList.map {
             when (it) {
                 HourlyTrendDisplay.TAG_TEMPERATURE -> HourlyTemperatureAdapter(activity, location, provider, tempUnit)
-                HourlyTrendDisplay.TAG_AIR_QUALITY -> HourlyAirQualityAdapter(activity, location)
                 HourlyTrendDisplay.TAG_WIND -> HourlyWindAdapter(activity, location)
                 HourlyTrendDisplay.TAG_UV_INDEX -> HourlyUVAdapter(activity, location)
                 HourlyTrendDisplay.TAG_PRECIPITATION -> HourlyPrecipitationAdapter(activity, location, provider)

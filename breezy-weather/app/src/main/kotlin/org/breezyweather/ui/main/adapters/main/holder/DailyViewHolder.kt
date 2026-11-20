@@ -17,12 +17,10 @@
 package org.breezyweather.ui.main.adapters.main.holder
 
 import android.annotation.SuppressLint
-import org.breezyweather.ui.main.adapters.trend.daily.DailyAirQualityAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyWindAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyTemperatureAdapter
 import org.breezyweather.ui.main.adapters.trend.daily.DailyFeelsLikeAdapter
 import org.breezyweather.common.extensions.getFormattedDate
-import org.breezyweather.sources.emb.EmbAirQualityService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -97,7 +95,6 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         } else null
         fun showSubtitle(index: Int) {
             val attribution = when (trendAdapter.adapters.getOrNull(index)) {
-                is DailyAirQualityAdapter -> if (location.airQualitySource == EmbAirQualityService.ID) R.string.traveller_model_label else null
                 is DailyWindAdapter -> if (location.forecastSource == "panahon") R.string.traveller_model_label else null
                 is DailyTemperatureAdapter, is DailyFeelsLikeAdapter -> if (location.forecastSource == "panahon") R.string.traveller_daily_period else null
                 else -> null

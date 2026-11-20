@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="emb_title">Station air quality · DENR-EMB</string>
+    <string name="emb_title">Air quality · DENR-EMB stations</string>
     <string name="emb_loading">Checking official station reports…</string>
     <string name="emb_uncovered">No verified EMB station readings for this location.</string>
     <string name="emb_missing">No readings for this location in the latest report.</string>
@@ -11,15 +11,12 @@
     <string name="emb_old">More than 24 hours old</string>
     <string name="emb_fetched">Retrieved: %1$s</string>
     <string name="emb_sub_index">%1$s sub-index %2$s</string>
-    <string name="emb_source_name">DENR-EMB stations + Open-Meteo model</string>
-    <string name="emb_model_title">Air quality · Open-Meteo</string>
-    <string name="emb_model">The air quality chart uses Open-Meteo model data.</string>
-    <string name="emb_model_updated">Open-Meteo model data last retrieved: %1$s</string>
-    <string name="emb_model_missing">Open-Meteo model data is currently unavailable.</string>
+    <string name="emb_source_name">DENR-EMB official stations</string>
     <string name="emb_official_link">Official monitoring report</string>
     <string name="emb_manual">Manual sampling</string>
     <string name="emb_annual">Annual monitoring summary</string>
     <string name="emb_year">Year: %1$s</string>
     <string name="emb_historical">Historical monitoring record</string>
     <string name="emb_no_recent">No verified current station readings for this location.</string>
+    <string name="emb_scale">Philippine AQI sub-indices are reported separately for each pollutant.</string>
 </resources>

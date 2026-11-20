@@ -37,7 +37,6 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceContinent
 import breezyweather.domain.source.SourceFeature
-import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.DailyCloudCover
 import breezyweather.domain.weather.model.DailyDewPoint
 import breezyweather.domain.weather.model.DailyPressure
@@ -50,7 +49,6 @@ import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.WeatherCode
-import breezyweather.domain.weather.wrappers.AirQualityWrapper
 import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
 import breezyweather.domain.weather.wrappers.HourlyWrapper
@@ -91,7 +89,6 @@ import org.breezyweather.ui.settings.preference.composables.PreferenceView
 import org.breezyweather.ui.settings.preference.composables.SwitchPreferenceView
 import org.breezyweather.unit.distance.Distance.Companion.meters
 import org.breezyweather.unit.pollen.PollenConcentration.Companion.perCubicMeter
-import org.breezyweather.unit.pollutant.PollutantConcentration.Companion.microgramsPerCubicMeter
 import org.breezyweather.unit.precipitation.Precipitation.Companion.centimeters
 import org.breezyweather.unit.precipitation.Precipitation.Companion.millimeters
 import org.breezyweather.unit.pressure.Pressure.Companion.hectopascals
@@ -143,12 +140,11 @@ class OpenMeteoService @Inject constructor(
         }
 
     private val weatherAttribution = "Open-Meteo (CC BY 4.0)"
-    private val airQualityAttribution = "Open-Meteo (CC BY 4.0) • CAMS ENSEMBLE data provider"
+    private val pollenAttribution = "Open-Meteo (CC BY 4.0) • CAMS ENSEMBLE data provider"
     override val supportedFeatures = mapOf(
         SourceFeature.FORECAST to weatherAttribution,
         SourceFeature.CURRENT to weatherAttribution,
-        SourceFeature.AIR_QUALITY to airQualityAttribution,
-        SourceFeature.POLLEN to airQualityAttribution,
+        SourceFeature.POLLEN to pollenAttribution,
         SourceFeature.MINUTELY to weatherAttribution
     )
     override val attributionLinks = mapOf(
@@ -290,47 +286,15 @@ class OpenMeteoService @Inject constructor(
             Observable.just(OpenMeteoWeatherResult())
         }
 
-        val aqi = if (SourceFeature.AIR_QUALITY in requestedFeatures ||
-            SourceFeature.POLLEN in requestedFeatures
-        ) {
-            val airQualityHourly = if (SourceFeature.AIR_QUALITY in requestedFeatures) {
-                arrayOf(
-                    "pm10",
-                    "pm2_5",
-                    "carbon_monoxide",
-                    "nitrogen_dioxide",
-                    "sulphur_dioxide",
-                    "ozone"
-                )
-            } else {
-                arrayOf()
-            }
-            val pollenHourly = if (SourceFeature.POLLEN in requestedFeatures) {
-                arrayOf(
-                    "alder_pollen",
-                    "birch_pollen",
-                    "grass_pollen",
-                    "mugwort_pollen",
-                    "olive_pollen",
-                    "ragweed_pollen"
-                )
-            } else {
-                arrayOf()
-            }
-            val airQualityPollenHourly = airQualityHourly + pollenHourly
+        val pollen = if (SourceFeature.POLLEN in requestedFeatures) {
             mAirQualityApi.getAirQuality(
                 location.latitude,
                 location.longitude,
-                airQualityPollenHourly.joinToString(","),
+                "alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen",
                 forecastDays = 7,
                 pastDays = 1
             ).onErrorResumeNext {
-                if (SourceFeature.AIR_QUALITY in requestedFeatures) {
-                    failedFeatures[SourceFeature.AIR_QUALITY] = it
-                }
-                if (SourceFeature.POLLEN in requestedFeatures) {
-                    failedFeatures[SourceFeature.POLLEN] = it
-                }
+                failedFeatures[SourceFeature.POLLEN] = it
                 Observable.just(OpenMeteoAirQualityResult())
             }
         } else {
@@ -338,7 +302,7 @@ class OpenMeteoService @Inject constructor(
         }
         return Observable.zip(
             weather,
-            aqi
+            pollen
         ) { weatherResult: OpenMeteoWeatherResult, airQualityResult: OpenMeteoAirQualityResult ->
             WeatherWrapper(
                 dailyForecast = if (SourceFeature.FORECAST in requestedFeatures) {
@@ -353,11 +317,6 @@ class OpenMeteoService @Inject constructor(
                 },
                 current = if (SourceFeature.CURRENT in requestedFeatures) {
                     getCurrent(weatherResult.current, context)
-                } else {
-                    null
-                },
-                airQuality = if (SourceFeature.AIR_QUALITY in requestedFeatures) {
-                    getAirQuality(airQualityResult.hourly)
                 } else {
                     null
                 },
@@ -493,27 +452,6 @@ class OpenMeteoService @Inject constructor(
             )
         }
         return hourlyList
-    }
-
-    private fun getAirQuality(
-        hourlyAirQualityResult: OpenMeteoAirQualityHourly?,
-    ): AirQualityWrapper? {
-        if (hourlyAirQualityResult == null) return null
-
-        val airQualityHourly = mutableMapOf<Date, AirQuality>()
-        for (i in hourlyAirQualityResult.time.indices) {
-            airQualityHourly[hourlyAirQualityResult.time[i].seconds.inWholeMilliseconds.toDate()] = AirQuality(
-                pM25 = hourlyAirQualityResult.pm25?.getOrNull(i)?.microgramsPerCubicMeter,
-                pM10 = hourlyAirQualityResult.pm10?.getOrNull(i)?.microgramsPerCubicMeter,
-                sO2 = hourlyAirQualityResult.sulphurDioxide?.getOrNull(i)?.microgramsPerCubicMeter,
-                nO2 = hourlyAirQualityResult.nitrogenDioxide?.getOrNull(i)?.microgramsPerCubicMeter,
-                o3 = hourlyAirQualityResult.ozone?.getOrNull(i)?.microgramsPerCubicMeter,
-                cO = hourlyAirQualityResult.carbonMonoxide?.getOrNull(i)?.microgramsPerCubicMeter
-            )
-        }
-        return AirQualityWrapper(
-            hourlyForecast = airQualityHourly
-        )
     }
 
     private fun getPollen(

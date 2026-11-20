@@ -27,7 +27,6 @@ enum class HourlyTrendDisplay(
 ) : BaseEnum {
 
     TAG_TEMPERATURE("temperature", R.string.conditions),
-    TAG_AIR_QUALITY("air_quality", R.string.air_quality),
     TAG_WIND("wind", R.string.wind),
     TAG_UV_INDEX("uv_index", R.string.uv_index),
     TAG_PRECIPITATION("precipitation", R.string.precipitation),
@@ -48,7 +47,7 @@ enum class HourlyTrendDisplay(
             try {
                 value.split("&").toTypedArray().mapNotNull { cardId ->
                     entries.firstOrNull { it.id == cardId }
-                }
+                }.ifEmpty { listOf(TAG_TEMPERATURE) }
             } catch (e: Exception) {
                 entries.toMutableList()
             }

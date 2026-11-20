@@ -1,6 +1,6 @@
-本项目是 Breezy Weather 的社区衍生版本。选择 PAGASA PANaHON 后，应用将所选地点的经纬度发送至 https://api.mobile.panahon.gov.ph/，用于查询该位置的预报和预警。选用 PANaHON 当前天气或预报时，应用还会向 Open-Meteo（api.open-meteo.com）发送地点坐标，以获取风、湿度和露点的补充模型数据；PAGASA 官网的自动站观测表在手机上按距离和观测时间匹配。字体随安装包提供，可离线使用。
+本项目是 Breezy Weather 的社区衍生版本。选择 PAGASA PANaHON 后，应用将所选地点的经纬度发送至 https://api.mobile.panahon.gov.ph/，用于查询该位置的预报和预警。选用 PANaHON 当前天气或预报时，应用还会向 Open-Meteo（api.open-meteo.com）发送地点坐标，以获取风、湿度、露点和海平面气压的补充模型数据；PAGASA 官网的自动站观测表在手机上按距离和观测时间匹配。字体随安装包提供，可离线使用。
 
-选择 DENR-EMB 空气质量源后，后台天气刷新和首页监测卡片均可读取官方站点报表。为获取空气质量浓度模型，刷新时还会把所选地点坐标发送给 Open-Meteo（air-quality-api.open-meteo.com）。查询官方报表时，应用在手机上匹配地点与站点。它从菲律宾环境管理局的区域门户或微软 Power BI（app.powerbi.com 及报表使用的 analysis.windows.net 集群）读取公开报表。吕宋中部（Region III）的监测接口使用 embr3-onlinesystems.cloud，会收到所选站点的标识；北棉兰老（Region X）的监测接口使用 api.bpit-inc.com，应用读取报表后在本地筛选站点。最近一次成功取得的读数保存在本机。启用应用内更新检查后，应用向 GitHub 查询本仓库的正式版本。
+选择 DENR-EMB 空气质量源后，后台天气刷新和首页监测卡片均可读取官方站点报表。空气质量仅使用 EMB 官方监测。查询官方报表时，应用在手机上匹配地点与站点。它从菲律宾环境管理局的区域门户或微软 Power BI（app.powerbi.com 及报表使用的 analysis.windows.net 集群）读取公开报表。吕宋中部（Region III）的监测接口使用 embr3-onlinesystems.cloud，会收到所选站点的标识；北棉兰老（Region X）的监测接口使用 api.bpit-inc.com，应用读取报表后在本地筛选站点。最近一次成功取得的读数保存在本机。启用应用内更新检查后，应用向 GitHub 查询本仓库的正式版本。
 
 Breezy Weather doesn’t collect any personal data.
 

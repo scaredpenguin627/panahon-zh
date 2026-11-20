@@ -22,6 +22,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.breezyweather.common.options.appearance.DailyTrendDisplay
+import org.breezyweather.common.options.appearance.HourlyTrendDisplay
 import org.junit.jupiter.api.Test
 
 class DailyTrendDisplayTest {
@@ -30,26 +31,30 @@ class DailyTrendDisplayTest {
         val value = "temperature&air_quality&wind&uv_index&precipitation&sunshine&feels_like"
         val list = DailyTrendDisplay.toDailyTrendDisplayList(value)
         list[0] shouldBe DailyTrendDisplay.TAG_TEMPERATURE
-        list[1] shouldBe DailyTrendDisplay.TAG_AIR_QUALITY
-        list[2] shouldBe DailyTrendDisplay.TAG_WIND
-        list[3] shouldBe DailyTrendDisplay.TAG_UV_INDEX
-        list[4] shouldBe DailyTrendDisplay.TAG_PRECIPITATION
-        list[5] shouldBe DailyTrendDisplay.TAG_SUNSHINE
-        list[6] shouldBe DailyTrendDisplay.TAG_FEELS_LIKE
+        list[1] shouldBe DailyTrendDisplay.TAG_WIND
+        list[2] shouldBe DailyTrendDisplay.TAG_UV_INDEX
+        list[3] shouldBe DailyTrendDisplay.TAG_PRECIPITATION
+        list[4] shouldBe DailyTrendDisplay.TAG_SUNSHINE
+        list[5] shouldBe DailyTrendDisplay.TAG_FEELS_LIKE
+    }
+
+    @Test
+    fun retiredPollutionOnlyPreferencesStillHaveAWeatherTab() {
+        DailyTrendDisplay.toDailyTrendDisplayList("air_quality") shouldBe listOf(DailyTrendDisplay.TAG_TEMPERATURE)
+        HourlyTrendDisplay.toHourlyTrendDisplayList("air_quality") shouldBe listOf(HourlyTrendDisplay.TAG_TEMPERATURE)
     }
 
     @Test
     fun toValue() = runTest {
         val list = arrayListOf(
             DailyTrendDisplay.TAG_TEMPERATURE,
-            DailyTrendDisplay.TAG_AIR_QUALITY,
             DailyTrendDisplay.TAG_WIND,
             DailyTrendDisplay.TAG_UV_INDEX,
             DailyTrendDisplay.TAG_PRECIPITATION,
             DailyTrendDisplay.TAG_SUNSHINE,
             DailyTrendDisplay.TAG_FEELS_LIKE
         )
-        val value = "temperature&air_quality&wind&uv_index&precipitation&sunshine&feels_like"
+        val value = "temperature&wind&uv_index&precipitation&sunshine&feels_like"
         DailyTrendDisplay.toValue(list) shouldBe value
     }
 
@@ -60,14 +65,13 @@ class DailyTrendDisplayTest {
         every { context.getString(org.breezyweather.unit.R.string.locale_separator) } returns ", "
         val list = arrayListOf(
             DailyTrendDisplay.TAG_TEMPERATURE,
-            DailyTrendDisplay.TAG_AIR_QUALITY,
             DailyTrendDisplay.TAG_WIND,
             DailyTrendDisplay.TAG_UV_INDEX,
             DailyTrendDisplay.TAG_PRECIPITATION,
             DailyTrendDisplay.TAG_SUNSHINE,
             DailyTrendDisplay.TAG_FEELS_LIKE
         )
-        val value = "Name, Name, Name, Name, Name, Name, Name"
+        val value = "Name, Name, Name, Name, Name, Name"
         DailyTrendDisplay.getSummary(context, list) shouldBe value
     }
 }

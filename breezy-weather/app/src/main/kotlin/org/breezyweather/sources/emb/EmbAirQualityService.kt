@@ -13,24 +13,18 @@ import org.breezyweather.R
 import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.NonFreeNetSource
 import org.breezyweather.common.source.WeatherSource
-import org.breezyweather.sources.openmeteo.OpenMeteoService
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EmbAirQualityService @Inject constructor(
     @ApplicationContext private val context: Context,
     private val stations: EmbRepository,
-    private val model: OpenMeteoService,
 ) : HttpSource(), WeatherSource, NonFreeNetSource {
     override val id = ID
     override val name get() = context.getString(R.string.emb_source_name)
     override val continent = SourceContinent.ASIA
     override val privacyPolicyUrl = BuildConfig.PRIVACY_POLICY_LINK
-    override val supportedFeatures = mapOf(
-        SourceFeature.AIR_QUALITY to "DENR-EMB • ${model.supportedFeatures.getValue(SourceFeature.AIR_QUALITY)}"
-    )
-    override val attributionLinks = model.attributionLinks +
-        ("DENR-EMB" to "https://air.emb.gov.ph/ambient-air-quality-monitoring/")
+    override val supportedFeatures = mapOf(SourceFeature.AIR_QUALITY to "DENR-EMB")
+    override val attributionLinks = mapOf("DENR-EMB" to "https://air.emb.gov.ph/ambient-air-quality-monitoring/")
 
     override fun isFeatureSupportedForLocation(location: Location, feature: SourceFeature) =
         feature == SourceFeature.AIR_QUALITY && location.countryCode.equals("PH", ignoreCase = true)
@@ -43,19 +37,17 @@ class EmbAirQualityService @Inject constructor(
         location: Location,
         requestedFeatures: List<SourceFeature>,
     ): Observable<WeatherWrapper> {
-        if (SourceFeature.AIR_QUALITY !in requestedFeatures) return Observable.just(WeatherWrapper())
-        // Station sub-indices have their own display and cache. The shared weather model only accepts concentrations.
-        val stationReports = rxSingle { stations.forLocation(location) }
-            .timeout(10, TimeUnit.SECONDS)
-            .onErrorReturn { emptyList() }
-            .toObservable()
-        val modelWeather = Observable.defer {
-            model.requestWeather(context, location, listOf(SourceFeature.AIR_QUALITY))
-        }.timeout(10, TimeUnit.SECONDS).onErrorReturn { WeatherWrapper(failedFeatures = mapOf(SourceFeature.AIR_QUALITY to it)) }
-        return Observable.zip(stationReports, modelWeather) { _, concentrations -> concentrations }
+        if (SourceFeature.AIR_QUALITY !in requestedFeatures || !location.countryCode.equals("PH", ignoreCase = true)) {
+            return Observable.just(WeatherWrapper())
+        }
+        // EMB observations retain their station, sampling period and original unit in the repository.
+        return rxSingle { stations.forLocation(location) }.map { WeatherWrapper() }.toObservable()
     }
 
     companion object {
         const val ID = "denr_emb"
     }
 }
+
+internal val Location.embAirQualitySource: String?
+    get() = airQualitySource?.takeIf { it == EmbAirQualityService.ID && countryCode.equals("PH", ignoreCase = true) }

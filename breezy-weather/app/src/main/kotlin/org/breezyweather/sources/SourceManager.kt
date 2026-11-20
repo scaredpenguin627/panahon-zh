@@ -82,6 +82,7 @@ import org.breezyweather.sources.dmi.DmiService
 import org.breezyweather.sources.eccc.EcccService
 import org.breezyweather.sources.ekuk.EkukService
 import org.breezyweather.sources.emb.EmbAirQualityService
+import org.breezyweather.sources.emb.embAirQualitySource
 import org.breezyweather.sources.epdhk.EpdHkService
 import org.breezyweather.sources.fmi.FmiService
 import org.breezyweather.sources.fpas.FpasService
@@ -421,11 +422,12 @@ class SourceManager @Inject constructor(
             listOf(
                 Pair(forecastSource, SourceFeature.FORECAST),
                 Pair(currentSource, SourceFeature.CURRENT),
-                Pair(airQualitySource, SourceFeature.AIR_QUALITY),
+                Pair(embAirQualitySource, SourceFeature.AIR_QUALITY),
                 Pair(pollenSource, SourceFeature.POLLEN),
                 Pair(minutelySource, SourceFeature.MINUTELY),
                 Pair(alertSource, SourceFeature.ALERT),
             ).forEach {
+                if (it.second == SourceFeature.AIR_QUALITY && it.first == null) return@forEach
                 val source = getWeatherSource(it.first ?: location.forecastSource)
                 if (source is PreferencesParametersSource &&
                     source.hasPreferencesScreen(location, listOf(it.second)) &&
@@ -452,6 +454,10 @@ class SourceManager @Inject constructor(
         // Optional id of the source that will always be taken, even if not matching the criteria
         sourceException: String? = null,
     ): ImmutableList<FeatureSource> = getFeatureSources()
+        .filter { source ->
+            feature != SourceFeature.AIR_QUALITY || (source.id == EmbAirQualityService.ID &&
+                (location == null || source.isFeatureSupportedForLocation(location, feature)))
+        }
         .filter {
             it.id != "naturalearth" && (
                 it.id == sourceException ||
@@ -490,7 +496,7 @@ class SourceManager @Inject constructor(
     }
 
     /**
-     * For air quality, default source is Open-Meteo (except India due to different times from the preselected IMD forecast)
+     * For air quality, only official EMB reports are supported.
      * For pollen:
      * - Open-Meteo in Europe
      * - AccuWeather in USA/Canada
@@ -503,14 +509,7 @@ class SourceManager @Inject constructor(
         feature: SourceFeature,
     ): FeatureSource? {
         return when (feature) {
-            SourceFeature.AIR_QUALITY -> if (!location.countryCode.equals("IN", ignoreCase = true) ||
-                BuildConfig.FLAVOR == "freenet"
-            ) {
-                getWeatherSource("openmeteo")
-            } else {
-                null
-            }
-
+            SourceFeature.AIR_QUALITY -> null // Only EMB can be selected for supported locations.
             SourceFeature.POLLEN -> getWeatherSource("openmeteo")?.let {
                 if (it.isFeatureSupportedForLocation(location, feature)) it else null
             } ?: getWeatherSource("accu")?.takeIf {

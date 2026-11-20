@@ -116,14 +116,6 @@ object Migrations {
                                             } else {
                                                 it.currentSource
                                             },
-                                            airQualitySource = if (it.airQualitySource.isNullOrEmpty() &&
-                                                SourceFeature.AIR_QUALITY in source.supportedFeatures &&
-                                                source.isFeatureSupportedForLocation(it, SourceFeature.AIR_QUALITY)
-                                            ) {
-                                                source.id
-                                            } else {
-                                                it.airQualitySource
-                                            },
                                             pollenSource = if (it.pollenSource.isNullOrEmpty() &&
                                                 SourceFeature.POLLEN in source.supportedFeatures &&
                                                 source.isFeatureSupportedForLocation(it, SourceFeature.POLLEN)

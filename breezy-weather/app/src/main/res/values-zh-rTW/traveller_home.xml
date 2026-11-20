@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="traveller_model_aqi">模型 AQI</string>
     <string name="traveller_model_label">Open-Meteo 模型</string>
     <string name="traveller_emb_none">EMB · 附近無已核實測站</string>
     <string name="traveller_emb_show">測站詳情</string>
     <string name="traveller_emb_hide">收合測站詳情</string>
-    <string name="traveller_emb_scale">EMB 按菲律賓標準報告各污染物子指數，模型圖表使用 Breezy Weather 指數。</string>
     <string name="traveller_daily_period">PAGASA PANaHON · 全天概況、最高和最低氣溫</string>
     <string name="traveller_hourly_period">PAGASA PANaHON · 逐小時預報</string>
     <string name="traveller_scope_names">PAGASA 預警 · %1$s及全國公告</string>

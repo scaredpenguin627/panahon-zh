@@ -22,6 +22,7 @@ import androidx.annotation.StringRes
 import breezyweather.domain.location.model.Location
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import org.breezyweather.sources.emb.EmbAirQualityService
 import org.breezyweather.R
 import org.breezyweather.common.options.BaseEnum
 
@@ -62,7 +63,8 @@ enum class DetailScreen(
                             it.day?.wind?.speed != null || it.night?.wind?.speed != null
                         } == true ||
                             location.weather?.hourlyForecast?.any { it.wind?.speed != null } == true
-                        TAG_AIR_QUALITY -> !location.airQualitySource.isNullOrEmpty()
+                        TAG_AIR_QUALITY -> !location.airQualitySource.isNullOrEmpty() &&
+                            location.airQualitySource != EmbAirQualityService.ID
                         TAG_POLLEN -> !location.pollenSource.isNullOrEmpty()
                         TAG_UV_INDEX -> location.weather?.dailyForecast?.any {
                             (it.uV?.index ?: 0.0) > 0.0

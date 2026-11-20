@@ -23,19 +23,15 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import breezyweather.domain.location.model.Location
 import org.breezyweather.BuildConfig
-import org.breezyweather.common.extensions.getBlocksPerRow
-import org.breezyweather.common.extensions.density
 import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.options.appearance.CardDisplay
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.hasMinutelyPrecipitation
 import org.breezyweather.domain.weather.model.isIndexValid
-import org.breezyweather.domain.weather.model.validAirQuality
 import org.breezyweather.sources.emb.EmbAirQualityService
 import org.breezyweather.ui.main.MainActivity
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainCardViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainViewHolder
-import org.breezyweather.ui.main.adapters.main.holder.AirQualityViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.AlertViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.ClockViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.DailyViewHolder
@@ -143,10 +139,9 @@ class MainAdapter(
                 if (c === CardDisplay.CARD_WIND && weather.current?.wind?.isValid != true) {
                     continue
                 }
-                if (c === CardDisplay.CARD_AIR_QUALITY) {
-                    if (weather.validAirQuality != null && !location.airQualitySource.isNullOrEmpty()) {
-                        mViewTypeList.add(ViewType.AIR_QUALITY)
-                    }
+                if (c === CardDisplay.CARD_AIR_QUALITY &&
+                    (BuildConfig.FLAVOR != "basic" || location.airQualitySource != EmbAirQualityService.ID)
+                ) {
                     continue
                 }
                 if (c === CardDisplay.CARD_POLLEN &&
@@ -178,23 +173,6 @@ class MainAdapter(
                 }
                 mViewTypeList.add(getViewType(c))
             }
-            if (CardDisplay.CARD_AIR_QUALITY in cardDisplayList && BuildConfig.FLAVOR == "basic" &&
-                location.airQualitySource == EmbAirQualityService.ID
-            ) {
-                val aqi = mViewTypeList.indexOf(ViewType.AIR_QUALITY)
-                if (aqi < 0) {
-                    mViewTypeList.add(ViewType.EMB)
-                } else {
-                    val columns = if (host.width > 0) activity.getBlocksPerRow(host.width.toFloat() / activity.density)
-                        else activity.getBlocksPerRow()
-                    val firstTile = mViewTypeList.subList(0, aqi).indexOfLast { ViewType.isHalfSizeableBlock(it) != true } + 1
-                    var end = aqi + 1
-                    while (end < mViewTypeList.size && (end - firstTile) % columns != 0 &&
-                        ViewType.isHalfSizeableBlock(mViewTypeList[end]) == true
-                    ) end++
-                    mViewTypeList.add(end, ViewType.EMB)
-                }
-            }
             mViewTypeList.add(ViewType.FOOTER)
         }
         for (i in 0..mViewTypeList.size) {
@@ -217,8 +195,7 @@ class MainAdapter(
         ViewType.WIND -> WindViewHolder(parent)
         ViewType.HUMIDITY -> HumidityViewHolder(parent)
         ViewType.UV -> UvViewHolder(parent)
-        ViewType.AIR_QUALITY -> AirQualityViewHolder(parent)
-        ViewType.EMB -> EmbViewHolder(parent)
+        ViewType.AIR_QUALITY -> EmbViewHolder(parent)
         ViewType.POLLEN -> PollenViewHolder(parent)
         ViewType.VISIBILITY -> VisibilityViewHolder(parent)
         ViewType.PRESSURE -> PressureViewHolder(parent)
@@ -302,7 +279,6 @@ class MainAdapter(
             ViewType.HEADER,
             ViewType.ALERT,
             ViewType.FOOTER,
-            ViewType.EMB,
 
             // TODO: #1972 - Remove below when we have figured out how to avoid the touch conflict with the chart
             ViewType.DAILY,

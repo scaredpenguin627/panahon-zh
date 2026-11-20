@@ -16,13 +16,11 @@
 
 package org.breezyweather.ui.main.adapters.main.holder
 
-import org.breezyweather.ui.main.adapters.trend.hourly.HourlyAirQualityAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyWindAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyTemperatureAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyFeelsLikeAdapter
 import org.breezyweather.ui.main.adapters.trend.hourly.HourlyHumidityAdapter
 import org.breezyweather.common.extensions.getFormattedDate
-import org.breezyweather.sources.emb.EmbAirQualityService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -96,7 +94,6 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         } else null
         fun showSubtitle(index: Int) {
             val attribution = when (trendAdapter.adapters.getOrNull(index)) {
-                is HourlyAirQualityAdapter -> if (location.airQualitySource == EmbAirQualityService.ID) R.string.traveller_model_label else null
                 is HourlyWindAdapter, is HourlyHumidityAdapter -> if (location.forecastSource == "panahon") R.string.traveller_model_label else null
                 is HourlyTemperatureAdapter, is HourlyFeelsLikeAdapter -> if (location.forecastSource == "panahon") R.string.traveller_hourly_period else null
                 else -> null
