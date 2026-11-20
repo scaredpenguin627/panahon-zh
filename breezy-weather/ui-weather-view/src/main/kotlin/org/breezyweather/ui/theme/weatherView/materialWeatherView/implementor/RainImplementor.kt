@@ -289,7 +289,7 @@ class RainImplementor(
         }
     }
 
-    companion object {
+    companion {
         private const val INITIAL_ROTATION_3D = 1000f
         const val TYPE_RAIN = 1
         const val TYPE_THUNDERSTORM = 3

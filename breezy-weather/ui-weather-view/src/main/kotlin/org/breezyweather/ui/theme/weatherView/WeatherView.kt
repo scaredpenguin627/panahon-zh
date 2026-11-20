@@ -51,7 +51,7 @@ interface WeatherView {
     fun setDoAnimate(animate: Boolean)
     fun setGravitySensorEnabled(enabled: Boolean)
 
-    companion object {
+    companion {
         const val WEATHER_KIND_NULL = 0
         const val WEATHER_KIND_CLEAR = 1
         const val WEATHER_KIND_CLOUD = 2 // Partly cloudy

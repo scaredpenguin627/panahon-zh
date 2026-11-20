@@ -223,7 +223,7 @@ class MaterialWeatherView(
         mGravitySensorEnabled = enabled
     }
 
-    companion object {
+    companion {
         private const val SWITCH_ANIMATION_DURATION: Long = 300
     }
 }

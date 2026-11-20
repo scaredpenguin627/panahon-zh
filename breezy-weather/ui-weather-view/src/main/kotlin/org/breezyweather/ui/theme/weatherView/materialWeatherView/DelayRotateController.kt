@@ -90,7 +90,7 @@ class DelayRotateController(
         }
     }
 
-    companion object {
+    companion {
         private const val DEFAULT_ABS_ACCELERATION = 90.0 / 200.0 / 800.0
     }
 }

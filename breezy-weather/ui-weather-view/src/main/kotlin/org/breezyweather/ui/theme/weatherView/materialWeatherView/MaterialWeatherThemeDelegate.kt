@@ -33,7 +33,7 @@ import org.breezyweather.ui.theme.weatherView.materialWeatherView.implementor.Wi
 
 class MaterialWeatherThemeDelegate : WeatherThemeDelegate {
 
-    companion object {
+    companion {
 
         fun getBrighterColor(color: Int): Int {
             val hsv = FloatArray(3)

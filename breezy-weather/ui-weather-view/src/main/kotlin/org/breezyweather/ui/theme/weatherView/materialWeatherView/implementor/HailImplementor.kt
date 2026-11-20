@@ -165,7 +165,7 @@ class HailImplementor(
         }
     }
 
-    companion object {
+    companion {
         private const val INITIAL_ROTATION_3D = 1000f
         private const val HAIL_COUNT = 51
 

@@ -157,7 +157,7 @@ class SnowImplementor(
         }
     }
 
-    companion object {
+    companion {
         private const val INITIAL_ROTATION_3D = 1000f
         private const val SNOW_COUNT = 50
         private const val SNOW_SPEED = 1.5

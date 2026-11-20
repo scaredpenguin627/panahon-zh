@@ -264,7 +264,7 @@ class MeteorShowerImplementor(
         }
     }
 
-    companion object {
+    companion {
         private const val INITIAL_ROTATION_3D = 1000f
         private const val METEOR_REVIVE_SEC_MIN = 5
         private const val METEOR_REVIVE_SEC_MAX = 25

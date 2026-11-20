@@ -169,7 +169,7 @@ class WindImplementor(
         }
     }
 
-    companion object {
+    companion {
         private const val INITIAL_ROTATION_3D = 1000f
         private const val WIND_COUNT = 160
 

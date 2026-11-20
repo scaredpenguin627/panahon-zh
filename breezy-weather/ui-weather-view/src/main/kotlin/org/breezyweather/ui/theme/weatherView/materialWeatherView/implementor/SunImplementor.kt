@@ -86,7 +86,7 @@ class SunImplementor(
         }
     }
 
-    companion object {
+    companion {
         const val SUN_POSITION = 0.5 // Old: 0.0333. Moved lower to avoid overlap with top icons
         const val SMALL_SUN_ALPHA = 0.16
         const val MEDIUM_SUN_ALPHA = 0.08

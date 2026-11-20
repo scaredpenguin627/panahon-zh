@@ -589,7 +589,7 @@ class CloudImplementor(
         }
     }
 
-    companion object {
+    companion {
         const val TYPE_CLOUD = 1
         const val TYPE_CLOUDY = 3
         const val TYPE_THUNDER = 5
