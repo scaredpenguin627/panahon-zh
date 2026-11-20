@@ -191,7 +191,7 @@ class PollenInfoService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val POLLENINFO_BASE_URL = "https://www.polleninformation.at/"
     }
 }

@@ -57,7 +57,7 @@ class NlscService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val NLSC_BASE_URL = "https://api.nlsc.gov.tw/"
     }
 }

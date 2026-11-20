@@ -118,7 +118,7 @@ class BaiduIPLocationService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val BAIDU_IP_LOCATION_BASE_URL = "https://api.map.baidu.com/"
     }
 }

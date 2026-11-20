@@ -76,7 +76,7 @@ class StatementManager @Inject constructor(
         config.edit().putBoolean(getPermissionDeniedKey(permission), true).apply()
     }
 
-    companion object {
+    companion {
         private const val SP_STATEMENT_RECORD = "statement_record"
         private const val KEY_LOCATION_PERMISSION_DECLARED = "location_permission_declared"
         private const val KEY_BACKGROUND_LOCATION_DECLARED = "background_location_declared"

@@ -632,7 +632,7 @@ class KnmiService @Inject constructor(
         direction = KnmiGridDirection.NorthWestColumnRow
     )
 
-    companion object {
+    companion {
         private const val KNMI_BASE_URL = "https://api.app.knmi.cloud/"
         private const val KNMI_DEMO_BASE_URL = "https://api.app.dev.knmi.cloud/"
 

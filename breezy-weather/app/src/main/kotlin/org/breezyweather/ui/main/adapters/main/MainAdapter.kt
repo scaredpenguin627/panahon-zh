@@ -340,7 +340,7 @@ class MainAdapter(
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
     })
 
-    companion object {
+    companion {
         private fun getViewType(cardDisplay: CardDisplay): Int = when (cardDisplay) {
             CardDisplay.CARD_NOWCAST -> ViewType.PRECIPITATION_NOWCAST
             CardDisplay.CARD_DAILY_FORECAST -> ViewType.DAILY

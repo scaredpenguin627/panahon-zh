@@ -65,7 +65,7 @@ class NotificationReceiver : BroadcastReceiver() {
         WeatherUpdateJob.stop(context)
     }
 
-    companion object {
+    companion {
         private const val NAME = "NotificationReceiver"
 
         private const val ACTION_CANCEL_WEATHER_UPDATE = "$ID.$NAME.CANCEL_WEATHER_UPDATE"

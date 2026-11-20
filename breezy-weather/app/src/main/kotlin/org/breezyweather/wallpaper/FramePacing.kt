@@ -86,7 +86,7 @@ internal class FrameIntervalCounter {
         return intervalMillis
     }
 
-    companion object {
+    companion {
         private const val NOT_STARTED = Long.MIN_VALUE
         const val MAX_INTERVAL_NANOS = 100 * FramePacing.NANOS_PER_MILLI
     }

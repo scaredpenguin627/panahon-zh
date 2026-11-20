@@ -179,7 +179,7 @@ class DrawerLayout @JvmOverloads constructor(
         requestLayout()
     }
 
-    companion object {
+    companion {
         private const val MIN_DRAWER_WIDTH_DP = 280
         private const val MAX_DRAWER_WIDTH_DP = 320
     }

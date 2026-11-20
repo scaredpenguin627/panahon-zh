@@ -683,7 +683,7 @@ class BmkgService @Inject constructor(
             ?: ""
     }
 
-    companion object {
+    companion {
         private const val BMKG_BASE_URL = "https://cuaca.bmkg.go.id/"
         private const val BMKG_APP_BASE_URL = "https://api-apps.bmkg.go.id/"
         private const val TOKEN_EXPIRY_MARGIN_MS = 60_000L

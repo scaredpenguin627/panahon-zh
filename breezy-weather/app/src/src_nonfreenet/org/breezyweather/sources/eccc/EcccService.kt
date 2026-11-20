@@ -392,7 +392,7 @@ class EcccService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val ECCC_BASE_URL = "https://app.weather.gc.ca/"
 
         // Most sold device in Canada

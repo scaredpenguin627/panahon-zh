@@ -1378,7 +1378,7 @@ class RefreshHelper @Inject constructor(
         return currentTime >= updateTime.time && currentTime - updateTime.time < wait.minutes.inWholeMilliseconds
     }
 
-    companion object {
+    companion {
         private const val WAIT_MINIMUM = 1
         private const val WAIT_REGULAR = 5
         private const val WAIT_RESTRICTED = 15

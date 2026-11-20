@@ -967,7 +967,7 @@ class CwaService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val CWA_BASE_URL = "https://opendata.cwa.gov.tw/"
         private val LINE_FEED_SPACES = Regex("""\n\s*""")
     }

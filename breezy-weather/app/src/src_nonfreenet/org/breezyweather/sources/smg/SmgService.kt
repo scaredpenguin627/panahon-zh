@@ -670,7 +670,7 @@ class SmgService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val SMG_BASE_URL = "https://new-api.smg.gov.mo/"
         private const val SMG_CMS_URL = "https://cms.smg.gov.mo/"
         private val SMG_ALERT_TYPES = listOf("typhoon", "rainstorm", "monsoon", "thunderstorm", "stormsurge", "tsunami")

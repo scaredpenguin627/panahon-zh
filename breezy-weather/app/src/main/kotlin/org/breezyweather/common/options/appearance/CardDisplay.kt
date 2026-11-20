@@ -53,7 +53,7 @@ enum class CardDisplay(
     CARD_CLOCK("clock", R.string.clock),
     ;
 
-    companion object {
+    companion {
 
         fun toCardDisplayList(
             value: String?,

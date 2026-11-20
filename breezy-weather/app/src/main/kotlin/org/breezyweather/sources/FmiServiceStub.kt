@@ -77,7 +77,7 @@ abstract class FmiServiceStub(context: Context) :
         }
     }
 
-    companion object {
+    companion {
         private val FMI_FORECAST_BBOX = LatLngBounds(
             LatLng(53.900000, 4.888770),
             LatLng(72.269067, 32.931465)

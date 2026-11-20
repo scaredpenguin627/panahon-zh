@@ -99,7 +99,7 @@ enum class OpenMeteoWeatherModel(
     CHMI_ALADIN_CZ("chmi_aladin_cz_1km"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

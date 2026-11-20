@@ -441,7 +441,7 @@ internal class LiveWallpaperRenderer(
         }
     }
 
-    companion object {
+    companion {
         private const val NO_FRAME_RATE_VOTE = -1
         private const val DRAW_NOW_TIMEOUT_MILLIS = 500L
         private const val GRAVITY_SAMPLING_PERIOD_US = 1_000_000 / FRAME_RATE_LOW

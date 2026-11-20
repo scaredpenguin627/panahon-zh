@@ -214,7 +214,7 @@ class NcdrService @Inject constructor(
         return output
     }
 
-    companion object {
+    companion {
         private const val NCDR_BASE_URL = "https://alerts.ncdr.nat.gov.tw/"
         private const val NLSC_BASE_URL = "https://api.nlsc.gov.tw/"
     }

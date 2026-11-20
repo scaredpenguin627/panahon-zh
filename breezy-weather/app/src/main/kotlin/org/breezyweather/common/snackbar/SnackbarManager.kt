@@ -194,7 +194,7 @@ internal class SnackbarManager private constructor() {
         }
     }
 
-    companion object {
+    companion {
         val instance: SnackbarManager by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
             SnackbarManager()
         }

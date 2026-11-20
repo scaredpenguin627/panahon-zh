@@ -150,7 +150,7 @@ class SmhiService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val SMHI_BASE_URL = "https://opendata-download-metfcst.smhi.se/api/"
     }
 }

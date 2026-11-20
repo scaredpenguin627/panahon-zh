@@ -171,7 +171,7 @@ class ChronusResourceProvider(
     override val moonDrawable: Drawable
         get() = getWeatherIcon(WeatherCode.CLEAR, false)
 
-    companion object {
+    companion {
         fun getProviderList(
             context: Context,
             defaultProvider: ResourceProvider,

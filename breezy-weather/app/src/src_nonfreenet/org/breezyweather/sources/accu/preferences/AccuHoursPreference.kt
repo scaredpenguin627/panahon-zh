@@ -33,7 +33,7 @@ enum class AccuHoursPreference(
     TWO_HUNDRED_FORTY("240"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

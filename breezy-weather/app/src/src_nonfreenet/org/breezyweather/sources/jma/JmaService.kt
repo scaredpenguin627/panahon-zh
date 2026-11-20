@@ -1075,7 +1075,7 @@ class JmaService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val JMA_BASE_URL = "https://www.jma.go.jp/"
     }
 }

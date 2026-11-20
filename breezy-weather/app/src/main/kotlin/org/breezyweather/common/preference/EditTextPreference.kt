@@ -31,7 +31,7 @@ class EditTextPreference(
     val onValueChanged: (String) -> Unit,
 ) : Preference {
 
-    companion object {
+    companion {
         val URL_REGEX = Regex(
             "^https://(www[.])?[-a-zA-Z0-9@:%._+~#=]{1,256}[.][a-zA-Z0-9()]{1,6}([-a-zA-Z0-9()!@:%_+.~#?&//=]*)/$"
         )

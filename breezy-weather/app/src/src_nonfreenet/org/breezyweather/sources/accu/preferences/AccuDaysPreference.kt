@@ -31,7 +31,7 @@ enum class AccuDaysPreference(
     FIFTEEN("15"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

@@ -420,7 +420,7 @@ class MetNoService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val METNO_BASE_URL = "https://api.met.no/weatherapi/"
     }
 }

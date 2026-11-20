@@ -39,7 +39,7 @@ enum class UpdateInterval(
     INTERVAL_24_00("24:00", 24.hours),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

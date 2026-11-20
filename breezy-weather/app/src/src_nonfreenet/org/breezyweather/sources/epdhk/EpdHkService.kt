@@ -98,7 +98,7 @@ class EpdHkService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val EPD_HK_BASE_URL = "https://www.aqhi.gov.hk/"
     }
 }

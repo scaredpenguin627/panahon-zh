@@ -744,7 +744,7 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val KEY_FORMATTED_ID = "formatted_id"
         private val DELAY_BEFORE_NEXT_MANUAL_REFRESH = 10.seconds.inWholeMilliseconds
     }

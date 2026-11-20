@@ -115,7 +115,7 @@ class AndroidLocationService @Inject constructor() : LocationSource {
             Manifest.permission.ACCESS_FINE_LOCATION
         )
 
-    companion object {
+    companion {
         private val TIMEOUT_MILLIS = 15.seconds.inWholeMilliseconds
 
         private fun getLastKnownLocation(

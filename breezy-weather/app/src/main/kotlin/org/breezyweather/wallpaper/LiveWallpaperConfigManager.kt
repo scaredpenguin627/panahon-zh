@@ -35,7 +35,7 @@ class LiveWallpaperConfigManager(context: Context) {
         animationsEnabled = config.getBoolean(KEY_ANIMATIONS_ENABLED, false)
     }
 
-    companion object {
+    companion {
         private const val SP_LIVE_WALLPAPER_CONFIG = "live_wallpaper_config"
         private const val KEY_WEATHER_KIND = "weather_kind"
         private const val KEY_DAY_NIGHT_TYPE = "day_night_type"

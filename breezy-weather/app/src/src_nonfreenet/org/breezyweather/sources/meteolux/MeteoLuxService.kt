@@ -434,7 +434,7 @@ class MeteoLuxService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val METEOLUX_BASE_URL = "https://metapi.ana.lu/"
     }
 }

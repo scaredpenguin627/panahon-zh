@@ -81,7 +81,7 @@ abstract class EpdHkServiceStub(context: Context) :
         }
     }
 
-    companion object {
+    companion {
         // Source: https://data.gov.hk/en-data/dataset/hk-epd-aqmnteam-air-quality-monitoring-network-of-hong-kong
         val EPD_HK_STATIONS = mapOf(
             "Central/Western" to LatLng(22.28489089, 114.14442071),

@@ -177,7 +177,7 @@ class SearchActivityRepository @Inject internal constructor(
         mCompositeDisposable.clear()
     }
 
-    companion object {
+    companion {
         private const val PREFERENCE_SEARCH_CONFIG = "SEARCH_CONFIG"
         private const val KEY_LAST_DEFAULT_SOURCE = "LAST_DEFAULT_SOURCE"
     }

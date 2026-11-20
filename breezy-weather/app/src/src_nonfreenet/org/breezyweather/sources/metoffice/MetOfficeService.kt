@@ -260,7 +260,7 @@ class MetOfficeService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val MET_OFFICE_BASE_URL =
             "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/"
     }

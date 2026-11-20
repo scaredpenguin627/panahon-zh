@@ -28,7 +28,7 @@ class BusLiveData<T>(
     private val mainHandler: Handler,
 ) : MutableLiveData<T>() {
 
-    companion object {
+    companion {
         const val START_VERSION = -1
     }
 

@@ -428,7 +428,7 @@ class ImsService @Inject constructor(
             }
     }
 
-    companion object {
+    companion {
         private const val IMS_BASE_URL = "https://ims.gov.il/"
     }
 }

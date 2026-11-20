@@ -128,7 +128,7 @@ enum class PollutantIndex(
     ),
     ;
 
-    companion object {
+    companion {
         // Plume 2023
         val aqiThresholds = listOf(0, 20, 50, 100, 150, 250)
         val namesArrayId = R.array.air_quality_levels

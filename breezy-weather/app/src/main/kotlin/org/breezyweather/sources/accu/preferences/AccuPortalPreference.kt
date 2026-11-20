@@ -29,7 +29,7 @@ enum class AccuPortalPreference(
     ENTERPRISE("enterprise"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

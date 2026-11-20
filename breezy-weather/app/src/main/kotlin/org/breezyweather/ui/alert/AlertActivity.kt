@@ -36,7 +36,7 @@ class AlertActivity : BreezyActivity() {
         }
     }
 
-    companion object {
+    companion {
         const val KEY_FORMATTED_ID = "formatted_id"
         const val KEY_ALERT_ID = "alert_id"
     }

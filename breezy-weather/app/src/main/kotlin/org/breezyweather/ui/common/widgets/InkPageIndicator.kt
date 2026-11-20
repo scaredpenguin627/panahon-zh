@@ -907,7 +907,7 @@ class InkPageIndicator @JvmOverloads constructor(
             dest.writeInt(currentPage)
         }
 
-        companion object {
+        companion {
             @JvmField
             val CREATOR = object : Parcelable.Creator<SavedState> {
                 override fun createFromParcel(parcel: Parcel): SavedState {
@@ -921,7 +921,7 @@ class InkPageIndicator @JvmOverloads constructor(
         }
     }
 
-    companion object {
+    companion {
         // defaults
         private const val DEFAULT_DOT_SIZE = 8 // dp
         private const val DEFAULT_GAP = 12 // dp

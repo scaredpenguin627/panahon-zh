@@ -215,7 +215,7 @@ enum class RefreshErrorType(
     ),
     ;
 
-    companion object {
+    companion {
         fun getTypeFromThrowable(
             context: Context,
             e: Throwable,

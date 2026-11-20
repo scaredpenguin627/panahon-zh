@@ -563,7 +563,7 @@ class LvgmcService @Inject constructor(
             "${longitude - 0.1} ${latitude - 0.1}))"
     }
 
-    companion object {
+    companion {
         private const val LVGMC_BASE_URL = "https://videscentrs.lvgmc.lv/"
     }
 }

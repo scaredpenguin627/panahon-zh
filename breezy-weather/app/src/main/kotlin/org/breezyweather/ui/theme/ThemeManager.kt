@@ -32,7 +32,7 @@ class ThemeManager private constructor(
     val weatherThemeDelegate: WeatherThemeDelegate,
 ) {
 
-    companion object {
+    companion {
 
         @Volatile
         private var instance: ThemeManager? = null

@@ -29,7 +29,7 @@ enum class DarkModeLocation(
     DARK("dark", false),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

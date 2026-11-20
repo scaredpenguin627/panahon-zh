@@ -416,7 +416,7 @@ class SearchActivity : BreezyActivity() {
         viewModel.openDialogLocationSearchSource()
     }
 
-    companion object {
+    companion {
         const val KEY_LOCATION = "location"
     }
 }

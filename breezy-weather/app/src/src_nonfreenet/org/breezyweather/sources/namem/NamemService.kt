@@ -518,7 +518,7 @@ class NamemService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val NAMEM_BASE_URL = "https://weather.gov.mn/"
     }
 }

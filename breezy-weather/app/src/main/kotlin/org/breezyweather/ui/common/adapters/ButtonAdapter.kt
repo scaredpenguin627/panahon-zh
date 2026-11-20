@@ -77,7 +77,7 @@ class ButtonAdapter @JvmOverloads constructor(
         return buttonList.size
     }
 
-    companion object {
+    companion {
         const val UNCHECKABLE_INDEX = -1
     }
 }

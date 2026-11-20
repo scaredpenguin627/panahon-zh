@@ -127,7 +127,7 @@ class IconCartesianMarker(
         }
     }
 
-    companion object {
+    companion {
         /**
          * The default [iconSize]. Icon providers should rasterize their source drawable at this
          * size (in px, via [androidx.compose.ui.unit.Density]) rather than at the drawable's own

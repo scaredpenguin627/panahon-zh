@@ -185,7 +185,7 @@ class HourlyTrendItemView @JvmOverloads constructor(
             requestLayout()
         }
 
-    companion object {
+    companion {
         private const val ICON_SIZE_DIP = 32
         private const val TEXT_MARGIN_DIP = 2
         private const val ICON_MARGIN_DIP = 8

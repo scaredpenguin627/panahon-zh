@@ -410,7 +410,7 @@ class BrightSkyService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val BRIGHT_SKY_BASE_URL = "https://api.brightsky.dev/"
     }
 }

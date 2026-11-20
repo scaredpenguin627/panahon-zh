@@ -654,7 +654,7 @@ class AemetService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val AEMET_BASE_URL = "https://opendata.aemet.es/opendata/"
     }
 }

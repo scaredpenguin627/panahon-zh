@@ -311,7 +311,7 @@ class OpenWeatherService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val OPEN_WEATHER_BASE_URL = "https://api.openweathermap.org/"
     }
 }

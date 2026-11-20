@@ -168,7 +168,7 @@ abstract class AtmoService : AtmoServiceStub() {
         )
     }
 
-    companion object {
+    companion {
         private const val USER_AGENT = "okhttp/3.14.9"
     }
 }

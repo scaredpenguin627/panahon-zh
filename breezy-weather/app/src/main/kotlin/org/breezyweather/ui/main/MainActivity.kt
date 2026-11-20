@@ -121,7 +121,7 @@ class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment
     private val _isLocationBasedLightTheme: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     val isLocationBasedLightTheme = _isLocationBasedLightTheme.asStateFlow()
 
-    companion object {
+    companion {
         const val SEARCH_ACTIVITY = 4
 
         const val ACTION_MAIN = "${BuildConfig.APPLICATION_ID}.Main"

@@ -289,7 +289,7 @@ class DmiService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val DMI_BASE_URL = "https://www.dmi.dk/"
         private const val DMI_WEATHER_CMD = "llj"
     }

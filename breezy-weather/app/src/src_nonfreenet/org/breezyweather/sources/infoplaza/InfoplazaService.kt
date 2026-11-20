@@ -338,7 +338,7 @@ class InfoplazaService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val INFOPLAZA_BASE_URL = "https://api.infoplaza.com/weather/v1/"
     }
 }

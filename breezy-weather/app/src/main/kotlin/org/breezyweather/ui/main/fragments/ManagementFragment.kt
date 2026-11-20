@@ -123,7 +123,7 @@ import org.breezyweather.ui.theme.resource.providers.ResourceProvider
 
 class PushedManagementFragment : ManagementFragment() {
 
-    companion object {
+    companion {
         fun getInstance() = PushedManagementFragment()
     }
 

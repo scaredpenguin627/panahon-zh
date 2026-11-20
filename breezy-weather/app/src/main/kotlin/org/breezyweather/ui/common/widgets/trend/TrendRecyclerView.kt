@@ -190,7 +190,7 @@ class TrendRecyclerView @JvmOverloads constructor(
         invalidate()
     }
 
-    companion object {
+    companion {
         private const val LINE_WIDTH_DIP = 1
         private const val TEXT_SIZE_DIP = 12
         private const val TEXT_MARGIN_DIP = 2

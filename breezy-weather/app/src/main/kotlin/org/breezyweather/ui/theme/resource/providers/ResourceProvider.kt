@@ -66,8 +66,7 @@ abstract class ResourceProvider {
 
     abstract val moonDrawable: Drawable
 
-    companion object {
-        @JvmStatic
+    companion {
         protected fun getResId(context: Context, resName: String, type: String): Int {
             return ResourceUtils.getResId(context, resName, type)
         }

@@ -168,7 +168,7 @@ abstract class AbstractWidgetConfigActivity : BreezyActivity() {
             return 0
         }
 
-        companion object {
+        companion {
             // To use this class, simply invoke assistActivity() on an Activity that already has its content view set.
             fun assistActivity(activity: Activity) {
                 KeyboardResizeBugWorkaround(activity)

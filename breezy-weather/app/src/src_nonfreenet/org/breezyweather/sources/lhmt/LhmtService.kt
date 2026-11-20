@@ -499,7 +499,7 @@ class LhmtService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val LHMT_BASE_URL = "https://api.meteo.lt/"
         private const val LHMT_WWW_BASE_URL = "https://www.meteo.lt/"
 

@@ -1076,7 +1076,7 @@ class MfService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val MF_BASE_URL = "https://webservice.meteofrance.com/"
         private const val USER_AGENT = "okhttp/5.2.1"
 

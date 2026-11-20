@@ -111,7 +111,7 @@ interface AddressSource : Source {
      */
     val knownAmbiguousCountryCodes: Array<String>?
 
-    companion object {
+    companion {
         /**
          * For technical reasons, we need to better identify each territory
          * Crimea is not included to let each location search/address lookup source resolves it the way they want

@@ -234,7 +234,7 @@ class IlmateenistusService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val ILMATEENISTUS_BASE_URL = "https://www.ilmateenistus.ee/"
     }
 }

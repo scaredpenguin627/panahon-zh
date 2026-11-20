@@ -54,7 +54,7 @@ interface NamemApi {
     @POST("api/get/agaar/multi")
     fun getAirQuality(): Observable<NamemAirQualityResult>
 
-    companion object {
+    companion {
         const val ORIGIN_URL = "https://www.weather.gov.mn"
     }
 }

@@ -618,7 +618,7 @@ class PolylineAndHistogramView @JvmOverloads constructor(
         return if (layoutDirection == LAYOUT_DIRECTION_RTL) (measuredWidth - x) else x
     }
 
-    companion object {
+    companion {
         private const val MARGIN_TOP_DIP = 24f
         private const val MARGIN_TOP_COMPACT_DIP = 12f
         private const val MARGIN_BOTTOM_DIP = 36f

@@ -47,7 +47,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 class BreezyWeather : Application(), Configuration.Provider {
 
-    companion object {
+    companion {
 
         lateinit var instance: BreezyWeather
             private set

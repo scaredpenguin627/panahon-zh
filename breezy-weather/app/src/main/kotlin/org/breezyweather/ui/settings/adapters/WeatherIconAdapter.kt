@@ -113,7 +113,7 @@ class WeatherIconAdapter(
         return if (mItemList[position] is Line) -1 else 0
     }
 
-    companion object {
+    companion {
         fun getSpanSizeLookup(
             columnCount: Int,
             itemList: List<Item>,

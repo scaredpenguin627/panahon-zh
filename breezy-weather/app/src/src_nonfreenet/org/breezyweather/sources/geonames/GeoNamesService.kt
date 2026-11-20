@@ -146,7 +146,7 @@ class GeoNamesService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val GEO_NAMES_BASE_URL = "https://secure.geonames.org/"
     }
 }

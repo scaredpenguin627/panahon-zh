@@ -94,7 +94,7 @@ class TagAdapter @JvmOverloads constructor(
         notifyDataSetChanged()
     }
 
-    companion object {
+    companion {
         const val UNCHECKABLE_INDEX = -1
     }
 }

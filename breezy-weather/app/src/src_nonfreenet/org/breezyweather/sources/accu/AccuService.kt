@@ -959,7 +959,7 @@ class AccuService @Inject constructor(
         )
     )
 
-    companion object {
+    companion {
         private const val ACCU_DEVELOPER_BASE_URL = "https://dataservice.accuweather.com/"
         private const val ACCU_ENTERPRISE_BASE_URL = "https://api.accuweather.com/"
 

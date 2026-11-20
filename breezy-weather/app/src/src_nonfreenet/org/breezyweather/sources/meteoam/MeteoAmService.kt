@@ -314,7 +314,7 @@ class MeteoAmService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val METEOAM_BASE_URL = "https://api.meteoam.it/"
     }
 }

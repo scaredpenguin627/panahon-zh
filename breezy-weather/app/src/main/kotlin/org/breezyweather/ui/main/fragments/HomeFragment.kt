@@ -514,7 +514,7 @@ class HomeFragment : MainModuleFragment() {
         }
     }
 
-    companion object {
+    companion {
         // 60 is 5 * 4 * 3, which allows us to divide from 1, 2, 3, 4 or 5 and have a whole number
         const val GRID_SPAN_COUNT = 60
     }

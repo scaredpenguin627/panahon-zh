@@ -37,7 +37,7 @@ enum class HourlyTrendDisplay(
     TAG_VISIBILITY("visibility", R.string.visibility),
     ;
 
-    companion object {
+    companion {
 
         fun toHourlyTrendDisplayList(
             value: String?,

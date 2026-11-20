@@ -78,7 +78,7 @@ class Snackbar private constructor(
         fun onDismissed(snackbar: Snackbar?, @DismissEvent event: Int) {}
         fun onShown(snackbar: Snackbar?) {}
 
-        companion object {
+        companion {
             const val DISMISS_EVENT_SWIPE = 0
             const val DISMISS_EVENT_ACTION = 1
             const val DISMISS_EVENT_TIMEOUT = 2
@@ -503,7 +503,7 @@ class Snackbar private constructor(
         }
     }
 
-    companion object {
+    companion {
         const val LENGTH_INDEFINITE = -2
         const val LENGTH_SHORT = -1
         const val LENGTH_LONG = 0

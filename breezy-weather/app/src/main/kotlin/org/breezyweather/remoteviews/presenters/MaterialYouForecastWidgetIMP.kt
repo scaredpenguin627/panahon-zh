@@ -44,7 +44,7 @@ import org.breezyweather.unit.formatting.UnitWidth
 
 class MaterialYouForecastWidgetIMP : AbstractRemoteViewsPresenter() {
 
-    companion object {
+    companion {
 
         fun isEnabled(context: Context): Boolean {
             return AppWidgetManager.getInstance(context).getAppWidgetIds(

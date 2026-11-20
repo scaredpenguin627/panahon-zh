@@ -327,7 +327,7 @@ class SunMoonView @JvmOverloads constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val ICON_SIZE_DIP = 24f
         private const val LINE_SIZE_DIP = 5f
         private const val DOTTED_LINE_SIZE_DIP = 1f

@@ -228,7 +228,7 @@ class WidgetItemView @JvmOverloads constructor(
         }
     }
 
-    companion object {
+    companion {
         const val ICON_SIZE_DIP = 32
         const val TREND_VIEW_HEIGHT_DIP_1X = 96
         const val TREND_VIEW_HEIGHT_DIP_2X = 108

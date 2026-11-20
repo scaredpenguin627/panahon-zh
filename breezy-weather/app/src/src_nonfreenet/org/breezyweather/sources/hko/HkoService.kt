@@ -1055,7 +1055,7 @@ class HkoService @Inject constructor(
     // Only supports its own country
     override val knownAmbiguousCountryCodes: Array<String>? = null
 
-    companion object {
+    companion {
         private const val HKO_BASE_URL = "https://www.hko.gov.hk/"
         private const val HKO_MAPS_BASE_URL = "https://maps.weather.gov.hk/"
         private const val HKO_SIMPLIFIED_CHINESE_PATH = "dps/sc/"

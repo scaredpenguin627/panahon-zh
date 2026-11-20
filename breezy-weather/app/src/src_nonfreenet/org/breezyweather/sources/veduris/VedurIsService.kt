@@ -499,7 +499,7 @@ class VedurIsService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val VEDUR_IS_BASE_URL = "https://gottvedur.is/"
         private const val EARTH_POLAR_RADIUS = 6356752
         private const val EARTH_EQUATORIAL_RADIUS = 6378137

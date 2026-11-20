@@ -67,7 +67,7 @@ interface FeatureSource : Source {
         feature: SourceFeature,
     ): Int = PRIORITY_NONE
 
-    companion object {
+    companion {
         const val PRIORITY_HIGHEST = 100
         const val PRIORITY_HIGH = 75
         const val PRIORITY_MEDIUM = 50

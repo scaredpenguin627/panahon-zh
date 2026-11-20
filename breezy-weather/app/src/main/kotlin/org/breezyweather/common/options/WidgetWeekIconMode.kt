@@ -29,7 +29,7 @@ enum class WidgetWeekIconMode(
     NIGHT("night"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

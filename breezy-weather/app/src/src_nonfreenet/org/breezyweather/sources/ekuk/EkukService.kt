@@ -249,7 +249,7 @@ class EkukService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val EKUK_BASE_URL = "https://www.ohuseire.ee/"
         private const val EKUK_AIR_QUALITY_INDICATORS = "1,3,4,6,21,23"
         // private const val EKUK_POLLEN_INDICATORS = "43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63"

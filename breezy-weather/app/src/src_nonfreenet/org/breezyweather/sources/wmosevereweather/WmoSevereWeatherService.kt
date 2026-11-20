@@ -241,7 +241,7 @@ class WmoSevereWeatherService @Inject constructor(
      */
     override val testingLocations: List<Location> = emptyList()
 
-    companion object {
+    companion {
         private const val WMO_ALERTS_BASE_URL = "https://severeweather.wmo.int/"
     }
 }

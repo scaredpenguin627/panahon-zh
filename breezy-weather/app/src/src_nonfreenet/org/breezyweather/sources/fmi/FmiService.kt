@@ -599,7 +599,7 @@ class FmiService @Inject constructor(
         return LatLng(location.latitude, location.longitude).getNearestLocation(stationList, 50000.0)
     }
 
-    companion object {
+    companion {
         private const val FMI_BASE_URL = "https://opendata.fmi.fi/"
         private const val FMI_ALERTS_BASE_URL = "https://alerts.fmi.fi/"
     }

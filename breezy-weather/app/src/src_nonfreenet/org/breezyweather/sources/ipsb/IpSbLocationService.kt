@@ -52,7 +52,7 @@ class IpSbLocationService @Inject constructor(
             }
     }
 
-    companion object {
+    companion {
         private const val IP_SB_BASE_URL = "https://api.ip.sb/"
     }
 }

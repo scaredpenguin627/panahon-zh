@@ -421,7 +421,7 @@ class MetIeService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val MET_IE_BASE_URL = "https://prodapi.metweb.ie/"
         private const val MET_IE_SRC = "android"
         private const val MET_IE_VERSION = "20513" // Last checked: 2025-10-29

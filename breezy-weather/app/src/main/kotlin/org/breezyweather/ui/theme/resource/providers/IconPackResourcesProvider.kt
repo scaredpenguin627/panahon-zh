@@ -453,7 +453,7 @@ open class IconPackResourcesProvider(
     open val moonDrawableClassName: String?
         get() = mSunMoonFilter?.getOrElse(Constants.RESOURCES_MOON) { null }
 
-    companion object {
+    companion {
         fun getProviderList(
             context: Context,
             defaultProvider: ResourceProvider,

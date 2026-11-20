@@ -83,7 +83,7 @@ abstract class PollenInfoServiceStub(context: Context) :
     // Makes the caching 1 hour, so that we respect the fair use policy
     override val isRestricted = true
 
-    companion object {
+    companion {
         private val SUPPORTED_COUNTRY_CODES: List<String> = listOf(
             "AT", // Austria
             "CH", // Switzerland

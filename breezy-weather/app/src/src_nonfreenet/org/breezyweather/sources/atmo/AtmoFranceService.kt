@@ -238,7 +238,7 @@ class AtmoFranceService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val ATMO_FRANCE_BASE_URL = "https://admindata.atmo-france.org/openapi/"
         private const val DATA_GOUV_GEO_BASE_URL = "https://data.geopf.fr/geocodage/"
         private const val USER_AGENT = "okhttp/3.14.9"

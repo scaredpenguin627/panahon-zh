@@ -552,7 +552,7 @@ class MgmService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val MGM_BASE_URL = "https://servis.mgm.gov.tr/"
     }
 }

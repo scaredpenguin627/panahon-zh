@@ -17,7 +17,7 @@
 package org.breezyweather.ui.main.adapters.main
 
 interface ViewType {
-    companion object {
+    companion {
         const val HEADER = 0
         const val ALERT = 1
         const val PRECIPITATION_NOWCAST = 2

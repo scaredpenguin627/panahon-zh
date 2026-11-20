@@ -29,7 +29,7 @@ enum class NotificationTextColor(
     LIGHT("light"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

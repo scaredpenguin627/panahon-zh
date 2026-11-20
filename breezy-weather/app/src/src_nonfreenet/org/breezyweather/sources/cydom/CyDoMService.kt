@@ -130,7 +130,7 @@ class CyDoMService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val CYDOM_BASE_URL = "https://dom.org.cy/AWS/OpenData/"
     }
 }

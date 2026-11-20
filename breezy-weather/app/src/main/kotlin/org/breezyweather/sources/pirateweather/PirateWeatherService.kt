@@ -479,7 +479,7 @@ class PirateWeatherService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val PIRATE_WEATHER_BASE_URL = "https://api.pirateweather.net/"
         private const val PIRATE_WEATHER_DEV_BASE_URL = "https://dev.pirateweather.net/"
     }

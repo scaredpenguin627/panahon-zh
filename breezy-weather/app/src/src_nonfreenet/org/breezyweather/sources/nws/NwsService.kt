@@ -1046,7 +1046,7 @@ class NwsService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         // Number of hours after which a station data is considered outdated
         // TODO: Move this to global for all sources
         private const val OUTDATED_HOURS = 2

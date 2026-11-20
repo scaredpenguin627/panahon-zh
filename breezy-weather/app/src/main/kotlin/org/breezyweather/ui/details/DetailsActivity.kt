@@ -36,7 +36,7 @@ class DetailsActivity : BreezyActivity() {
         }
     }
 
-    companion object {
+    companion {
         const val KEY_FORMATTED_LOCATION_ID = "FORMATTED_LOCATION_ID"
         const val KEY_CURRENT_DAILY_INDEX = "CURRENT_DAILY_INDEX"
         const val KEY_CURRENT_PAGE = "CURRENT_PAGE"

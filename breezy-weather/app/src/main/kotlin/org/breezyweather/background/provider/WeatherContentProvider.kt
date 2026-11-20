@@ -943,7 +943,7 @@ class WeatherContentProvider : ContentProvider() {
         return 0
     }
 
-    companion object {
+    companion {
         private const val TAG = "Breezy"
 
         const val AUTHORITY = BuildConfig.APPLICATION_ID + ".provider.weather"

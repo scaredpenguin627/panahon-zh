@@ -30,7 +30,7 @@ class SchedulerTransformer<T : Any> : ObservableTransformer<T, T> {
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    companion object {
+    companion {
         fun <T : Any> create(): SchedulerTransformer<T> {
             return SchedulerTransformer()
         }

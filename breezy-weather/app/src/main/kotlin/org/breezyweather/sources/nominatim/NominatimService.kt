@@ -301,7 +301,7 @@ class NominatimService @Inject constructor(
         "NO" // Territories: BV
     )
 
-    companion object {
+    companion {
         private const val NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/"
     }
 }

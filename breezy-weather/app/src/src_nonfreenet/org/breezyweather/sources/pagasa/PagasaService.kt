@@ -361,7 +361,7 @@ class PagasaService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val PAGASA_BASE_URL = "https://www.pagasa.dost.gov.ph/"
     }
 }

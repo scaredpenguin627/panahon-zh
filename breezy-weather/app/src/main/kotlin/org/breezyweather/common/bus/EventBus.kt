@@ -22,7 +22,7 @@ import org.breezyweather.common.activities.livedata.BusLiveData
 
 class EventBus private constructor() {
 
-    companion object {
+    companion {
 
         val instance: EventBus by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
             EventBus()

@@ -69,7 +69,7 @@ class SettingsActivity : BreezyActivity() {
 
     @Inject lateinit var refreshHelper: RefreshHelper
 
-    companion object {
+    companion {
         const val KEY_PROVIDER_ID = "PROVIDER_ID"
         const val KEY_SETTINGS_ACTIVITY_START_DESTINATION =
             "SETTINGS_ACTIVITY_START_DESTINATION"

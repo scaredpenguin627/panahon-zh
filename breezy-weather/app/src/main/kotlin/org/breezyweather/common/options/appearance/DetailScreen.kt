@@ -46,7 +46,7 @@ enum class DetailScreen(
     TAG_SUN_MOON("sun_moon", R.string.ephemeris, R.drawable.weather_clear_night_mini_xml),
     ;
 
-    companion object {
+    companion {
 
         const val CHART_MIN_COUNT = 2
 

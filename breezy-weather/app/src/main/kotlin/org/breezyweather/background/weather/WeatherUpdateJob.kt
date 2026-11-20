@@ -446,7 +446,7 @@ class WeatherUpdateJob @AssistedInject constructor(
         return File("")
     }
 
-    companion object {
+    companion {
         private const val TAG = "WeatherUpdate"
         private const val WORK_NAME_AUTO = "WeatherUpdate-auto"
         private const val WORK_NAME_MANUAL = "WeatherUpdate-manual"

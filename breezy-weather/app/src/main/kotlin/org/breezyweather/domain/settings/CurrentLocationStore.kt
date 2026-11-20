@@ -72,7 +72,7 @@ class CurrentLocationStore @Inject constructor(
         lastSuccessfulRefresh = 0
     }
 
-    companion object {
+    companion {
         private const val CURRENT_LOCATION_STORE = "current_location"
         private const val KEY_LAST_SUCCESSFUL_REFRESH = "last_successful_refresh"
         private const val KEY_LAST_KNOWN_LONGITUDE = "last_known_longitude"

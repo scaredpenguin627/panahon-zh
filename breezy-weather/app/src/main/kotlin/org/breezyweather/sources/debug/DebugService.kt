@@ -238,7 +238,7 @@ class DebugService @Inject constructor() : WeatherSource {
         }
     }
 
-    companion object {
+    companion {
         private const val CURRENT_LATITUDE = 48.0
         private const val CURRENT_LONGITUDE_START = 2.0
         private const val CURRENT_CITY_LABEL = "Current weather: "

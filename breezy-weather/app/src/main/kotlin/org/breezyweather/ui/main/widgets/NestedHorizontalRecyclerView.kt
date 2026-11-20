@@ -153,7 +153,7 @@ open class NestedHorizontalRecyclerView @JvmOverloads constructor(
         return super.onTouchEvent(ev)
     }
 
-    companion object {
+    companion {
         private const val TAG = "HorizontalRecyclerView"
     }
 }

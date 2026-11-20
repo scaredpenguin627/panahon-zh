@@ -34,7 +34,7 @@ enum class DailyTrendDisplay(
     TAG_FEELS_LIKE("feels_like", R.string.temperature_feels_like),
     ;
 
-    companion object {
+    companion {
 
         fun toDailyTrendDisplayList(
             value: String?,

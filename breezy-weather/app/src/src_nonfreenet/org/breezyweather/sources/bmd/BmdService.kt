@@ -413,7 +413,7 @@ class BmdService @Inject constructor(
         }
     }
 
-    companion object {
+    companion {
         private const val BMD_API_BASE_URL = "https://api.bdservers.site/"
     }
 }

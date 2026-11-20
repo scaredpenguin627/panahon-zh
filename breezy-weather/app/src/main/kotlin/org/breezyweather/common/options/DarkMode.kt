@@ -31,7 +31,7 @@ enum class DarkMode(
     DARK("dark", AppCompatDelegate.MODE_NIGHT_YES),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

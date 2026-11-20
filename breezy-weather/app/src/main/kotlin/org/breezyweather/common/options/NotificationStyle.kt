@@ -30,7 +30,7 @@ enum class NotificationStyle(
     HOURLY("hourly"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

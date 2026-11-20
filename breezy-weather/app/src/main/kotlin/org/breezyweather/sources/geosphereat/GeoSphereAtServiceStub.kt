@@ -90,7 +90,7 @@ abstract class GeoSphereAtServiceStub(context: Context) :
         }
     }
 
-    companion object {
+    companion {
         val hourlyBbox = LatLngBounds.parse(west = 5.49, south = 42.98, east = 22.1, north = 51.82)
         val airQuality3KmBbox = LatLngBounds.parse(west = 2.86, south = 40.91, east = 23.74, north = 53.75)
         val airQuality9KmBbox = LatLngBounds.parse(west = -53.73, south = 15.59, east = 80.33, north = 74.39)

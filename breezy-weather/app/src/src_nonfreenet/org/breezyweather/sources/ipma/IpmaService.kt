@@ -394,7 +394,7 @@ class IpmaService @Inject constructor(
         throw InvalidLocationException()
     }
 
-    companion object {
+    companion {
         private const val IPMA_BASE_URL = "https://api.ipma.pt/"
     }
 }

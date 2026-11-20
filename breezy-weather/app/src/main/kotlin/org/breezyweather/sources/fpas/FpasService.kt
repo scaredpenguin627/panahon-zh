@@ -180,7 +180,7 @@ class FpasService @Inject constructor(
         )
     }
 
-    companion object {
+    companion {
         private const val FPAS_BASE_URL = "https://alerts.kde.org/"
     }
 }

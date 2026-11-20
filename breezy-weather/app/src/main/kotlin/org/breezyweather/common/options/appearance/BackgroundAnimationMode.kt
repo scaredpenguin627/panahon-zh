@@ -30,7 +30,7 @@ enum class BackgroundAnimationMode(
     DISABLED("disabled"),
     ;
 
-    companion object {
+    companion {
 
         fun getInstance(
             value: String,

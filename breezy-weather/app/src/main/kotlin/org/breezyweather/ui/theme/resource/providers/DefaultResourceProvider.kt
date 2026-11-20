@@ -248,7 +248,7 @@ class DefaultResourceProvider : ResourceProvider() {
     override val moonDrawable: Drawable
         get() = MoonDrawable()
 
-    companion object {
+    companion {
         fun isDefaultIconProvider(packageName: String): Boolean {
             return packageName == BreezyWeather.instance.packageName
         }

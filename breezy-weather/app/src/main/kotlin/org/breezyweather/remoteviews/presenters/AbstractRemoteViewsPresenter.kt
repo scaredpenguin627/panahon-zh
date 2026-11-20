@@ -123,14 +123,14 @@ abstract class AbstractRemoteViewsPresenter {
             NONE("none"),
             ;
 
-            companion object {
+            companion {
                 fun find(id: String): WidgetBackgroundType = entries.find { it.id == id }
                     ?: throw Exception("Invalid WidgetBackgroundType id: $id")
             }
         }
     }
 
-    companion object {
+    companion {
         private const val SUBTITLE_DAILY_ITEM_LENGTH = 5
 
         fun getWidgetConfig(context: Context, configStoreName: String): WidgetConfig {

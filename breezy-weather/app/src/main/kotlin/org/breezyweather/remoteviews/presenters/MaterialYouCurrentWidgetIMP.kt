@@ -41,7 +41,7 @@ import kotlin.math.roundToInt
 
 class MaterialYouCurrentWidgetIMP : AbstractRemoteViewsPresenter() {
 
-    companion object {
+    companion {
 
         fun isEnabled(context: Context): Boolean {
             return AppWidgetManager.getInstance(context).getAppWidgetIds(

@@ -154,7 +154,7 @@ class PreviewIconActivity : BreezyActivity() {
         }
     }
 
-    companion object {
+    companion {
         const val KEY_ICON_PREVIEW_ACTIVITY_PACKAGE_NAME = "ICON_PREVIEW_ACTIVITY_PACKAGE_NAME"
     }
 }

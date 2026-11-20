@@ -87,7 +87,7 @@ abstract class AccuServiceStub :
 
     override val isRestricted = false
 
-    companion object {
+    companion {
         // Accuweather's pollen forecast is only available in the 48 contiguous U.S. states + D.C., Canada,
         // and European coverage area of Copernicus. We will limit Pollen Source to these areas.
 
