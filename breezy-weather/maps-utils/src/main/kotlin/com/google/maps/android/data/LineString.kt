@@ -41,7 +41,7 @@ open class LineString(
         return """${GEOMETRY_TYPE}{ coordinates=$geometryObject}"""
     }
 
-    companion object {
+    companion {
         const val GEOMETRY_TYPE = "LineString"
     }
 }

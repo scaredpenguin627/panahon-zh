@@ -62,7 +62,7 @@ class LatLng(
         return "$latitude,$longitude"
     }
 
-    companion object {
+    companion {
         @Throws(ParseException::class)
         fun parse(value: String): LatLng {
             val coordArr = value.split(",")

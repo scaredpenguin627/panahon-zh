@@ -73,7 +73,7 @@ class GeoJsonPolygon(
         return """$TYPE{ coordinates=$coordinates}"""
     }
 
-    companion object {
+    companion {
         const val TYPE = "Polygon"
 
         private const val POLYGON_OUTER_COORDINATE_INDEX = 0

@@ -21,7 +21,7 @@ data class LatLngBounds(
         return false
     }
 
-    companion object {
+    companion {
         fun parse(
             west: Double,
             south: Double,

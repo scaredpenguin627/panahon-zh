@@ -130,7 +130,7 @@ class GeoJsonParser(
         return features
     }
 
-    companion object {
+    companion {
         private const val LOG_TAG = "GeoJsonParser"
 
         // Feature object type
