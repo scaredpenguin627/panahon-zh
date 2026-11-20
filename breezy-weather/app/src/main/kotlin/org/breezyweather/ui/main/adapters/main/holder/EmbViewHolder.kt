@@ -8,9 +8,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import androidx.core.net.toUri
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import breezyweather.domain.location.model.Location
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.breezyweather.R
@@ -43,15 +43,24 @@ class EmbViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         super.onBindView(activity, location, provider, listAnimationEnabled, itemAnimationEnabled)
         val host = activity as MainActivity
         update?.cancel()
-        val sourceId = location.airQualitySource ?: location.forecastSource
-        val source = host.sourceManager.getWeatherSource(sourceId)
-        model.isVisible = location.weather?.validAirQuality != null
-        model.text = context.getString(if (sourceId == "openmeteo") R.string.emb_model else R.string.emb_other_source,
-            source?.name ?: sourceId)
+        val updated = location.weather?.base?.airQualityUpdateTime
+        model.text = when {
+            location.weather?.validAirQuality == null -> context.getString(R.string.emb_model_missing)
+            updated == null -> context.getString(R.string.emb_model)
+            else -> context.getString(R.string.emb_model_updated, DateFormat.getDateTimeInstance().format(updated))
+        }
         readings.setText(R.string.emb_loading)
         links.removeAllViews()
         update = host.lifecycleScope.launch {
-            val reports = host.embRepository.forLocation(location)
+            val reports = try {
+                host.embRepository.forLocation(location)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                readings.setText(R.string.emb_error)
+                addLink("https://air.emb.gov.ph/national-air-quality-data/", "")
+                return@launch
+            }
             val now = System.currentTimeMillis()
             val entries = reports.map { format(it) }.toMutableList()
             if (reports.isEmpty()) entries += context.getString(R.string.emb_uncovered)

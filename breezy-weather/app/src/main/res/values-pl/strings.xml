@@ -637,8 +637,6 @@
     <string name="message_outdated_server_data">Nieaktualne dane otrzymane z serwera</string>
     <string name="action_enable">Włącz</string>
     <string name="action_allow">Zezwól</string>
-    <string name="action_open_in_other_app">Otwórz w innej aplikacji</string>
-    <string name="action_open_in_other_app_description">Otwórz tę lokalizację w innej aplikacji</string>
     <string name="ephemeris_about">O godzinach wschodu i zachodu</string>
     <string name="ephemeris_about_rise">Godzina wschodu to moment, gdy Słońce lub Księżyc całkowicie pojawia się nad horyzontem.</string>
     <string name="ephemeris_about_set">Godzina zachodu to moment, gdy Słońce lub Księżyc całkowicie znika poniżej horyzontu.</string>
@@ -758,7 +756,6 @@
     <string name="air_quality_co_about">O tlenku węgla (%s)</string>
     <string name="air_quality_co_index">Skala indeksu jakości powietrza dla %s</string>
     <string name="weather_source_recommended">Zalecane</string>
-    <string name="action_open_in_other_app_no_app">Nie znaleziono aplikacji map</string>
     <string name="action_change">Zmień</string>
     <string name="action_share_no_app">Nie znaleziono aplikacji do udostępniania</string>
     <string name="action_translate">Przetłumacz</string>

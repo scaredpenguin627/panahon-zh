@@ -624,8 +624,6 @@
     <string name="message_outdated_server_data">Sonraí atá as dáta faighte ón bhfreastalaí</string>
     <string name="action_enable">Cumasaigh</string>
     <string name="action_allow">Ceadaigh</string>
-    <string name="action_open_in_other_app">Oscail in aip eile</string>
-    <string name="action_open_in_other_app_description">Oscail an suíomh seo in aip eile</string>
     <string name="ephemeris_about">Maidir le hamanna éirí agus luí</string>
     <string name="ephemeris_about_rise">Is é an t-am éirí nuair a bhíonn an ghrian nó an ghealach le feiceáil go hiomlán os cionn na spéire.</string>
     <string name="ephemeris_about_set">Is é an t-am socraithe ná nuair a imíonn an ghrian nó an ghealach go hiomlán faoin léaslíne.</string>
@@ -744,7 +742,6 @@
     <string name="air_quality_o3_index">Scála innéacs cáilíochta aeir le haghaidh %s</string>
     <string name="air_quality_co_about">Maidir le haonocsaíd charbóin (%s)</string>
     <string name="air_quality_co_index">Scála innéacs cáilíochta aeir le haghaidh %s</string>
-    <string name="action_open_in_other_app_no_app">Níor aimsíodh aon aip léarscáileanna</string>
     <string name="action_share_no_app">Níor aimsíodh aon aip le roinnt</string>
     <string name="action_translate">Aistrigh</string>
     <string name="action_translate_no_app">Níor aimsíodh aon aip aistriúcháin</string>

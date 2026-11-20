@@ -642,8 +642,6 @@
     <string name="message_outdated_server_data">Ze serveru byla obdržena zastaralá data</string>
     <string name="action_enable">Zapnout</string>
     <string name="action_allow">Povolit</string>
-    <string name="action_open_in_other_app_description">Otevřít toto místo v jiné aplikaci</string>
-    <string name="action_open_in_other_app">Otevřít v jiné aplikaci</string>
     <string name="ephemeris_about_set">Čas západu je okamžik, kdy slunce nebo měsíc zcela zmizí pod obzorem.</string>
     <string name="daily_summary">Denní souhrn</string>
     <string name="chart_no_hourly_data">Žádná hodinová data nejsou k dispozici.</string>
@@ -750,7 +748,6 @@
     <string name="temperature_normals_deviation_explanation_minimum">Odchylka od průměrné minimální teploty v měsíci %s v tomto místě</string>
     <string name="widget_custom_subtitle_help_content_description">Zobrazit nápovědu k vlastním klíčovým slovům titulků</string>
     <string name="widget_custom_subtitle_alert_box_title">Vlastní nápověda titulků</string>
-    <string name="action_open_in_other_app_no_app">Nenalezeny žádné mapy</string>
     <string name="action_share_no_app">Nenalezena žádná aplikace pro sdílení</string>
     <string name="action_translate">Přeložit</string>
     <string name="action_translate_no_app">Nenalezena žádná aplikace překladače</string>

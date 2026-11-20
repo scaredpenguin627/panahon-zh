@@ -39,6 +39,7 @@ import org.breezyweather.domain.weather.model.getColor
 import org.breezyweather.domain.weather.model.getIndex
 import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.validAirQuality
+import org.breezyweather.sources.emb.EmbAirQualityService
 import org.breezyweather.ui.common.widgets.ArcProgress
 import org.breezyweather.ui.theme.resource.providers.ResourceProvider
 import org.breezyweather.unit.formatting.format
@@ -47,6 +48,7 @@ import kotlin.math.roundToInt
 class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.container_main_air_quality, parent, false)
 ) {
+    private val title: TextView = itemView.findViewById(R.id.title)
     private val aqiValueView: TextView = itemView.findViewById(R.id.aqi_value)
     private val aqiLevelView: TextView = itemView.findViewById(R.id.aqi_level)
     private val aqiProgress: ArcProgress = itemView.findViewById(R.id.aqi_progress)
@@ -63,6 +65,9 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         itemAnimationEnabled: Boolean,
     ) {
         super.onBindView(activity, location, provider, listAnimationEnabled, itemAnimationEnabled)
+        title.setText(
+            if (location.airQualitySource == EmbAirQualityService.ID) R.string.emb_model_title else R.string.air_quality_short
+        )
 
         val talkBackBuilder = StringBuilder()
         location.weather!!.validAirQuality?.let { airQuality ->

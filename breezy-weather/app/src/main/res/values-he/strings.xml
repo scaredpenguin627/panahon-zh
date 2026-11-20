@@ -703,9 +703,6 @@
     <string name="location_last_updated_x">עודכן לאחרונה %s</string>
     <string name="location_has_active_alerts">התרעה פעילה</string>
     <string name="action_add_as_location">הוסף כמיקום</string>
-    <string name="action_open_in_other_app">פתיחה ביישום אחר</string>
-    <string name="action_open_in_other_app_description">פתיחת מיקום זה ביישום אחר</string>
-    <string name="action_open_in_other_app_no_app">אפליקציית מפות לא נמצאה</string>
     <string name="action_configure_item">הגדר %s</string>
     <string name="action_pull_down_to_refresh">גלול למטה בכדי לרענן</string>
     <string name="action_change">שנה</string>

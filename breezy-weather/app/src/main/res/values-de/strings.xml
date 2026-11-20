@@ -637,8 +637,6 @@
     <string name="message_outdated_server_data">Veraltete Daten vom Server empfangen</string>
     <string name="action_enable">Aktivieren</string>
     <string name="action_allow">Erlauben</string>
-    <string name="action_open_in_other_app">In einer anderen App öffnen</string>
-    <string name="action_open_in_other_app_description">Diesen Ort in einer anderen App öffnen</string>
     <string name="chart_no_daily_data">Für diesen Tag sind keine Daten verfügbar.</string>
     <string name="ephemeris_about_set">Die Untergangszeit ist der Zeitpunkt, an dem die Sonne oder der Mond vollständig unter dem Horizont verschwindet.</string>
     <string name="ephemeris_about">Über Auf- und Untergangszeiten</string>
@@ -745,7 +743,6 @@
     <string name="temperature_normals_deviation_explanation_minimum">Abweichung von der durchschnittlichen Minimaltemperatur im %s für diesen Ort</string>
     <string name="widget_custom_subtitle_alert_box_title">Hilfe zu benutzerdefiniertem Untertitel</string>
     <string name="widget_custom_subtitle_help_content_description">Zeigt Schlüsselwörter für benutzerdefinierte Untertitel als Hilfe an</string>
-    <string name="action_open_in_other_app_no_app">Keine Maps-App gefunden</string>
     <string name="action_share_no_app">Keine App zum Teilen gefunden</string>
     <string name="action_translate">Übersetzen</string>
     <string name="action_translate_no_app">Keine Übersetzungs-App gefunden</string>

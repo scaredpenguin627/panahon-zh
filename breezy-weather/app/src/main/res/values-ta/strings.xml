@@ -737,9 +737,6 @@
     <string name="weather_source_recommended">பரிந்துரைக்கப்படுகிறது</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s இருப்பிட புதுப்பிப்பு அறிவிப்பான்</string>
     <string name="action_add_as_location">இருப்பிடமாகச் சேர்க்கவும்</string>
-    <string name="action_open_in_other_app">மற்றொரு பயன்பாட்டில் திறக்கவும்</string>
-    <string name="action_open_in_other_app_description">இந்த இடத்தை வேறொரு ஆப்சில் திறக்கவும்</string>
-    <string name="action_open_in_other_app_no_app">வரைபட பயன்பாடு எதுவும் இல்லை</string>
     <string name="action_configure_item">%sஐ உள்ளமைக்கவும்</string>
     <string name="action_pull_down_to_refresh">புதுப்பிக்க கீழே இழுக்கவும்</string>
     <string name="action_change">மாற்றவும்</string>

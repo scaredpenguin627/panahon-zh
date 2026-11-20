@@ -706,9 +706,6 @@
     <string name="location_last_updated_x">Posljednje ažuriranje %s</string>
     <string name="location_has_active_alerts">Aktivno upozorenje</string>
     <string name="action_add_as_location">Dodaj kao lokaciju</string>
-    <string name="action_open_in_other_app">Otvori u drugoj aplikaciji</string>
-    <string name="action_open_in_other_app_description">Otvori ovu lokaciju u drugoj aplikaciji</string>
-    <string name="action_open_in_other_app_no_app">Nije pronađena nijedna aplikacija za karte</string>
     <string name="action_configure_item">Konfiguriraj %s</string>
     <string name="action_pull_down_to_refresh">Povuci prema dolje za osvježavanje</string>
     <string name="action_change">Promijeni</string>

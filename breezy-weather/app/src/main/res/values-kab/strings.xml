@@ -201,9 +201,6 @@
     <string name="location_search_placeholder">Anadi n umkan…</string>
     <string name="location_search_source">Aɣbalu n unadi n umkan</string>
     <string name="location_search_change_source">Beddel aɣbalu n unadi n umkan</string>
-    <string name="action_open_in_other_app_no_app">Ulac asnas n tkardisin</string>
-    <string name="action_open_in_other_app">Ldi di usnas nniḍen</string>
-    <string name="action_open_in_other_app_description">Ldi amkan-a di usnas nniḍen</string>
     <string name="action_change">Beddel</string>
     <string name="action_edit_location">Ẓreg amkan-a</string>
     <string name="action_pull_down_to_refresh">Sider dduḥ ad ttwajeḍdid</string>

@@ -624,8 +624,6 @@
     <string name="message_outdated_server_data">Отримано застарілі дані з сервера</string>
     <string name="action_allow">Дозволити</string>
     <string name="action_enable">Увімкнути</string>
-    <string name="action_open_in_other_app">Відкрити в іншому застосунку</string>
-    <string name="action_open_in_other_app_description">Відкрити це розташування в іншому застосунку</string>
     <string name="ephemeris_about">Про час сходу та заходу</string>
     <string name="daily_summary">Щоденне зведення</string>
     <string name="chart_no_daily_data">Немає даних за цей день.</string>
@@ -734,7 +732,6 @@
     <string name="widget_custom_subtitle_alert_box_title">Допомога з налаштуванням субтитрів</string>
     <string name="settings_appearance_dark_mode_locations_day_night">Слідкуйте за днем/ніччю</string>
     <string name="settings_appearance_dark_mode_locations_dark">Завжди темно, коли програма перебуває в темному режимі</string>
-    <string name="action_open_in_other_app_no_app">Картографічний додаток не знайдено</string>
     <string name="action_share_no_app">Не знайдено програми для спільного доступу</string>
     <string name="action_translate">Перекласти</string>
     <string name="action_translate_no_app">Програму для перекладу не знайдено</string>

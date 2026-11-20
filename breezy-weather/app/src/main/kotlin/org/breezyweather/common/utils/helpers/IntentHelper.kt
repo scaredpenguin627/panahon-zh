@@ -17,7 +17,6 @@
 package org.breezyweather.common.utils.helpers
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,7 +24,6 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
-import androidx.core.net.toUri
 import breezyweather.domain.location.model.Location
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.ui.about.AboutActivity
@@ -214,19 +212,6 @@ object IntentHelper {
 
     fun startLocationSettingsActivity(context: Context) {
         context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-    }
-
-    fun openLocationInOtherApp(activity: Activity, location: Location): Boolean {
-        return try {
-            activity.startActivity(
-                Intent(Intent.ACTION_VIEW, "geo:${location.latitude},${location.longitude}".toUri())
-            )
-            true
-        } catch (_: ActivityNotFoundException) {
-            false
-        } catch (_: SecurityException) {
-            false
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

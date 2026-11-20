@@ -91,6 +91,7 @@ object WeatherMapper {
         ceiling: Distance?,
         dailyForecast: String?,
         hourlyForecast: String?,
+        windHumiditySource: String?,
     ): Weather = Weather(
         Base(
             refreshTime?.let { Date(it) },
@@ -135,7 +136,8 @@ object WeatherMapper {
             visibility,
             ceiling,
             dailyForecast,
-            hourlyForecast
+            hourlyForecast,
+            windHumiditySource
         )
     )
 

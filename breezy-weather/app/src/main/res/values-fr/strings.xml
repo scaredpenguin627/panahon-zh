@@ -765,9 +765,6 @@
     <string name="action_add_new_location">Ajouter un nouvel emplacement</string>
     <string name="action_add_as_location">Ajouter comme emplacement</string>
     <string name="action_edit_location">Modifier cet emplacement</string>
-    <string name="action_open_in_other_app">Ouvrir dans une autre app</string>
-    <string name="action_open_in_other_app_description">Ouvrir cet emplacement dans une autre application</string>
-    <string name="action_open_in_other_app_no_app">Aucune appli de carte compatible trouvée</string>
     <string name="widget_material_you_forecast">Material You – Prévisions</string>
     <string name="widget_material_you_current">Material You – En ce moment</string>
     <string name="notification_channel_alerts">Vigilances</string>

@@ -29,6 +29,7 @@ import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.hasMinutelyPrecipitation
 import org.breezyweather.domain.weather.model.isIndexValid
 import org.breezyweather.domain.weather.model.validAirQuality
+import org.breezyweather.sources.emb.EmbAirQualityService
 import org.breezyweather.ui.main.MainActivity
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainCardViewHolder
 import org.breezyweather.ui.main.adapters.main.holder.AbstractMainViewHolder
@@ -140,12 +141,13 @@ class MainAdapter(
                 if (c === CardDisplay.CARD_WIND && weather.current?.wind?.isValid != true) {
                     continue
                 }
-                if (c === CardDisplay.CARD_AIR_QUALITY && BuildConfig.FLAVOR == "basic" &&
-                    location.countryCode.equals("PH", ignoreCase = true)
-                ) {
-                    mViewTypeList.add(ViewType.EMB)
-                }
-                if (c === CardDisplay.CARD_AIR_QUALITY && weather.validAirQuality == null) {
+                if (c === CardDisplay.CARD_AIR_QUALITY) {
+                    if (weather.validAirQuality != null && !location.airQualitySource.isNullOrEmpty()) {
+                        mViewTypeList.add(ViewType.AIR_QUALITY)
+                    }
+                    if (BuildConfig.FLAVOR == "basic" && location.airQualitySource == EmbAirQualityService.ID) {
+                        mViewTypeList.add(ViewType.EMB)
+                    }
                     continue
                 }
                 if (c === CardDisplay.CARD_POLLEN &&

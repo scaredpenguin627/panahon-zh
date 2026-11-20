@@ -626,8 +626,6 @@
     <string name="message_outdated_server_data">No servera saņemti novecojuši dati</string>
     <string name="action_enable">Iespējot</string>
     <string name="action_allow">Atļaut</string>
-    <string name="action_open_in_other_app">Atvērt citā lietotnē</string>
-    <string name="action_open_in_other_app_description">Atvērt šo atrašanās vietu citā lietotnē</string>
     <string name="daily_summary">Ikdienas kopsavilkums</string>
     <string name="conditions">Apstākļi</string>
     <string name="visibility_poor">Slikta</string>
@@ -742,7 +740,6 @@
     <string name="visibility_from_to_description">%1$s līdz %2$s</string>
     <string name="cloud_cover_about">Par mākoņainumu</string>
     <string name="cloud_cover_about_description">Mākoņainums norāda uz debesu daļu, ko vidēji aizsedz mākoņi, procentos. Mākoņainums ir tiešā veidā saistīts ar saules gaismas ilgumu.</string>
-    <string name="action_open_in_other_app_no_app">Netika atrasta karšu lietotne</string>
     <string name="action_configure_item">Konfigurēt %s</string>
     <string name="action_share_no_app">Netika atrasta neviena lietotne, kurā kopīgot</string>
     <string name="action_translate">Tulkot</string>

@@ -11,8 +11,11 @@
     <string name="emb_old">距今已超过 24 小时</string>
     <string name="emb_fetched">读取时间：%1$s</string>
     <string name="emb_sub_index">%1$s 子指数 %2$s</string>
-    <string name="emb_other_source">其他空气质量数据来源：%1$s</string>
-    <string name="emb_model">空气质量模型来源：%1$s</string>
+    <string name="emb_source_name">DENR-EMB 官方站点 + Open-Meteo 模型</string>
+    <string name="emb_model_title">空气质量 · Open-Meteo</string>
+    <string name="emb_model">空气质量图表使用 Open-Meteo 模型数据。</string>
+    <string name="emb_model_updated">Open-Meteo 模型数据上次获取于 %1$s</string>
+    <string name="emb_model_missing">Open-Meteo 暂无可用的模型数据。</string>
     <string name="emb_official_link">查看官方监测报表</string>
     <string name="emb_manual">手工采样记录</string>
     <string name="emb_annual">年度空气质量汇总</string>

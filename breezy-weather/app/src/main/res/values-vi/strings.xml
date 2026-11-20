@@ -762,9 +762,6 @@
     <string name="weather_source_recommended">Khuyến nghị</string>
     <string name="broadcast_source_breezy_weather_update_notifier">Thông báo cập nhật vị trí của %s</string>
     <string name="action_add_as_location">Thêm địa điểm</string>
-    <string name="action_open_in_other_app">Mở trong ứng dụng khác</string>
-    <string name="action_open_in_other_app_description">Mở vị trí này bằng ứng dụng khác</string>
-    <string name="action_open_in_other_app_no_app">Không tìm thấy ứng dụng bản đồ</string>
     <string name="action_configure_item">Thiết lập %s</string>
     <string name="action_pull_down_to_refresh">Kéo xuống để làm mới</string>
     <string name="action_change">Thay đổi</string>

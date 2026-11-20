@@ -148,6 +148,10 @@ class FooterViewHolder(
                         append(stringResource(R.string.dot_separator))
                         withLink(moreClickableLinkAnnotation) { append(stringResource(R.string.action_more)) }
                     } ?: withLink(moreClickableLinkAnnotation) { append(stringResource(R.string.data_sources)) }
+                    location.weather?.current?.windHumiditySource?.let {
+                        append("\n")
+                        append(stringResource(R.string.wind_humidity_attribution, it))
+                    }
                 },
                 color = Color(
                     delegate.getOnBackgroundColor(

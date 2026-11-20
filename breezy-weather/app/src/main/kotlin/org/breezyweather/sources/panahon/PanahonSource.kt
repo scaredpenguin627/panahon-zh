@@ -13,9 +13,15 @@ abstract class PanahonSource : HttpSource(), WeatherSource, NonFreeNetSource {
     override val name = "PAGASA PANaHON"
     override val continent = SourceContinent.ASIA
     override val privacyPolicyUrl = ""
-    override val attributionLinks = mapOf(name to "https://panahon.gov.ph/")
-    override val supportedFeatures = listOf(SourceFeature.FORECAST, SourceFeature.CURRENT, SourceFeature.ALERT)
-        .associateWith { name }
+    override val attributionLinks = mapOf(
+        name to "https://panahon.gov.ph/", "PAGASA AWS" to "https://www.pagasa.dost.gov.ph/",
+        "Open-Meteo" to "https://open-meteo.com/"
+    )
+    override val supportedFeatures = mapOf(
+        SourceFeature.FORECAST to "$name • Open-Meteo (CC BY 4.0)",
+        SourceFeature.CURRENT to "$name • PAGASA AWS • Open-Meteo (CC BY 4.0)",
+        SourceFeature.ALERT to name
+    )
 
     override fun isFeatureSupportedForLocation(location: Location, feature: SourceFeature) =
         location.countryCode.equals("PH", ignoreCase = true) && feature in supportedFeatures

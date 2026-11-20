@@ -380,9 +380,6 @@
     <string name="location_has_active_alerts">চলমান সতর্কতা</string>
     <string name="action_add_as_location">লোকেশান হিসেবে যুক্ত করুণ</string>
     <string name="action_edit_location">লোকেশান পরিবর্তন করুন</string>
-    <string name="action_open_in_other_app">অন্য অ্যাপে চালু করুন</string>
-    <string name="action_open_in_other_app_description">এই লোকেশান অন্য অ্যাপ এ চালু করুন</string>
-    <string name="action_open_in_other_app_no_app">কনো ম্যাপ অ্যাপ পাওয়া যায়নি</string>
     <string name="action_settings">সেটিং</string>
     <string name="action_configure_item">পরিবর্তন %s</string>
     <string name="action_preview">পূর্বরূপ</string>

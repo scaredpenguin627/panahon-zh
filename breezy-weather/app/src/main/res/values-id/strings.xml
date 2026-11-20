@@ -753,14 +753,11 @@
     <string name="air_quality_o3_about">Tentang ozon permukaan (%s)</string>
     <string name="air_quality_o3_sources">Ozon terbentuk melalui reaksi kimia antara oksigen atmosfer, nitrogen oksida, karbon monoksida, dan senyawa organik dengan adanya sinar matahari.</string>
     <string name="action_share_no_app">Tidak ada aplikasi untuk berbagi yang ditemukan</string>
-    <string name="action_open_in_other_app_description">Buka lokasi ini di aplikasi lain</string>
     <string name="action_change">Ubah</string>
     <string name="about_update_check_eol">Versi Android ini tidak lagi didukung</string>
     <string name="action_add_as_location">Tambahkan sebagai lokasi</string>
     <string name="action_close_menu">Tutup menu</string>
     <string name="action_toggle_data_type_menu">Alihkan menu pemilihan jenis data</string>
-    <string name="action_open_in_other_app">Buka di aplikasi lain</string>
-    <string name="action_open_in_other_app_no_app">Tidak ada aplikasi peta yang ditemukan</string>
     <string name="action_pull_down_to_refresh">Tarik ke bawah untuk menyegarkan</string>
     <string name="action_translate">Terjemahkan</string>
     <string name="action_translate_no_app">Tidak ada aplikasi terjemahan yang ditemukan</string>

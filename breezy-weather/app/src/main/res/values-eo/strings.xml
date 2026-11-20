@@ -647,8 +647,6 @@
     <string name="daily_yesterday">Hieraŭ</string>
     <string name="daily_today">Hodiaŭ</string>
     <string name="daily_tomorrow">Morgaŭ</string>
-    <string name="action_open_in_other_app">Malfermi en alia aplikaĵo</string>
-    <string name="action_open_in_other_app_description">Malfermu ĉi tiun lokon en alia aplikaĵo</string>
     <string name="ephemeris_about">Pri leviĝo kaj subirotempoj</string>
     <string name="ephemeris_about_rise">La leviĝtempo estas kiam la suno aŭ la luno plene aperas sur la horizonto.</string>
     <string name="ephemeris_about_set">La subiro tempo estas kiam la suno aŭ luno plene malaperas sub la horizonto.</string>
@@ -794,7 +792,6 @@
     <string name="weather_source_recommended">Rekomendita</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s Loka ĝisdatigo atentigilo</string>
     <string name="action_add_as_location">Aldoni kiel loko</string>
-    <string name="action_open_in_other_app_no_app">Neniuj mapaj aplikaĵoj trovitaj</string>
     <string name="action_configure_item">Agordi %s</string>
     <string name="action_change">Ŝanĝi</string>
     <string name="action_share_no_app">Neniu aplikaĵo por kunhavigi trovita</string>

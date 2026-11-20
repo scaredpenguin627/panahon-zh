@@ -636,8 +636,6 @@
     <string name="message_outdated_server_data">Date învechite primite de la server</string>
     <string name="action_allow">Permite</string>
     <string name="action_enable">Activează</string>
-    <string name="action_open_in_other_app_description">Deschideți această locație în altă aplicație</string>
-    <string name="action_open_in_other_app">Deschideți în altă aplicație</string>
     <string name="label_collapsed">Colapsat</string>
     <string name="label_expanded">Expandat</string>
     <string name="action_toggle_data_type_menu">Comutați meniul de selectare a tipului de date</string>
@@ -758,7 +756,6 @@
     <string name="weather_source_recommended">Recomandări</string>
     <string name="broadcast_source_breezy_weather_update_notifier">Notificator actualizări locație %s</string>
     <string name="action_add_as_location">Adaugă ca locație</string>
-    <string name="action_open_in_other_app_no_app">Nu a fost găsită nicio aplicație de hărți</string>
     <string name="action_configure_item">Configurează %s</string>
     <string name="action_change">Schimbă</string>
     <string name="action_share_no_app">Nu s-a găsit nicio aplicație cu care să partajezi</string>

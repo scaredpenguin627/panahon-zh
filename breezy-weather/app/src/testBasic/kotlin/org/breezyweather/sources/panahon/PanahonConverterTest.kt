@@ -53,4 +53,28 @@ class PanahonConverterTest {
         ))
         assertEquals(listOf("local", "national"), alerts.toAlerts(PanahonArea(region = "Metro Manila"), now).map { it.alertId })
     }
+
+    @Test
+    fun finalAdvisoryWithEmptyLocationsDoesNotInvalidateOtherProvinces() {
+        // These three entries coexisted in the nationwide feed on 2026-11-20.
+        val advisory = PanahonBulletin(
+            "e15684d3c7a986b043ecf876443676b3", "Thunderstorm Advisory #VISPRSD",
+            locations = listOf("Iloilo", "Aklan", "Capiz"), valid_until_at = "November 20, 2026 07:37 PM"
+        )
+        val final = PanahonBulletin(
+            "21d514d7f0b5f2dee243ad62d376a10b", "Rainfall Advisory#NCRPRSD",
+            locations = emptyList(), valid_until_at = "November 20, 2026 07:00 PM"
+        )
+        val watch = PanahonBulletin(
+            "ed60b623b73c88da34fac567865efc0b", "Thunderstorm Watch #VISPRSD",
+            locations = listOf("Iloilo", "Aklan"), valid_until_at = "November 20, 2026 10:00 PM"
+        )
+        val feed = PanahonAlerts(true, listOf(advisory, final, watch))
+        val at1830ManilaTime = Instant.parse("2026-11-20T10:30:00Z").toEpochMilli()
+        assertTrue(feed.toAlerts(PanahonArea(region = "Metro Manila"), at1830ManilaTime).isEmpty())
+        assertEquals(
+            listOf(advisory.alert_id, watch.alert_id),
+            feed.toAlerts(PanahonArea(province = "Aklan"), at1830ManilaTime).map { it.alertId }
+        )
+    }
 }

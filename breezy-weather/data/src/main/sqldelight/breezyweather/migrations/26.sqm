@@ -1,0 +1,1 @@
+ALTER TABLE weathers ADD COLUMN wind_humidity_source TEXT;

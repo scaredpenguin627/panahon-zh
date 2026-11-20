@@ -746,9 +746,6 @@
     <string name="weather_source_recommended">Προτεινόμενη</string>
     <string name="broadcast_source_breezy_weather_update_notifier">Ειδοποιητής Ενημέρωσης Τοποθεσίας %s</string>
     <string name="action_add_as_location">Προσθήκη ως τοποθεσία</string>
-    <string name="action_open_in_other_app">Άνοιγμα σ’ άλλη εφαρμογή</string>
-    <string name="action_open_in_other_app_description">Άνοιγμα αυτή την τοποθεσία σ’ άλλη εφαρμογή</string>
-    <string name="action_open_in_other_app_no_app">Δεν υπάρχει εφαρμογή χαρτών</string>
     <string name="action_configure_item">Ρύθμιση %s</string>
     <string name="action_pull_down_to_refresh">Τράβηγμα κάτω για ανανέωση</string>
     <string name="action_change">Αλλαγή</string>

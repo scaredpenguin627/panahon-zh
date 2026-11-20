@@ -632,8 +632,6 @@
     <string name="message_outdated_server_data">Застарели подаци примљени са сервера</string>
     <string name="action_enable">Омогући</string>
     <string name="action_allow">Дозволи</string>
-    <string name="action_open_in_other_app">Отвори у другој апликацији</string>
-    <string name="action_open_in_other_app_description">Отворите ову локацију у другој апликацији</string>
     <string name="ephemeris_about">О временима изласка и заласка</string>
     <string name="ephemeris_about_rise">Време изласка је када се сунце или месец потпуно појаве изнад хоризонта.</string>
     <string name="ephemeris_about_set">Време заласка је када сунце или месец потпуно нестану испод хоризонта.</string>
@@ -749,7 +747,6 @@
     <string name="air_quality_co_index">Скала индекса квалитета ваздуха за %s</string>
     <string name="daytime_short">Дан</string>
     <string name="nighttime_short">Ноћ</string>
-    <string name="action_open_in_other_app_no_app">Није пронађена ниједна апликација за мапе</string>
     <string name="action_share_no_app">Није пронађена апликација за дељење</string>
     <string name="action_translate">Преведи</string>
     <string name="action_translate_no_app">Није пронађена апликација за превођење</string>

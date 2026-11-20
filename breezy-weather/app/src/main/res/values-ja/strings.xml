@@ -662,8 +662,6 @@
     <string name="message_outdated_server_data">サーバーから古いデータを受信しました</string>
     <string name="action_enable">有効にする</string>
     <string name="action_allow">許可</string>
-    <string name="action_open_in_other_app">別のアプリケーションで開く</string>
-    <string name="action_open_in_other_app_description">この場所を別のアプリケーションで開く</string>
     <string name="conditions">状況</string>
     <string name="chart_average">平均</string>
     <string name="chart_maximum_value">最大値</string>
@@ -764,7 +762,6 @@
     <string name="cloud_cover_scale">雲量階級</string>
     <string name="data_modified">このコンテンツは、欠けているデータを計算または補完するため、%sによってオリジナルのデータから修正されました。</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s 場所更新通知機能</string>
-    <string name="action_open_in_other_app_no_app">地図アプリが見つかりません</string>
     <string name="action_configure_item">%sの設定</string>
     <string name="action_change">変更</string>
     <string name="action_toggle_data_type_menu">データの種類を選択するメニューの表示を切り替える</string>

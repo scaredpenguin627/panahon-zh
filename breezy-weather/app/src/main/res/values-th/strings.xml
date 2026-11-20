@@ -167,8 +167,6 @@
     <string name="air_quality_co_full">คาร์บอนมอนอกไซด์ (%s)</string>
     <string name="ephemeris_moon_phase_waxing_gibbous">จันทร์ค่อมดวง ข้างขึ้น</string>
     <string name="ephemeris_moon_phase_full_moon">จันทร์เต็มดวง</string>
-    <string name="action_open_in_other_app">เปิดในแอปอื่น</string>
-    <string name="action_open_in_other_app_description">เปิดสถานที่นี้ในแอปอื่น</string>
     <string name="weather_source_continent_worldwide">ทั่วโลก</string>
     <string name="weather_source_continent_south_america">อเมริกาใต้</string>
     <string name="widget_refreshing">กำลังรีเฟรชอยู่</string>
@@ -797,7 +795,6 @@
     <string name="air_quality_co_index">ระดับดัชนีคุณภาพอากาศสำหรับ %s</string>
     <string name="daytime_short">กลางวัน</string>
     <string name="nighttime_short">กลางคืน</string>
-    <string name="action_open_in_other_app_no_app">ไม่พบแอปแผนที่</string>
     <string name="action_share_no_app">ไม่พบแอปที่สามารถแชร์ให้ได้</string>
     <string name="action_translate">แปลภาษา</string>
     <string name="action_translate_no_app">ไม่พบแอปแปลภาษา</string>

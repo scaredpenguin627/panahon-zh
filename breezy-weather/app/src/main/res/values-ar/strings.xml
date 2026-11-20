@@ -631,8 +631,6 @@
     <string name="message_outdated_server_data">تم تلقي بيانات قديمة من الخادم</string>
     <string name="action_enable">تفعيل</string>
     <string name="action_allow">السماح</string>
-    <string name="action_open_in_other_app">افتح في تطبيق آخر</string>
-    <string name="action_open_in_other_app_description">افتح هذا الموقع في تطبيق آخر</string>
     <string name="air_quality_short">جودة الهواء</string>
     <string name="ephemeris_sun">الشمس</string>
     <string name="ephemeris_moon">القمر</string>
@@ -750,7 +748,6 @@
     <string name="weather_source_recommended">موصى به</string>
     <string name="broadcast_source_breezy_weather_update_notifier">منبّه تحديث الموقع لـ %s</string>
     <string name="action_add_as_location">أضف كموقع</string>
-    <string name="action_open_in_other_app_no_app">لم يُعثر على تطبيق خرائط</string>
     <string name="action_configure_item">اضبط %s</string>
     <string name="action_pull_down_to_refresh">اسحب للأسفل للتحديث</string>
     <string name="action_change">تغيير</string>

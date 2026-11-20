@@ -288,9 +288,6 @@
     <string name="action_add_new_location">ಹೊಸ ಸ್ಥಳ ಸೇರಿಸಿ</string>
     <string name="action_add_as_location">ಸ್ಥಳವಾಗಿ ಸೇರಿಸಿ</string>
     <string name="action_edit_location">ಈ ಸ್ಥಳ ತಿದ್ದಿ</string>
-    <string name="action_open_in_other_app">ಬೇರೆ ಆ್ಯಪ್ ನಲ್ಲಿ ತೆರೆ</string>
-    <string name="action_open_in_other_app_description">ಈ ಸ್ಥಳವನ್ನು ಬೇರೆ ಆ್ಯಪ್ ನಲ್ಲಿ ತೆರೆ</string>
-    <string name="action_open_in_other_app_no_app">ನಕ್ಷೆಗಳ ಆ್ಯಪ್ ಕಂಡುಬಂದಿಲ್ಲ</string>
     <string name="action_settings">ಸಂಯೋಜನೆಗಳು</string>
     <string name="action_configure_item">%s ಅನ್ನು ಸಂರಚಿಸಿ</string>
     <string name="action_preview">ಮುನ್ನೋಟ</string>

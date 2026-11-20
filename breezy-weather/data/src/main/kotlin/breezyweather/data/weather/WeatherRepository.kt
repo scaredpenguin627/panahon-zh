@@ -169,7 +169,8 @@ class WeatherRepository(
                 visibility = weather.current?.visibility,
                 ceiling = weather.current?.ceiling,
                 dailyForecast = weather.current?.dailyForecast,
-                hourlyForecast = weather.current?.hourlyForecast
+                hourlyForecast = weather.current?.hourlyForecast,
+                windHumiditySource = weather.current?.windHumiditySource
             )
 
             // 2. Save daily (delete first, then re-add)

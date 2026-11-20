@@ -142,6 +142,21 @@
                 app:layout_constraintStart_toEndOf="@+id/dew_point_circle"
                 app:layout_constraintTop_toTopOf="@+id/dew_point_circle" />
 
+            <TextView
+                android:id="@+id/wind_humidity_source"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorSurfaceInverse"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/block_end_guideline"
+                app:layout_constraintStart_toStartOf="@id/block_start_guideline"
+                app:layout_constraintTop_toBottomOf="@id/block_bottom_guideline" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

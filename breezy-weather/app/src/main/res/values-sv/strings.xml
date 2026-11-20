@@ -624,8 +624,6 @@
     <string name="message_outdated_server_data">Föråldrade data mottogs från servern</string>
     <string name="action_allow">Tillåt</string>
     <string name="action_enable">Aktivera</string>
-    <string name="action_open_in_other_app">Öppna i en annan app</string>
-    <string name="action_open_in_other_app_description">Öppna denna plats i en annan app</string>
     <string name="ephemeris_about">Om uppgångs- och nedgångstider</string>
     <string name="ephemeris_about_rise">Uppgångstiden är när solen eller månen helt och hållet syns över horisonten.</string>
     <string name="ephemeris_about_set">Nedgångstiden är när solen eller månen helt och hållet försvinner under horisonten.</string>
@@ -713,7 +711,6 @@
     <string name="action_share_no_app">Ingen app för delning hittades</string>
     <string name="action_toggle_data_type_menu">Visa eller dölj menyn för val av datatyp</string>
     <string name="action_close_menu">Stäng menyn</string>
-    <string name="action_open_in_other_app_no_app">Ingen kartapp hittades</string>
     <string name="nighttime_details">Börjar på kvällen och varar till gryningen nästa dag</string>
     <string name="air_quality_pm25_full">Fina luftburna partiklar (&lt; %s)</string>
     <string name="air_quality_pm10_full">Inandningsbara partiklar (&lt; %s)</string>

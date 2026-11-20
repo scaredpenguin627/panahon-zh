@@ -83,7 +83,6 @@ class HomeFragment : MainModuleFragment() {
     interface Callback {
         fun onEditIconClicked()
         fun onManageIconClicked()
-        fun onOpenInOtherAppIconClicked()
     }
 
     override fun onCreateView(
@@ -197,12 +196,10 @@ class HomeFragment : MainModuleFragment() {
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_edit -> callback?.onEditIconClicked()
-                R.id.action_open_in_other_app -> callback?.onOpenInOtherAppIconClicked()
             }
             true
         }
         binding.toolbar.menu.findItem(R.id.action_edit).isVisible = false
-        binding.toolbar.menu.findItem(R.id.action_open_in_other_app).isVisible = false
         // Needed to get the icon to show the correct color depending on dark mode
         binding.toolbar.overflowIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_more_vert)
 
@@ -277,11 +274,9 @@ class HomeFragment : MainModuleFragment() {
                 viewModel.currentLocation.collect {
                     if (it?.location != null) {
                         binding.toolbar.menu.findItem(R.id.action_edit).isVisible = true
-                        binding.toolbar.menu.findItem(R.id.action_open_in_other_app).isVisible = true
                         binding.emptyText.visibility = if (it.location.weather != null) View.GONE else View.VISIBLE
                     } else {
                         binding.toolbar.menu.findItem(R.id.action_edit).isVisible = false
-                        binding.toolbar.menu.findItem(R.id.action_open_in_other_app).isVisible = false
                         binding.emptyText.visibility = View.GONE
                     }
                     if (it?.location != lastCurrentLocation) {

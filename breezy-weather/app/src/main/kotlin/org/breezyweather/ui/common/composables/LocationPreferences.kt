@@ -885,7 +885,15 @@ fun SecondarySourcesPreference(
                             // TODO: Will trigger a full refresh which we should avoid
                             // if we only change a secondary weather source
                             weather = location.weather?.let { weather ->
+                                val keepAirQuality = location.airQualitySource.orEmpty() == airQualitySource.value
                                 weather.copy(
+                                    current = if (keepAirQuality) weather.current else weather.current?.copy(airQuality = null),
+                                    dailyForecast = if (keepAirQuality) weather.dailyForecast else {
+                                        weather.dailyForecast.map { it.copy(airQuality = null) }
+                                    },
+                                    hourlyForecast = if (keepAirQuality) weather.hourlyForecast else {
+                                        weather.hourlyForecast.map { it.copy(airQuality = null) }
+                                    },
                                     base = weather.base.copy(
                                         refreshTime = null,
                                         forecastUpdateTime = null,

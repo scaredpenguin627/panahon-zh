@@ -727,9 +727,6 @@
     <string name="weather_source_recommended">Anbefalet</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s Placeringsopdateringsunderretter</string>
     <string name="action_add_as_location">Tilføj som lokation</string>
-    <string name="action_open_in_other_app">Åben i anden app</string>
-    <string name="action_open_in_other_app_description">Åben denne lokation i en anden app</string>
-    <string name="action_open_in_other_app_no_app">Intet kort fundet</string>
     <string name="action_configure_item">Konfigurer %s</string>
     <string name="action_pull_down_to_refresh">Træk ned for at genindlæse</string>
     <string name="action_change">Ændre</string>

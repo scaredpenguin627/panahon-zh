@@ -698,9 +698,6 @@
     <string name="action_change">Zmeniť</string>
     <string name="action_pull_down_to_refresh">Potiahnite nadol pre obnovenie</string>
     <string name="action_configure_item">Nastaviť %s</string>
-    <string name="action_open_in_other_app_no_app">Neboli nájdené žiadne mapy</string>
-    <string name="action_open_in_other_app_description">Otvorte toto miesto v inej aplikácii</string>
-    <string name="action_open_in_other_app">Otvoriť v inej aplikácii</string>
     <string name="action_add_as_location">Pridať ako miesto</string>
     <string name="broadcast_source_breezy_weather_update_notifier">Oznámenie o aktualizácii miesta %s</string>
     <string name="weather_source_recommended">Odporúčané</string>

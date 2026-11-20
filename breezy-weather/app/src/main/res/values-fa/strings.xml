@@ -703,8 +703,6 @@
     <string name="cloud_cover_about_description">پوشش ابر به درصد آسمان پوشیده شده توسط ابرها به طور میانگین اشاره دارد. پوشش ابر با مدت زمان تابش آفتاب هم‌بستگی دارد.</string>
     <string name="data_sources">منابع داده</string>
     <string name="data_modified">این محتوا توسط %s از نسخه اصلی دگرگون شده، عمدتاً برای محاسبه یا برون‌یابی داده‌های گم‌شده.</string>
-    <string name="action_open_in_other_app">باز کردن در برنامه دیگر</string>
-    <string name="action_open_in_other_app_description">باز کردن این مکان در برنامه دیگر</string>
     <string name="action_configure_item">پیکربندی %s</string>
     <string name="action_close_menu">بستن منو</string>
     <string name="action_toggle_data_type_menu">تغییر منوی انتخاب نوع داده</string>
@@ -750,7 +748,6 @@
     <string name="weather_source_recommended">پیشنهادی</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s اگهی به‌روزرسانی مکان</string>
     <string name="action_add_as_location">افزودن به عنوان مکان</string>
-    <string name="action_open_in_other_app_no_app">هیچ برنامه نقشه‌ای یافت نشد</string>
     <string name="action_pull_down_to_refresh">برای بازگذاری به پایین بکشید</string>
     <string name="action_change">تغییر</string>
     <string name="action_share_no_app">‏هیچ برنامه‌ای برای ارسال یافت نشد</string>

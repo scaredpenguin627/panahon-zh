@@ -712,8 +712,6 @@
     <string name="data_modified">Този материал е променен спрямо оригинала от %s, главно за изчисляване или екстраполиране на липсващи данни.</string>
     <string name="location_custom_name">Персонализирано име</string>
     <string name="location_reverse_geocoding">Търсене на адрес</string>
-    <string name="action_open_in_other_app">Отвори в друго приложение</string>
-    <string name="action_open_in_other_app_description">Отвори това местоположение в друго приложение</string>
     <string name="action_configure_item">Конфигурирай %s</string>
     <string name="action_close_menu">Затвори менюто</string>
     <string name="action_toggle_data_type_menu">Превключи менюто за избор на тип данни</string>
@@ -746,7 +744,6 @@
     <string name="air_quality_o3_index">Скала за индекс на качеството на въздуха за %s</string>
     <string name="air_quality_co_about">За въглеродния окис (%s)</string>
     <string name="air_quality_co_index">Скала за индекс на качеството на въздуха за %s</string>
-    <string name="action_open_in_other_app_no_app">Не е намерено приложение за карти</string>
     <string name="action_share_no_app">Няма приложение, което да споделя с намерени</string>
     <string name="action_translate">Превод</string>
     <string name="action_translate_no_app">Не е намерено приложение за превод</string>

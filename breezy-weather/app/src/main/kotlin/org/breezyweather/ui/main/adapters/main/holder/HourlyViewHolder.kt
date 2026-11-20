@@ -63,12 +63,11 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
 
         val weather = location.weather ?: return
 
-        if (weather.current?.hourlyForecast.isNullOrEmpty()) {
-            subtitle.visibility = View.GONE
-        } else {
-            subtitle.visibility = View.VISIBLE
-            subtitle.text = weather.current?.hourlyForecast
-        }
+        val modelAttribution = if (location.forecastSource == "panahon" &&
+            weather.hourlyForecast.any { it.wind?.speed != null || it.relativeHumidity != null }
+        ) context.getString(R.string.hourly_wind_humidity_model) else null
+        subtitle.text = listOfNotNull(weather.current?.hourlyForecast, modelAttribution).joinToString("\n")
+        subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
 
         val trendAdapter = HourlyTrendAdapter(activity, trendRecyclerView).apply {
             bindData(location)

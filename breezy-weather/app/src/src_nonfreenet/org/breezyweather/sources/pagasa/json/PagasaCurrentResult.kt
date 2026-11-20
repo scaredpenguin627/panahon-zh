@@ -18,15 +18,17 @@ package org.breezyweather.sources.pagasa.json
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonPrimitive
 
 @Serializable
 data class PagasaCurrentResult(
     val datetime: String,
     val temperature: String?,
     val humidity: String?,
-    val pressure: String?,
+    val pressure: JsonPrimitive?,
     @SerialName("wind_speed") val windSpeed: String?,
     @SerialName("wind_direction") val windDirection: String?,
     val latitude: String,
     val longitude: String,
+    @SerialName("site_name") val siteName: String? = null,
 )

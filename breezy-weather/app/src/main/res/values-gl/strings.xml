@@ -466,9 +466,6 @@
     <string name="action_add_new_location">Engadir unha nova localización</string>
     <string name="action_add_as_location">Engadir como localización</string>
     <string name="action_edit_location">Editar esta localización</string>
-    <string name="action_open_in_other_app">Abrir noutra app</string>
-    <string name="action_open_in_other_app_description">Abrir esta localización noutra app</string>
-    <string name="action_open_in_other_app_no_app">Non se atopou ningunha app de mapas</string>
     <string name="action_settings">Axustes</string>
     <string name="action_configure_item">Configurar %s</string>
     <string name="action_preview">Vista previa</string>

@@ -633,8 +633,6 @@
     <string name="message_outdated_server_data">С сервера получены устаревшие данные</string>
     <string name="action_enable">Включить</string>
     <string name="action_allow">Разрешить</string>
-    <string name="action_open_in_other_app">Открыть в другом приложении</string>
-    <string name="action_open_in_other_app_description">Открыть это местоположение в другом приложении</string>
     <string name="ephemeris_about">О времени восхода и заката</string>
     <string name="ephemeris_about_rise">Время восхода — это момент, когда солнце или луна полностью появляются над горизонтом.</string>
     <string name="ephemeris_about_set">Время заката наступает, когда солнце или луна полностью скрываются за горизонтом.</string>
@@ -753,7 +751,6 @@
     <string name="air_quality_o3_index">Шкала индекса качества воздуха для %s</string>
     <string name="air_quality_co_about">Об оксиде углерода (%s)</string>
     <string name="air_quality_co_index">Шкала индекса качества воздуха для %s</string>
-    <string name="action_open_in_other_app_no_app">Приложение для карт не найдено</string>
     <string name="action_share_no_app">Приложение для отправки не найдено</string>
     <string name="action_translate">Перевести</string>
     <string name="action_translate_no_app">Приложение для перевода не найдено</string>

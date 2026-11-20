@@ -138,9 +138,9 @@ internal fun PanahonAlerts.toAlerts(area: PanahonArea, now: Long): List<Alert> {
     val relevantAreas = areas + nationwide
     val stamp = formatter("MMMM d, yyyy hh:mm a")
     return data.mapNotNull { item ->
-        val locations = item.locations?.filter { it.isNotBlank() }.orEmpty()
-        if (locations.isEmpty()) throw InvalidOrIncompleteDataException()
-        if (locations.none { it.trim().lowercase(Locale.ROOT) in relevantAreas }) return@mapNotNull null
+        // PAGASA can leave the locations list empty on a final advisory. The issuing
+        // office or a national feed alone does not establish that it covers this location.
+        if (item.locations.orEmpty().none { it.trim().lowercase(Locale.ROOT) in relevantAreas }) return@mapNotNull null
         val end = stamp.read(item.valid_until_at)
         if (end == null || item.alert_id.isBlank()) throw InvalidOrIncompleteDataException()
         if (end.time <= now) return@mapNotNull null

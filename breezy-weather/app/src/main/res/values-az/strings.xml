@@ -545,9 +545,6 @@
     <string name="action_add_new_location">Yeni bir məkan əlavə edin</string>
     <string name="action_add_as_location">Məkan olaraq əlavə edin</string>
     <string name="action_edit_location">Bu məkana düzəliş edin</string>
-    <string name="action_open_in_other_app">Başqa bir tətbiqdə açın</string>
-    <string name="action_open_in_other_app_description">Bu məkanı başqa bir tətbiqdə açın</string>
-    <string name="action_open_in_other_app_no_app">Heç bir xəritə tətbiqi tapılmadı</string>
     <string name="action_settings">Sazlamalar</string>
     <string name="action_configure_item">%s konfiqurasiya edin</string>
     <string name="action_preview">İlkin baxış</string>

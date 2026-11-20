@@ -630,8 +630,6 @@
     <string name="message_outdated_server_data">Elavult adatok lettek fogadva a kiszolgálótól</string>
     <string name="action_enable">Engedélyezés</string>
     <string name="action_allow">Engedélyezés</string>
-    <string name="action_open_in_other_app">Megnyitás másik alkalmazásban</string>
-    <string name="action_open_in_other_app_description">Hely megnyitása egy másik alkalmazásban</string>
     <string name="daily_summary">Napi összefoglaló</string>
     <string name="visibility_poor">Gyenge</string>
     <string name="visibility_moderate">Mérsékelt</string>
@@ -740,7 +738,6 @@
     <string name="widget_custom_subtitle_alert_box_title">Egyéni segédfelirat</string>
     <string name="settings_appearance_dark_mode_locations_day_night">Napszaktól függ</string>
     <string name="settings_appearance_dark_mode_locations_dark">Mindig sötét, amikor az alkalmazás sötét módban van</string>
-    <string name="action_open_in_other_app_no_app">Nem található térképalkalmazás</string>
     <string name="action_share_no_app">Nem található olyan alkalmazás amivel meg lehetne osztani</string>
     <string name="action_translate">Fordítás</string>
     <string name="action_translate_no_app">Nem található fordítóalkalmazás</string>

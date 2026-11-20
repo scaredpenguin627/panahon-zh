@@ -712,9 +712,6 @@
     <string name="location_last_updated_x">Actualitzat %s</string>
     <string name="location_has_active_alerts">Alerta activa</string>
     <string name="action_add_as_location">Afegir com a ubicació</string>
-    <string name="action_open_in_other_app">Obrir en altra aplicació</string>
-    <string name="action_open_in_other_app_description">Obrir aquesta ubicació en altra aplicació</string>
-    <string name="action_open_in_other_app_no_app">No s’han trobat aplicacions de mapes</string>
     <string name="action_configure_item">Configurar %s</string>
     <string name="action_pull_down_to_refresh">Arrastrar cap avall per refrescar</string>
     <string name="action_change">Canviar</string>

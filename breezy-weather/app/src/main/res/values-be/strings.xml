@@ -624,8 +624,6 @@
     <string name="message_outdated_server_data">Ад сервера атрыманы састарэлыя даныя</string>
     <string name="action_enable">Уключыць</string>
     <string name="action_allow">Дазволіць</string>
-    <string name="action_open_in_other_app">Адкрыць у іншай праграме</string>
-    <string name="action_open_in_other_app_description">Адкрыць месца ў іншай праграме</string>
     <string name="uv_index_about">Пра УФ-індэкс</string>
     <string name="uv_index_about_description">УФ-індэкс вымярае сілу ўльтрафіялетавага выпраменьвання сонца. Чым вышэй паказальнік, тым мацней уздзеянне і хутчэй могуць узнікаць сонечныя апёкі, рак скуры і пашкоджанне вачэй.</string>
     <string name="uv_index_scale">Шкала УФ-індэкса</string>
@@ -743,7 +741,6 @@
     <string name="air_quality_pm25_about">Пра завіслыя мікрачасцінкі (%s)</string>
     <string name="air_quality_o3_index">Шкала якасці паветра для %s</string>
     <string name="air_quality_co_about">Пра монааксід вугляроду (%s)</string>
-    <string name="action_open_in_other_app_no_app">Праграма для прагляду карт не знойдзена</string>
     <string name="action_translate">Перакласці</string>
     <string name="action_share_no_app">Праграма для абагульвання не знойдзена</string>
     <string name="action_translate_no_app">Праграма для перакладу не знойдзена</string>

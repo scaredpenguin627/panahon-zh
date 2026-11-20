@@ -629,8 +629,6 @@
     <string name="message_outdated_server_data">Verouderde gegevens ontvangen van de server</string>
     <string name="action_allow">Toestaan</string>
     <string name="message_server_insecure_title">Beveiligde verbinding mislukt</string>
-    <string name="action_open_in_other_app">Openen in andere app</string>
-    <string name="action_open_in_other_app_description">Deze locatie openen in een andere app</string>
     <string name="action_enable">Inschakelen</string>
     <string name="visibility_moderate">Matig</string>
     <string name="settings_appearance_dark_mode_locations_day_night">Dag/nacht volgen</string>
@@ -750,7 +748,6 @@
     <string name="weather_source_recommended">Aanbevolen</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s Locatie-update meldingen</string>
     <string name="action_add_as_location">Toevoegen als locatie</string>
-    <string name="action_open_in_other_app_no_app">Geen kaarten-app gevonden</string>
     <string name="action_configure_item">%s configureren</string>
     <string name="action_change">Wijzigen</string>
     <string name="action_close_menu">Menu sluiten</string>

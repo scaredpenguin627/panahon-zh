@@ -11,8 +11,11 @@
     <string name="emb_old">More than 24 hours old</string>
     <string name="emb_fetched">Retrieved: %1$s</string>
     <string name="emb_sub_index">%1$s sub-index %2$s</string>
-    <string name="emb_other_source">Other air quality data: %1$s</string>
-    <string name="emb_model">Air quality model: %1$s</string>
+    <string name="emb_source_name">DENR-EMB stations + Open-Meteo model</string>
+    <string name="emb_model_title">Air quality · Open-Meteo</string>
+    <string name="emb_model">The air quality chart uses Open-Meteo model data.</string>
+    <string name="emb_model_updated">Open-Meteo model data last retrieved: %1$s</string>
+    <string name="emb_model_missing">Open-Meteo model data is currently unavailable.</string>
     <string name="emb_official_link">Official monitoring report</string>
     <string name="emb_manual">Manual sampling</string>
     <string name="emb_annual">Annual monitoring summary</string>

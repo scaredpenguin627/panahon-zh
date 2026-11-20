@@ -744,9 +744,6 @@
     <string name="weather_source_recommended">Soovitatav</string>
     <string name="broadcast_source_breezy_weather_update_notifier">(%s) asukoha värskenduste teavitaja</string>
     <string name="action_add_as_location">Lisa asukohana</string>
-    <string name="action_open_in_other_app">Ava teises rakenduses</string>
-    <string name="action_open_in_other_app_description">Ava see asukoht teises rakenduses</string>
-    <string name="action_open_in_other_app_no_app">Kaardirakendust ei leitud</string>
     <string name="action_pull_down_to_refresh">Värskendamiseks tõmba alla</string>
     <string name="action_close_menu">Sule menüü</string>
     <string name="action_toggle_data_type_menu">Andmetüübi valiku menüü</string>

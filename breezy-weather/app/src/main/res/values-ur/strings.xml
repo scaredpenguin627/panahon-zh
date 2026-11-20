@@ -352,9 +352,6 @@
     <string name="action_add_new_location">نیا مقام شامل کیجیے</string>
     <string name="action_add_as_location">مقام شامل کیجیے</string>
     <string name="action_edit_location">اس مقام کی ترمیم کیجیے</string>
-    <string name="action_open_in_other_app">کسی دوسرے ایپ میں کھولیں</string>
-    <string name="action_open_in_other_app_description">اس مقام کو کسی دوسرے ایپ میں کھولیں</string>
-    <string name="action_open_in_other_app_no_app">کوئی نقشہ ایپ نہیں ملا</string>
     <string name="action_settings">ترتیبات</string>
     <string name="action_configure_item">‫%s کی تشکیل</string>
     <string name="action_preview">پیش نظارہ</string>

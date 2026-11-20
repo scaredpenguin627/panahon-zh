@@ -32,6 +32,7 @@ import com.google.maps.android.SphericalUtil
 import com.google.maps.android.model.LatLng
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
+import kotlinx.serialization.json.doubleOrNull
 import org.breezyweather.R
 import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.extensions.getIsoFormattedDate
@@ -173,7 +174,7 @@ class PagasaService @Inject constructor(
                     speed = it.windSpeed?.substringBefore(" ")?.toDoubleOrNull()?.kilometersPerHour
                 ),
                 relativeHumidity = it.humidity?.substringBefore(" ")?.toDoubleOrNull()?.percent,
-                pressure = it.pressure?.toDoubleOrNull()?.hectopascals
+                pressure = it.pressure?.doubleOrNull?.hectopascals
             )
         }
     }

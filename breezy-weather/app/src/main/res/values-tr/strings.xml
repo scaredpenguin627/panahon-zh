@@ -632,8 +632,6 @@
     <string name="message_server_insecure_title">Güvenli bağlantı başarısız</string>
     <string name="action_allow">İzin ver</string>
     <string name="action_enable">Etkinleştir</string>
-    <string name="action_open_in_other_app">Başka bir uygulamada aç</string>
-    <string name="action_open_in_other_app_description">Bu konumu başka bir uygulamada aç</string>
     <string name="ephemeris_about">Doğum ve batım vakitleri hakkında</string>
     <string name="ephemeris_about_rise">Doğum vakti, güneşin ya da ayın, ufuğun tamamiyle üstünde belirdiği zamana denir.</string>
     <string name="ephemeris_about_set">Batım vakti, güneşin ya da ayın, ufuğun tamamiyle altına kaybolduğu zamana denir.</string>
@@ -750,7 +748,6 @@
     <string name="weather_source_recommended">Tavsiye edilen</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s Konum Güncelleme Bildiricisi</string>
     <string name="action_add_as_location">Konum olarak ekle</string>
-    <string name="action_open_in_other_app_no_app">Harita uygulaması bulunamadı</string>
     <string name="action_configure_item">%s’yi yapılandırın</string>
     <string name="action_pull_down_to_refresh">Yenilemek için aşağı çekin</string>
     <string name="action_change">Değiştir</string>

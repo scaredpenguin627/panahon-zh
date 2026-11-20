@@ -750,9 +750,6 @@
     <string name="data_sources">Tietolähteet</string>
     <string name="data_modified">Tätä sisältöä on muokannut %s alkuperäisestä, pääasiassa puuttuvien tietojen laskemiseksi tai ekstrapoloimiseksi.</string>
     <string name="weather_source_recommended">Suositukset</string>
-    <string name="action_open_in_other_app">Avaa toisessa sovelluksessa</string>
-    <string name="action_open_in_other_app_description">Avaa tämä sijainti toisessa sovelluksessa</string>
-    <string name="action_open_in_other_app_no_app">Yhteensopivaa karttasovellusta ei löytynyt</string>
     <string name="action_configure_item">Määritä %s</string>
     <string name="action_change">Muuta</string>
     <string name="action_close_menu">Sulje valikko</string>

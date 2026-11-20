@@ -648,8 +648,6 @@
     <string name="air_quality_index_about_description_1">Indeks kvalitete zraka (IKZ) je skala koja pomaže u razumijevanju količine zagađenja zraka u određenom području i mogući ugroz za zdravlje.</string>
     <string name="pressure_about_description1">Atmosferski tlak je tlak Zemljine atmosfere prema dolje. Ova aplikacija upotrebljava srednji tlak na razini mora radi olakšavanja usporedbe tlaka sa mjestima s različitim nadmorskim visinama.</string>
     <string name="location_reverse_geocoding">Pretraga adrese</string>
-    <string name="action_open_in_other_app">Otvori u jednoj drugoj aplikaciji</string>
-    <string name="action_open_in_other_app_description">Otvori ovu lokaciju u jednoj drugoj aplikaciji</string>
     <string name="action_close_menu">Zatvori izbornik</string>
     <string name="action_enable">Aktiviraj</string>
     <string name="action_allow">Dozvoli</string>
@@ -730,7 +728,6 @@
     <string name="pressure_falling">Opadajući</string>
     <string name="air_quality_index_about_description_2">U ovoj se aplikaciji korištena skala zasniva na preporukama Svjetske zdravstvene organizacije, a ne na lokalnim propisima, kako bi kategorije bile smislenije i kako bi se lakše uspoređivale razine onečišćenja između zemalja.</string>
     <string name="action_change">Promijeni</string>
-    <string name="action_open_in_other_app_no_app">Nije pronađena nijedna aplikacija za karte</string>
     <string name="action_configure_item">Konfiguriraj %s</string>
     <string name="action_pull_down_to_refresh">Povuci prema dolje za osvježavanje</string>
     <string name="widget_live_wallpaper_animations_enable_dangerous">OPASNO</string>

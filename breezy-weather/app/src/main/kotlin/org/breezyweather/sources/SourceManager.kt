@@ -81,6 +81,7 @@ import org.breezyweather.sources.debug.DebugService
 import org.breezyweather.sources.dmi.DmiService
 import org.breezyweather.sources.eccc.EcccService
 import org.breezyweather.sources.ekuk.EkukService
+import org.breezyweather.sources.emb.EmbAirQualityService
 import org.breezyweather.sources.epdhk.EpdHkService
 import org.breezyweather.sources.fmi.FmiService
 import org.breezyweather.sources.fpas.FpasService
@@ -155,6 +156,7 @@ class SourceManager @Inject constructor(
     dwrGmService: DwrGmService,
     ecccService: EcccService,
     ekukService: EkukService,
+    embAirQualityService: EmbAirQualityService,
     epdHkService: EpdHkService,
     ethioMetService: EthioMetService,
     fmiService: FmiService,
@@ -265,6 +267,7 @@ class SourceManager @Inject constructor(
         dwrGmService,
         ecccService,
         ekukService,
+        embAirQualityService,
         epdHkService,
         ethioMetService,
         fmiService,

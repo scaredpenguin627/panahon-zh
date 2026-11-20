@@ -689,8 +689,6 @@
     <string name="action_allow">Permitir</string>
     <string name="action_enable">Ativar</string>
     <string name="message_outdated_server_data">Dados recebidos do servidor estão desatualizados</string>
-    <string name="action_open_in_other_app">Abrir em outro app</string>
-    <string name="action_open_in_other_app_description">Abrir esta localização em outro app</string>
     <string name="ephemeris_about">Sobre o nascer e o pôr do sol</string>
     <string name="ephemeris_about_rise">O horário em que o sol ou a lua aparece totalmente acima do horizonte.</string>
     <string name="ephemeris_about_set">O horário de quando o sol ou a lua desaparece totalmente abaixo do horizonte.</string>
@@ -809,7 +807,6 @@
     <string name="air_quality_o3_index">Escala do índice de qualidade do ar para %s</string>
     <string name="air_quality_co_about">Sobre o monóxido de carbono (%s)</string>
     <string name="air_quality_co_index">Escala do índice de qualidade do ar para %s</string>
-    <string name="action_open_in_other_app_no_app">Nenhum aplicativo de mapas encontrado</string>
     <string name="action_share_no_app">Nenhum aplicativo para compartilhar encontrado</string>
     <string name="action_translate">Traduzir</string>
     <string name="action_translate_no_app">Nenhum aplicativo de tradução encontrado</string>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wind_humidity_attribution">当前风况与湿度：%1$s</string>
+    <string name="hourly_wind_humidity_model">逐时风况、湿度和露点：Open-Meteo 模型</string>
+</resources>

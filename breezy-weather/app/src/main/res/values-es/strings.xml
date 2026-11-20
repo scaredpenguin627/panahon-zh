@@ -662,8 +662,6 @@
     <string name="message_outdated_server_data">La información recibida del servidor está desactualizada</string>
     <string name="action_enable">Activar</string>
     <string name="action_allow">Permitir</string>
-    <string name="action_open_in_other_app">Abrir en otra aplicación</string>
-    <string name="action_open_in_other_app_description">Abrir esta ubicación en otra aplicación</string>
     <string name="widget_live_wallpaper_animations_enable_warning2">Si decides activarlas, asumes toda la responsabilidad por cualquier problema que pueda surgir y no se proporcionará asistencia técnica.</string>
     <string name="widget_live_wallpaper_animations_enable_warning1">Las animaciones de fondo de pantalla son conocidas por causar, entre otras cosas: alto consumo de batería; sobrecalentamiento de la batería; alto consumo de memoria; disminución de la capacidad de respuesta del sistema; fallo del sistema Android.</string>
     <string name="widget_live_wallpaper_animations_enable_dangerous">PELIGROSO</string>
@@ -784,7 +782,6 @@
     <string name="weather_source_recommended">Recomendado</string>
     <string name="broadcast_source_breezy_weather_update_notifier">%s Notificador de Actualización de Ubicación</string>
     <string name="action_add_as_location">Añadir como ubicación</string>
-    <string name="action_open_in_other_app_no_app">No se ha encontrado ninguna aplicación de mapas</string>
     <string name="action_configure_item">Configurar %s</string>
     <string name="action_change">Cambiar</string>
     <string name="action_close_menu">Cerrar menú</string>

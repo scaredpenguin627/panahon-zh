@@ -703,8 +703,6 @@
     <string name="ephemeris_about_rise">日出及月出時間是指太陽或月亮完全出現在地平線上方的時間。</string>
     <string name="ephemeris_about_set">日落及月落時間是指太陽或月亮完全消失於地平線以下的時間。</string>
     <string name="daily_summary">每日概況</string>
-    <string name="action_open_in_other_app">在其他應用程式中開啟</string>
-    <string name="action_open_in_other_app_description">在其他應用程式中開啟此位置</string>
     <string name="chart_no_daily_data">當日無資料。</string>
     <string name="chart_no_hourly_data">無每小時資料。</string>
     <string name="chart_not_enough_hourly_data">每小時資料不足以顯示當日圖表。</string>
@@ -810,7 +808,6 @@
     <string name="widget_custom_subtitle_alert_box_title">自訂副標題說明</string>
     <string name="settings_appearance_dark_mode_locations_day_night">跟隨位置晝夜</string>
     <string name="settings_appearance_dark_mode_locations_dark">應用程式使用深色模式時，總是顯示深色模式</string>
-    <string name="action_open_in_other_app_no_app">找不到地圖應用程式</string>
     <string name="action_share_no_app">找不到可分享的應用程式</string>
     <string name="action_translate">翻譯</string>
     <string name="action_translate_no_app">找不到翻譯應用程式</string>

@@ -392,8 +392,6 @@
     <string name="action_add_current_location">Dodaj trenutno lokacijo</string>
     <string name="action_add_new_location">Dodaj novo lokacijo</string>
     <string name="action_edit_location">Uredi to lokacijo</string>
-    <string name="action_open_in_other_app">Odpri v drugi aplikaciji</string>
-    <string name="action_open_in_other_app_description">Odpri to lokacijo v drugi aplikaciji</string>
     <string name="action_restart">Znova zaženi</string>
     <string name="action_edit">Uredi</string>
     <string name="action_delete">Izbriši</string>
@@ -530,7 +528,6 @@
     <string name="location_last_updated_x">Nazadnje posodobljeno %s</string>
     <string name="location_has_active_alerts">Aktivno opozorilo</string>
     <string name="action_add_as_location">Dodaj kot lokacijo</string>
-    <string name="action_open_in_other_app_no_app">Ni najdene aplikacije za zemljevide</string>
     <string name="action_configure_item">Nastavi %s</string>
     <string name="action_pull_down_to_refresh">Povlecite navzdol za osvežitev</string>
     <string name="action_more">Več</string>

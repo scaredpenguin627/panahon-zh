@@ -21,6 +21,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.appcompat.content.res.AppCompatResources
 import breezyweather.domain.location.model.Location
 import org.breezyweather.R
@@ -37,6 +38,7 @@ import org.breezyweather.unit.formatting.UnitWidth
 class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.container_main_wind, parent, false)
 ) {
+    private val sourceView: TextView = itemView.findViewById(R.id.wind_humidity_source)
     private val windDirectionView: ImageView = itemView.findViewById(R.id.wind_direction)
     private val windSpeedValueView: TextView = itemView.findViewById(R.id.wind_speed_value)
     private val windDetailView: TextView = itemView.findViewById(R.id.visibility_description)
@@ -94,6 +96,10 @@ class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
         }
 
+        val source = location.weather?.current?.windHumiditySource
+        sourceView.isVisible = source != null
+        sourceView.text = source?.substringBefore(" · ")
+        if (source != null) talkBackBuilder.append(", ").append(source)
         itemView.contentDescription = talkBackBuilder.toString()
         itemView.setOnClickListener {
             IntentHelper.startDailyWeatherActivity(
