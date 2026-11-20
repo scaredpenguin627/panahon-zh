@@ -65,9 +65,15 @@ internal fun encodeAlertScope(location: Location, names: String): String =
 internal fun Context.alertScopeText(location: Location): String {
     val prefix = encodeAlertScope(location, "")
     val scope = location.weather?.base?.alertScope?.takeIf { it.startsWith(prefix) }?.removePrefix(prefix)
-    return when {
+    val description = when {
         scope == null -> getString(R.string.traveller_scope_unverified)
         scope.isEmpty() -> getString(R.string.traveller_scope_national)
         else -> getString(R.string.traveller_scope_names, scope)
     }
+    val checked = location.weather?.base?.alertsUpdateTime
+    if (scope == null || checked == null) return description
+    val clock = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT).apply {
+        timeZone = TimeZone.getTimeZone("Asia/Manila")
+    }
+    return description + " · " + getString(R.string.traveller_alerts_checked, clock.format(checked))
 }

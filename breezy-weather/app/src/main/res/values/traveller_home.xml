@@ -19,4 +19,5 @@
         <item quantity="other">%d days ago</item>
     </plurals>
     <string name="traveller_query_point">Forecast point %1$s</string>
+    <string name="traveller_alerts_checked">Checked %1$s PHT</string>
 </resources>

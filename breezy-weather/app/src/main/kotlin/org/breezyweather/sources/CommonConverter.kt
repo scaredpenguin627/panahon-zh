@@ -1463,7 +1463,11 @@ internal fun completeCurrentFromHourlyData(
         airQuality = currentAirQuality ?: hourly.airQuality,
         relativeHumidity = newRelativeHumidity,
         dewPoint = newDewPoint,
-        pressure = newCurrent.pressure?.toValidOrNull() ?: hourly.pressure,
+        pressure = newCurrent.pressure?.toValidOrNull() ?: hourly.pressure.takeUnless {
+            // This source accepts pressure only from its coordinate- and hour-checked model grid.
+            (location.currentSource ?: location.forecastSource) == "panahon"
+        },
+        pressureSource = newCurrent.pressureSource.takeIf { newCurrent.pressure?.toValidOrNull() != null },
         cloudCover = newCurrent.cloudCover?.toValidRangeOrNull() ?: hourly.cloudCover,
         visibility = newCurrent.visibility?.toValidOrNull() ?: hourly.visibility,
         ceiling = newCurrent.ceiling?.toValidOrNull()

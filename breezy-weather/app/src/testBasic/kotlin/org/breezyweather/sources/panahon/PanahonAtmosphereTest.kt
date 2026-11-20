@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.doubleOrNull
 import org.breezyweather.sources.completeCurrentFromHourlyData
 import org.breezyweather.sources.pagasa.json.PagasaCurrentResult
+import org.breezyweather.unit.pressure.Pressure.Companion.hectopascals
 import org.breezyweather.unit.computing.computeDewPoint
 import org.breezyweather.unit.ratio.Ratio.Companion.percent
 import org.breezyweather.unit.speed.Speed.Companion.kilometersPerHour
@@ -101,6 +102,20 @@ class PanahonAtmosphereTest {
         }
         val invalid = grid.copy(hourly = grid.hourly.copy(pressure = listOf(0.0, Double.NaN)))
         assertTrue(invalid.hourlyReadings(boracay).isEmpty())
+    }
+
+    @Test
+    fun missingCheckedPressureCannotAcquireAnotherForecastSourcesHourlyPressure() {
+        val location = boracay.copy(currentSource = "panahon", forecastSource = "other")
+        val hour = Hourly(date = Date(now), pressure = 1010.hectopascals)
+        val missing = completeCurrentFromHourlyData(CurrentWrapper(), hour, null, null, location)
+        assertNull(missing.pressure)
+        assertNull(missing.pressureSource)
+        val source = "Open-Meteo · 2026-11-20 18:00 PHT"
+        val supplied = CurrentWrapper(pressure = 1012.hectopascals, pressureSource = source)
+        val merged = completeCurrentFromHourlyData(supplied, hour, null, null, location)
+        assertEquals(1012.hectopascals, merged.pressure)
+        assertEquals(source, merged.pressureSource)
     }
 
     @Test

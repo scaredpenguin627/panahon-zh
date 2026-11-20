@@ -19,4 +19,5 @@
         <item quantity="other">%d 天前</item>
     </plurals>
     <string name="traveller_query_point">預報點 %1$s</string>
+    <string name="traveller_alerts_checked">核對於 %1$s（菲律賓時間）</string>
 </resources>
