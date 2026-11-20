@@ -126,3 +126,13 @@ internal fun EmbLocalReport.hasRecentMonitoring(now: Long): Boolean {
         reportAgeMillis(clock, now)?.let { age -> age <= 86_400_000L } == true
     } == true
 }
+
+/** Only a recent, local pollutant sub-index can be shown in a current-AQI widget. */
+internal fun EmbSnapshot.widgetSubIndex(ids: Set<String>, now: Long): Pair<EmbStation, EmbMeasurement>? =
+    stations.asSequence().filter { it.name in ids }.mapNotNull { station ->
+        val age = reportAgeMillis(station.observed ?: reported, now) ?: return@mapNotNull null
+        if (age > 86_400_000L) return@mapNotNull null
+        val indices = station.readings.filter { it.unit == "AQI" }
+        val reading = indices.find { it.name == "PM2.5" } ?: indices.firstOrNull() ?: return@mapNotNull null
+        station to reading
+    }.maxByOrNull { (station, _) -> station.observed ?: reported.orEmpty() }

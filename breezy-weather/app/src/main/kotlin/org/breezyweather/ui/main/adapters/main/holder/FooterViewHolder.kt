@@ -57,6 +57,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
 import org.breezyweather.sources.panahon.localizedWindHumiditySource
+import org.breezyweather.sources.emb.EmbAirQualityService
 import org.breezyweather.R
 import org.breezyweather.common.extensions.splitKeeping
 import org.breezyweather.common.source.HttpSource
@@ -170,7 +171,7 @@ class FooterViewHolder(
             val sources = mapOf(
                 SourceFeature.FORECAST to location.forecastSource,
                 SourceFeature.CURRENT to location.currentSource,
-                SourceFeature.AIR_QUALITY to location.airQualitySource,
+                SourceFeature.AIR_QUALITY to location.airQualitySource?.takeIf { it == EmbAirQualityService.ID },
                 SourceFeature.POLLEN to location.pollenSource,
                 SourceFeature.MINUTELY to location.minutelySource,
                 SourceFeature.ALERT to location.alertSource,

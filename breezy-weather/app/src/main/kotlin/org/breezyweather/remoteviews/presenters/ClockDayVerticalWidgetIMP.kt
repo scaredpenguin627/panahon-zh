@@ -18,6 +18,7 @@ package org.breezyweather.remoteviews.presenters
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import org.breezyweather.sources.emb.embWidgetReading
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
@@ -28,7 +29,6 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.weather.model.Weather
 import org.breezyweather.R
 import org.breezyweather.background.receiver.widget.WidgetClockDayVerticalProvider
-import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.getFormattedMediumDayAndMonthInAdditionalCalendar
 import org.breezyweather.common.extensions.getFormattedTime
@@ -41,15 +41,12 @@ import org.breezyweather.common.source.PollenIndexSource
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.location.model.isDaylight
 import org.breezyweather.domain.settings.SettingsManager
-import org.breezyweather.domain.weather.model.getIndex
-import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.getShortDescription
 import org.breezyweather.domain.weather.model.getTrendTemperature
 import org.breezyweather.remoteviews.Widgets
 import org.breezyweather.ui.theme.resource.ResourceHelper
 import org.breezyweather.ui.theme.resource.ResourcesProviderFactory
 import org.breezyweather.unit.formatting.UnitWidth
-import org.breezyweather.unit.formatting.format
 import org.breezyweather.unit.temperature.TemperatureUnit
 import java.util.Date
 import kotlin.math.roundToInt
@@ -571,17 +568,7 @@ object ClockDayVerticalWidgetIMP : AbstractRemoteViewsPresenter() {
 
                 else -> null
             }
-            "aqi" -> weather.current?.airQuality?.let { airQuality ->
-                if (airQuality.getIndex() != null && airQuality.getName(context) != null) {
-                    context.getString(
-                        R.string.parenthesis,
-                        airQuality.getIndex()!!.format(decimals = 0, locale = context.currentLocale),
-                        airQuality.getName(context)
-                    )
-                } else {
-                    null
-                }
-            }
+            "aqi" -> context.embWidgetReading(location)
             "wind" -> weather.current?.wind?.getShortDescription(context)
             "lunar" -> when (viewStyle) {
                 "rectangle" -> location.getPlace(context) +

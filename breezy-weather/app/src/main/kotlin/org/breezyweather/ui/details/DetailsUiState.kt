@@ -18,11 +18,9 @@ package org.breezyweather.ui.details
 
 import breezyweather.domain.location.model.Location
 import org.breezyweather.common.options.appearance.DetailScreen
-import org.breezyweather.domain.weather.index.PollutantIndex
 
 data class DetailsUiState(
     val location: Location? = null,
     val selectedChart: DetailScreen = DetailScreen.TAG_CONDITIONS,
-    val selectedPollutant: PollutantIndex? = null,
     val initialIndex: Int = 0,
 )

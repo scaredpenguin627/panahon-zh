@@ -16,6 +16,7 @@
 
 package org.breezyweather.remoteviews.presenters.notification
 
+import org.breezyweather.sources.emb.embWidgetReading
 import android.content.Context
 import android.graphics.drawable.Icon
 import androidx.core.app.NotificationCompat
@@ -32,7 +33,6 @@ import org.breezyweather.common.extensions.toBitmap
 import org.breezyweather.common.options.appearance.CalendarHelper
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.settings.SettingsManager
-import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.getStrength
 import org.breezyweather.remoteviews.Notifications
 import org.breezyweather.remoteviews.presenters.AbstractRemoteViewsPresenter
@@ -110,13 +110,9 @@ object NativeWidgetNotificationIMP : AbstractRemoteViewsPresenter() {
             }
             setSubText(subtitle.toString())
             setContentTitle(contentTitle.toString())
-            if (current.airQuality?.isIndexValid == true) {
-                setContentText(context.getString(R.string.air_quality) + " – " + current.airQuality!!.getName(context))
-            } else {
-                current.wind?.getStrength(context)?.let { strength ->
-                    setContentText(context.getString(R.string.wind) + " – " + strength)
-                }
-            }
+            setContentText(context.embWidgetReading(location) ?: current.wind?.getStrength(context)?.let {
+                context.getString(R.string.wind) + " – " + it
+            })
             setOngoing(persistent)
             setOnlyAlertOnce(true)
             setContentIntent(getWeatherPendingIntent(context, null, Notifications.ID_WIDGET))

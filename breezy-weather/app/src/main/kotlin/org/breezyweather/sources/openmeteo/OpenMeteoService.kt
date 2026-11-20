@@ -160,7 +160,7 @@ class OpenMeteoService @Inject constructor(
     ): Boolean {
         return when (feature) {
             SourceFeature.POLLEN -> COPERNICUS_POLLEN_BBOX.contains(LatLng(location.latitude, location.longitude))
-            else -> true
+            else -> feature in supportedFeatures
         }
     }
     override fun requestWeather(
@@ -655,7 +655,7 @@ class OpenMeteoService @Inject constructor(
                 }
             ),
             EditTextPreference(
-                titleId = R.string.settings_weather_source_open_meteo_instance_air_quality,
+                titleId = R.string.settings_weather_source_open_meteo_instance_pollen,
                 summary = { _, content ->
                     content.ifEmpty {
                         OPEN_METEO_AIR_QUALITY_BASE_URL

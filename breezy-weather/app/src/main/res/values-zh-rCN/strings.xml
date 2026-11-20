@@ -263,7 +263,7 @@
     <string name="widget_week_style_5_days">5 天</string>
     <string name="widget_week_style_3_days">3 天</string>
     <string name="widget_subtitle_data_time">更新时间</string>
-    <string name="widget_subtitle_data_aqi">空气质量</string>
+    <string name="widget_subtitle_data_aqi">EMB 站点空气质量</string>
     <string name="widget_subtitle_data_wind">风况</string>
     <string name="widget_subtitle_data_feels_like">体感温度</string>
     <string name="widget_subtitle_data_custom">自定义</string>
@@ -508,7 +508,7 @@
     <string name="location_delete_location_dialog_message">您即将从已储存的位置列表中删除“%s”。</string>
     <string name="location_delete_location_dialog_message_no_name">您即将从已储存的位置列表中删除这个位置。</string>
     <string name="action_confirm">确认</string>
-    <string name="widget_custom_subtitle_keyword_caqi_description">当前空气质量指数</string>
+    <string name="widget_custom_subtitle_keyword_caqi_description">最近一次本地 EMB 污染物子指数</string>
     <string name="weather_message_too_frequent_refreshes">请稍候几秒再试…</string>
     <string name="widget_label_hide_header">隐藏标题</string>
     <string name="widget_custom_subtitle_keyword_xaqi_description">空气质量指数（今天、明天、…、4 天后）</string>
@@ -540,7 +540,7 @@
     <string name="alert">预警</string>
     <string name="settings_source_instance">实例</string>
     <string name="settings_source_instance_geocoding">地理编码实例</string>
-    <string name="settings_weather_source_open_meteo_instance_air_quality">空气质量实例</string>
+    <string name="settings_weather_source_open_meteo_instance_pollen">花粉数据服务器</string>
     <string name="settings_modules_broadcast_title">数据共享</string>
     <string name="message_invalid_incomplete_data">从服务器接收到的数据无效或不完整</string>
     <string name="settings_per_location_theme">主题</string>

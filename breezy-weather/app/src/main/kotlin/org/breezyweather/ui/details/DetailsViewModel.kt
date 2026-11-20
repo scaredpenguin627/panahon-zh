@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.common.source.PollenIndexSource
-import org.breezyweather.domain.weather.index.PollutantIndex
 import org.breezyweather.sources.SourceManager
 import javax.inject.Inject
 
@@ -109,9 +108,5 @@ class DetailsViewModel @Inject constructor(
         )
     }
 
-    fun setSelectedPollutant(pollutantIndex: PollutantIndex?) {
-        _uiState.value = _uiState.value.copy(
-            selectedPollutant = pollutantIndex
-        )
-    }
+
 }

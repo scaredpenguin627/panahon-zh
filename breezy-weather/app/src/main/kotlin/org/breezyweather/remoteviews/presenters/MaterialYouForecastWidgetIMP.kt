@@ -18,6 +18,7 @@ package org.breezyweather.remoteviews.presenters
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import org.breezyweather.sources.emb.embWidgetReading
 import android.content.Context
 import android.os.Build
 import android.util.SizeF
@@ -33,7 +34,6 @@ import org.breezyweather.common.options.NotificationTextColor
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.location.model.isDaylight
 import org.breezyweather.domain.settings.SettingsManager
-import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.getShortDescription
 import org.breezyweather.domain.weather.model.getWeek
 import org.breezyweather.domain.weather.model.isToday
@@ -192,16 +192,8 @@ private fun buildRemoteViews(
 
     views.setTextViewText(
         R.id.widget_material_you_forecast_aqiOrWind,
-        weather.current?.let { current ->
-            if (current.airQuality?.isIndexValid == true) {
-                context.getString(R.string.air_quality) + " – " + current.airQuality!!.getName(context)
-            } else {
-                current.wind?.let { wind ->
-                    wind.getShortDescription(context)?.let {
-                        context.getString(R.string.wind) + " – " + it
-                    }
-                }
-            }
+        context.embWidgetReading(location) ?: weather.current?.wind?.getShortDescription(context)?.let {
+            context.getString(R.string.wind) + " – " + it
         }
     )
 

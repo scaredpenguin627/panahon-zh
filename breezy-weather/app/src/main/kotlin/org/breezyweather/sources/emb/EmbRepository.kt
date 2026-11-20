@@ -33,6 +33,7 @@ class EmbRepository @Inject constructor(
     private val client = httpClient.newBuilder().callTimeout(10, TimeUnit.SECONDS).build()
     private val prefs by lazy { context.getSharedPreferences("emb-public-reports-v1", Context.MODE_PRIVATE) }
     private val latest = ConcurrentHashMap<String, EmbSnapshot>()
+    private val localSnapshots = ConcurrentHashMap<String, EmbSnapshot>()
     private val locks = ConcurrentHashMap<String, Mutex>()
     private val feedList by lazy {
         context.assets.list("emb").orEmpty().filter { it == "ncr.json" || it.endsWith(".report.json") }.sorted().mapNotNull { file ->
@@ -43,26 +44,56 @@ class EmbRepository @Inject constructor(
     }
 
     internal suspend fun forLocation(location: Location): List<EmbLocalReport> = withContext(Dispatchers.IO) {
-        if (!location.countryCode.equals("PH", ignoreCase = true)) return@withContext emptyList()
+        coroutineScope {
+            localFeeds(location).map { (feed, ids) -> async { loadReport(feed, ids) } }.map { it.await() }
+        }
+    }
+
+    private fun localFeeds(location: Location): List<Pair<EmbFeed, Set<String>>> {
+        if (!location.countryCode.equals("PH", ignoreCase = true)) return emptyList()
         val names = listOfNotNull(location.city, location.district, location.admin3, location.admin4)
             .map(::normalizeCity).filter { it.isNotEmpty() }.toSet()
-        feedList.mapNotNull { feed ->
+        return feedList.mapNotNull { feed ->
             val ids = feed.sites.filter { it.matches(names, location.latitude, location.longitude) }.map { it.station }.toSet()
-            if (ids.isEmpty()) return@mapNotNull null
-            async { loadReport(feed, ids) }
-        }.map { it.await() }
+            if (ids.isEmpty()) null else feed to ids
+        }
+    }
+
+    private fun savedKey(feed: EmbFeed, ids: Set<String>) =
+        feed.key + ":" + feed.kind + ":" + ids.sorted().joinToString("|")
+
+    private fun savedSnapshot(key: String): EmbSnapshot? {
+        localSnapshots[key]?.let { return it }
+        val text = prefs.getString(key, null) ?: return null
+        val snapshot = runCatching { Json.decodeFromString<EmbSnapshot>(text) }.getOrNull() ?: return null
+        return localSnapshots.putIfAbsent(key, snapshot) ?: snapshot
+    }
+
+    // RemoteViews cannot expand a station report. Only use a recent, time-stamped local
+    // PM sub-index there; keep manual measurements, older readings and other units in the app.
+    internal fun currentWidgetReading(location: Location, now: Long): String? {
+        for ((feed, ids) in localFeeds(location)) {
+            if (feed.kind != "station") continue
+            val snapshot = savedSnapshot(savedKey(feed, ids)) ?: continue
+            val (station, measurement) = snapshot.widgetSubIndex(ids, now) ?: continue
+            val stationName = feed.sites.find { it.station == station.name }?.displayName ?: station.name
+            val value = java.text.NumberFormat.getNumberInstance().format(measurement.value)
+            val reading = context.getString(org.breezyweather.R.string.emb_sub_index, measurement.name, value)
+            val stamp = station.observed ?: snapshot.reported ?: continue
+            val timeLabel = if (station.observed == null) org.breezyweather.R.string.emb_report_time else org.breezyweather.R.string.emb_station_time
+            return listOf("EMB", stationName, reading, context.getString(timeLabel, stamp)).joinToString(" · ")
+        }
+        return null
     }
 
     private suspend fun loadReport(feed: EmbFeed, ids: Set<String>): EmbLocalReport {
         val feedKey = feed.key + ":" + feed.kind
         val lock = locks.getOrPut(feedKey) { Mutex() }
         return lock.withLock {
-            val localKey = feedKey + ":" + ids.sorted().joinToString("|")
+            val localKey = savedKey(feed, ids)
             val tables = feed.tables.filter { it.fixedStation == null || it.fixedStation in ids }
             val wholeReportKey = if (feed.key == "emb-r3" || tables.size != feed.tables.size) localKey else feedKey
-            val saved = prefs.getString(localKey, null)?.let {
-                runCatching { Json.decodeFromString<EmbSnapshot>(it) }.getOrNull()
-            }
+            val saved = savedSnapshot(localKey)
             val now = System.currentTimeMillis()
             if (saved != null && now - saved.fetchedAt in 0 until 600_000L) {
                 return@withLock EmbLocalReport(feed, saved)
@@ -79,6 +110,7 @@ class EmbRepository @Inject constructor(
                     }.also { latest[wholeReportKey] = it }
                 val selected = selectEmbReport(feed, report, saved, ids)
                 if (!selected.cachedOnError && selected.snapshot?.stations?.isNotEmpty() == true) {
+                    localSnapshots[localKey] = selected.snapshot
                     prefs.edit().putString(localKey, Json.encodeToString(selected.snapshot)).apply()
                 }
                 selected

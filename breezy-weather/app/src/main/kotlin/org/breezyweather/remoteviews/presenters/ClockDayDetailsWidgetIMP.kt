@@ -18,6 +18,7 @@ package org.breezyweather.remoteviews.presenters
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import org.breezyweather.sources.emb.embWidgetReading
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
@@ -28,7 +29,6 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.weather.model.Weather
 import org.breezyweather.R
 import org.breezyweather.background.receiver.widget.WidgetClockDayDetailsProvider
-import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.formatPercent
 import org.breezyweather.common.extensions.getFormattedMediumDayAndMonthInAdditionalCalendar
@@ -37,15 +37,12 @@ import org.breezyweather.common.options.appearance.CalendarHelper
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.location.model.isDaylight
 import org.breezyweather.domain.settings.SettingsManager
-import org.breezyweather.domain.weather.model.getIndex
-import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.getShortDescription
 import org.breezyweather.domain.weather.model.getTrendTemperature
 import org.breezyweather.remoteviews.Widgets
 import org.breezyweather.ui.theme.resource.ResourceHelper
 import org.breezyweather.ui.theme.resource.ResourcesProviderFactory
 import org.breezyweather.unit.formatting.UnitWidth
-import org.breezyweather.unit.formatting.format
 import java.util.Date
 import kotlin.math.roundToInt
 
@@ -191,7 +188,7 @@ object ClockDayDetailsWidgetIMP : AbstractRemoteViewsPresenter() {
         } ?: run {
             views.setTextViewText(R.id.widget_clock_day_feelsLikeTemp, null)
         }
-        views.setTextViewText(R.id.widget_clock_day_aqiHumidity, getAQIHumidityTempText(context, weather))
+        views.setTextViewText(R.id.widget_clock_day_aqiHumidity, context.embWidgetReading(location) ?: humidityText(context, weather))
         weather.current?.wind?.let { wind ->
             views.setTextViewText(
                 R.id.widget_clock_day_wind,
@@ -282,25 +279,11 @@ object ClockDayDetailsWidgetIMP : AbstractRemoteViewsPresenter() {
         return widgetIds != null && widgetIds.isNotEmpty()
     }
 
-    private fun getAQIHumidityTempText(context: Context, weather: Weather): String? {
-        return if (weather.current?.airQuality?.getIndex() != null &&
-            weather.current!!.airQuality!!.getName(context) != null
-        ) {
-            context.getString(R.string.air_quality) +
-                context.getString(R.string.colon_separator) +
-                context.getString(
-                    R.string.parenthesis,
-                    weather.current!!.airQuality!!.getIndex()!!.format(decimals = 0, locale = context.currentLocale),
-                    weather.current!!.airQuality!!.getName(context)
-                )
-        } else {
-            weather.current?.relativeHumidity?.let {
-                context.getString(R.string.humidity) +
-                    context.getString(R.string.colon_separator) +
-                    it.formatPercent(context, UnitWidth.NARROW)
-            }
+    private fun humidityText(context: Context, weather: Weather): String? =
+        weather.current?.relativeHumidity?.let {
+            context.getString(R.string.humidity) + context.getString(R.string.colon_separator) +
+                it.formatPercent(context, UnitWidth.NARROW)
         }
-    }
 
     private fun setOnClickPendingIntent(context: Context, views: RemoteViews, location: Location) {
         // weather.

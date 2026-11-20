@@ -30,7 +30,6 @@ import breezyweather.data.location.LocationRepository
 import breezyweather.data.weather.WeatherRepository
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
-import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.Alert
 import breezyweather.domain.weather.model.Current
 import breezyweather.domain.weather.model.Daily
@@ -58,7 +57,6 @@ import org.breezyweather.common.extensions.gzipCompress
 import org.breezyweather.common.extensions.roundDecimals
 import org.breezyweather.common.source.HttpSource
 import org.breezyweather.common.source.PollenIndexSource
-import org.breezyweather.datasharing.json.BreezyAirQuality
 import org.breezyweather.datasharing.json.BreezyAlert
 import org.breezyweather.datasharing.json.BreezyBulletin
 import org.breezyweather.datasharing.json.BreezyCurrent
@@ -70,7 +68,6 @@ import org.breezyweather.datasharing.json.BreezyHourly
 import org.breezyweather.datasharing.json.BreezyMinutely
 import org.breezyweather.datasharing.json.BreezyPollen
 import org.breezyweather.datasharing.json.BreezyPollenLevel
-import org.breezyweather.datasharing.json.BreezyPollutant
 import org.breezyweather.datasharing.json.BreezyPrecipitation
 import org.breezyweather.datasharing.json.BreezyPrecipitationDuration
 import org.breezyweather.datasharing.json.BreezyPrecipitationProbability
@@ -84,10 +81,8 @@ import org.breezyweather.datasharing.provider.ProviderUri
 import org.breezyweather.datasharing.provider.ProviderVersion
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.source.resourceName
-import org.breezyweather.domain.weather.index.PollutantIndex
 import org.breezyweather.domain.weather.model.getColor
 import org.breezyweather.domain.weather.model.getConcentration
-import org.breezyweather.domain.weather.model.getIndex
 import org.breezyweather.domain.weather.model.getIndexName
 import org.breezyweather.domain.weather.model.getLevel
 import org.breezyweather.domain.weather.model.getMinutelyDescription
@@ -95,7 +90,6 @@ import org.breezyweather.domain.weather.model.getMinutelyTitle
 import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.getUVColor
 import org.breezyweather.domain.weather.model.validPollens
-import org.breezyweather.domain.weather.model.validPollutants
 import org.breezyweather.sources.SourceManager
 import org.breezyweather.unit.distance.Distance
 import org.breezyweather.unit.distance.DistanceUnit
@@ -473,7 +467,7 @@ class WeatherContentProvider : ContentProvider() {
                 temperature = getTemperature(cur.temperature, temperatureUnit),
                 wind = getWind(cur.wind, speedUnit),
                 uV = getUV(cur.uV),
-                airQuality = getAirQuality(cur.airQuality),
+                airQuality = null, // The sharing schema cannot carry EMB station, sampling time and index standard.
                 relativeHumidity = getPercentUnit(cur.relativeHumidity),
                 dewPoint = getTemperatureUnit(cur.dewPoint, temperatureUnit),
                 pressure = getPressureUnit(cur.pressure, pressureUnit),
@@ -532,7 +526,7 @@ class WeatherContentProvider : ContentProvider() {
                         description = it.getDescription(context!!)
                     )
                 },*/
-                airQuality = getAirQuality(day.airQuality),
+                airQuality = null, // The sharing schema cannot carry EMB station, sampling time and index standard.
                 pollen = getPollen(day.pollen, pollenIndexSource),
                 uV = getUV(day.uV),
                 sunshineDuration = getDurationUnit(day.sunshineDuration),
@@ -598,7 +592,7 @@ class WeatherContentProvider : ContentProvider() {
                 precipitation = getPrecipitation(hour.precipitation, precipitationUnit, snowfallUnit),
                 precipitationProbability = getPrecipitationProbability(hour.precipitationProbability),
                 wind = getWind(hour.wind, speedUnit),
-                airQuality = getAirQuality(hour.airQuality),
+                airQuality = null, // The sharing schema cannot carry EMB station, sampling time and index standard.
                 uV = getUV(hour.uV),
                 relativeHumidity = getPercentUnit(hour.relativeHumidity),
                 dewPoint = getTemperatureUnit(hour.dewPoint, temperatureUnit),
@@ -631,7 +625,6 @@ class WeatherContentProvider : ContentProvider() {
         return mapOf(
             SourceFeature.FORECAST to location.forecastSource,
             SourceFeature.CURRENT to location.currentSource,
-            SourceFeature.AIR_QUALITY to location.airQualitySource,
             SourceFeature.POLLEN to location.pollenSource,
             SourceFeature.MINUTELY to location.minutelySource,
             SourceFeature.ALERT to location.alertSource,
@@ -868,39 +861,6 @@ class WeatherContentProvider : ContentProvider() {
                 value = it.inWholeMinutes.toDouble(),
                 unit = "m"
             )
-        }
-    }
-
-    private fun getAirQuality(
-        airQuality: AirQuality?,
-    ): BreezyAirQuality? {
-        return airQuality?.let {
-            if (airQuality.isValid) {
-                BreezyAirQuality(
-                    index = BreezyUnit(
-                        value = airQuality.getIndex()?.toDouble(),
-                        unit = "aqi",
-                        description = airQuality.getName(context!!),
-                        color = colorToHex(airQuality.getColor(context!!))
-                    ),
-                    pollutants = airQuality.validPollutants.associate {
-                        it.id to BreezyPollutant(
-                            index = BreezyUnit(
-                                value = airQuality.getIndex(it)?.toDouble(),
-                                unit = "aqi",
-                                description = airQuality.getName(context!!, it),
-                                color = colorToHex(airQuality.getColor(context!!, it))
-                            ),
-                            concentration = BreezyUnit(
-                                value = airQuality.getConcentration(it)?.roundDecimals(1),
-                                unit = PollutantIndex.getUnit(it).id
-                            )
-                        )
-                    }
-                )
-            } else {
-                null
-            }
         }
     }
 

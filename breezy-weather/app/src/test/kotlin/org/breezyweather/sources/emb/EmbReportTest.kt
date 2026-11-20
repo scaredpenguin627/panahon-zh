@@ -65,6 +65,22 @@ class EmbReportTest {
     }
 
     @Test
+    fun widgetAcceptsOnlyFreshLocalOfficialSubIndices() {
+        val report = snapshot(ncr, "ncr")
+        val now = Instant.parse("2026-11-20T06:00:00Z").toEpochMilli()
+        val ids = setOf("Manila")
+        val (station, reading) = requireNotNull(report.widgetSubIndex(ids, now))
+        assertEquals("Manila", station.name)
+        assertEquals("AQI", reading.unit)
+        assertEquals("PM2.5", reading.name)
+        assertNull(report.widgetSubIndex(setOf("Boracay"), now))
+        assertNull(report.widgetSubIndex(ids, now + 86_400_000L))
+        assertNull(report.copy(reported = null).widgetSubIndex(ids, now))
+        val raw = station.copy(readings = listOf(EmbMeasurement("PM2.5", 18.0, "μg/m³")))
+        assertNull(report.copy(stations = listOf(raw)).widgetSubIndex(ids, now))
+    }
+
+    @Test
     fun stationSelectionRequiresNameAndGeography() {
         val site = ncr.sites.single { it.station == "Manila" }
         assertTrue(site.matches(setOf(normalizeCity("马尼拉")), 14.5995, 120.9842))

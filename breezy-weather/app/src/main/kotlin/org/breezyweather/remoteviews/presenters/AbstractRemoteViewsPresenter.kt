@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.WallpaperManager
 import android.content.ContentUris
+import org.breezyweather.sources.emb.embWidgetReading
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
@@ -32,7 +33,6 @@ import androidx.core.content.ContextCompat
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.weather.model.Weather
 import org.breezyweather.R
-import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.formatPercent
 import org.breezyweather.common.extensions.getFormattedDate
@@ -49,14 +49,11 @@ import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.settings.ConfigStore
 import org.breezyweather.domain.weather.model.getDescription
-import org.breezyweather.domain.weather.model.getIndex
-import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.getShortDescription
 import org.breezyweather.domain.weather.model.getSummary
 import org.breezyweather.domain.weather.model.pollensWithConcentration
 import org.breezyweather.ui.theme.ThemeManager
 import org.breezyweather.unit.formatting.UnitWidth
-import org.breezyweather.unit.formatting.format
 import org.breezyweather.unit.temperature.TemperatureUnit
 import java.util.Date
 
@@ -314,15 +311,8 @@ abstract class AbstractRemoteViewsPresenter {
                         ?: context.getString(R.string.null_data_text)
                 ).replace(
                     "\$caqi$",
-                    if (weather.current?.airQuality?.isIndexValid == true) {
-                        context.getString(
-                            R.string.parenthesis,
-                            weather.current!!.airQuality!!.getIndex()!!.format(decimals = 0, context.currentLocale),
-                            weather.current!!.airQuality!!.getName(context)
-                        )
-                    } else {
-                        context.getString(R.string.null_data_text)
-                    }
+                    if (subtitleP.contains("\$caqi$")) context.embWidgetReading(location) ?: context.getString(R.string.null_data_text)
+                    else ""
                 ).replace(
                     "\$cuv$",
                     weather.current?.uV?.getShortDescription(context)
@@ -507,18 +497,7 @@ abstract class AbstractRemoteViewsPresenter {
                         ?: context.getString(R.string.null_data_text)
                 ).replace(
                     "$" + i + "aqi$",
-                    if (weather.dailyForecastStartingToday.getOrNull(i)?.airQuality?.isIndexValid == true) {
-                        context.getString(
-                            R.string.parenthesis,
-                            weather.dailyForecastStartingToday[i].airQuality!!.getIndex()!!.format(
-                                decimals = 0,
-                                locale = context.currentLocale
-                            ),
-                            weather.dailyForecastStartingToday[i].airQuality!!.getName(context)
-                        )
-                    } else {
-                        context.getString(R.string.null_data_text)
-                    }
+                    context.getString(R.string.null_data_text) // No official station AQI forecast for this token.
                 ).replace(
                     "$" + i + "pis$",
                     if (weather.dailyForecastStartingToday.getOrNull(i)?.pollen

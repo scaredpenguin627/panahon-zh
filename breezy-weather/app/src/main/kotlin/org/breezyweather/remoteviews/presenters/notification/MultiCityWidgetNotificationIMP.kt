@@ -16,6 +16,7 @@
 
 package org.breezyweather.remoteviews.presenters.notification
 
+import org.breezyweather.sources.emb.embWidgetReading
 import android.content.Context
 import android.graphics.drawable.Icon
 import android.view.View
@@ -33,7 +34,6 @@ import org.breezyweather.common.options.appearance.CalendarHelper
 import org.breezyweather.domain.location.model.getPlace
 import org.breezyweather.domain.location.model.isDaylight
 import org.breezyweather.domain.settings.SettingsManager
-import org.breezyweather.domain.weather.model.getName
 import org.breezyweather.domain.weather.model.getStrength
 import org.breezyweather.domain.weather.model.getTrendFeelsLikeTemperature
 import org.breezyweather.domain.weather.model.getTrendTemperature
@@ -175,19 +175,12 @@ object MultiCityWidgetNotificationIMP : AbstractRemoteViewsPresenter() {
                     )
                 )
             }
-            if (current.airQuality?.isIndexValid == true) {
-                setTextViewText(
-                    R.id.notification_base_aqiAndWind,
-                    context.getString(R.string.air_quality) + " – " + current.airQuality!!.getName(context)
-                )
-            } else {
-                current.wind?.getStrength(context)?.let { strength ->
-                    setTextViewText(
-                        R.id.notification_base_aqiAndWind,
-                        context.getString(R.string.wind) + " – " + strength
-                    )
+            setTextViewText(
+                R.id.notification_base_aqiAndWind,
+                context.embWidgetReading(location) ?: current.wind?.getStrength(context)?.let {
+                    context.getString(R.string.wind) + " – " + it
                 }
-            }
+            )
             if (!current.weatherText.isNullOrEmpty()) {
                 setTextViewText(
                     R.id.notification_base_weather,
