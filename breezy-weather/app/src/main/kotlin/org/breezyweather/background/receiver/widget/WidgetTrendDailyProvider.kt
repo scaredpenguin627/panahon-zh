@@ -60,7 +60,6 @@ class WidgetTrendDailyProvider : AppWidgetProvider() {
                             withHourly = false,
                             withMinutely = false,
                             withAlerts = false,
-                            withNormals = true // Threshold lines
                         )
                     )
                 )

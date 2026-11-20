@@ -168,17 +168,6 @@ class SearchActivityRepository @Inject internal constructor(
                         } else {
                             null
                         },
-                        normalsSource = if (SourceFeature.NORMALS in
-                            source.supportedFeatures &&
-                            source.isFeatureSupportedForLocation(
-                                location,
-                                SourceFeature.NORMALS
-                            )
-                        ) {
-                            source.id
-                        } else {
-                            null
-                        }
                     )
                 }
             }

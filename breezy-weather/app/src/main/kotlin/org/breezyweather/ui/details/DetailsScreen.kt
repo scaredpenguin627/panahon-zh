@@ -75,7 +75,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.breezyweather.R
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.common.extensions.getFormattedDate
 import org.breezyweather.common.extensions.getFormattedDayOfTheMonth
 import org.breezyweather.common.extensions.getFormattedFullDayAndMonth
@@ -404,7 +403,6 @@ fun DailyPagerContent(
                     location,
                     hourlyList,
                     daily,
-                    location.weather?.normals?.getOrElse(daily.date.getCalendarMonth(location)) { null },
                     selectedChart,
                     { setSelectedChart(if (it) DetailScreen.TAG_CONDITIONS else DetailScreen.TAG_FEELS_LIKE) }
                 )

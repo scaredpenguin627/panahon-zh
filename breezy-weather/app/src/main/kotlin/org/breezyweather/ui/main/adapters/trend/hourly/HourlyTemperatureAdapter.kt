@@ -26,7 +26,6 @@ import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.formatPercent
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.common.extensions.getThemeColor
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
@@ -37,7 +36,6 @@ import org.breezyweather.ui.theme.resource.providers.ResourceProvider
 import org.breezyweather.ui.theme.weatherView.WeatherViewController
 import org.breezyweather.unit.formatting.UnitWidth
 import org.breezyweather.unit.temperature.TemperatureUnit
-import java.util.Date
 import kotlin.math.max
 
 /**
@@ -176,10 +174,6 @@ class HourlyTemperatureAdapter(
                 i += 2
             }
         }
-        weather.normals.getOrElse(Date().getCalendarMonth(location)) { null }?.let { normals ->
-            mHighestTemperature = normals.daytimeTemperature?.value?.toFloat()
-            mLowestTemperature = normals.nighttimeTemperature?.value?.toFloat()
-        }
         weather.nextHourlyForecast
             .forEach { hourly ->
                 hourly.temperature?.temperature?.value?.let {
@@ -210,38 +204,6 @@ class HourlyTemperatureAdapter(
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_temperature)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {
-        val normals = location.weather?.normals?.getOrElse(Date().getCalendarMonth(location)) { null }
-        if (normals?.daytimeTemperature == null || normals.nighttimeTemperature == null) {
-            host.setData(null, 0f, 0f)
-        } else {
-            val keyLineList = mutableListOf<TrendRecyclerView.KeyLine>()
-            keyLineList.add(
-                TrendRecyclerView.KeyLine(
-                    normals.daytimeTemperature!!.value.toFloat(),
-                    normals.daytimeTemperature!!.formatMeasure(
-                        activity,
-                        temperatureUnit,
-                        valueWidth = UnitWidth.NARROW,
-                        unitWidth = UnitWidth.NARROW
-                    ),
-                    activity.getString(R.string.temperature_normal_short),
-                    TrendRecyclerView.KeyLine.ContentPosition.ABOVE_LINE
-                )
-            )
-            keyLineList.add(
-                TrendRecyclerView.KeyLine(
-                    normals.nighttimeTemperature!!.value.toFloat(),
-                    normals.nighttimeTemperature!!.formatMeasure(
-                        activity,
-                        temperatureUnit,
-                        valueWidth = UnitWidth.NARROW,
-                        unitWidth = UnitWidth.NARROW
-                    ),
-                    activity.getString(R.string.temperature_normal_short),
-                    TrendRecyclerView.KeyLine.ContentPosition.BELOW_LINE
-                )
-            )
-            host.setData(keyLineList, mHighestTemperature!!, mLowestTemperature!!)
-        }
+        host.setData(null, 0f, 0f)
     }
 }

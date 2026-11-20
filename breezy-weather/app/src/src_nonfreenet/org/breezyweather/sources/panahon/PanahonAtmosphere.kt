@@ -11,6 +11,8 @@ import kotlinx.serialization.Serializable
 import org.breezyweather.sources.getWindDegree
 import org.breezyweather.sources.pagasa.json.PagasaCurrentResult
 import org.breezyweather.unit.computing.computeDewPoint
+import org.breezyweather.unit.pressure.Pressure
+import org.breezyweather.unit.pressure.Pressure.Companion.hectopascals
 import org.breezyweather.unit.ratio.Ratio
 import org.breezyweather.unit.ratio.Ratio.Companion.percent
 import org.breezyweather.unit.speed.Speed.Companion.metersPerSecond
@@ -26,7 +28,7 @@ import java.util.TimeZone
 import kotlin.time.Duration.Companion.hours
 
 internal interface PanahonModelApi {
-    @GET("v1/forecast?hourly=relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms&timeformat=unixtime&forecast_days=3")
+    @GET("v1/forecast?hourly=relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl&wind_speed_unit=ms&timeformat=unixtime&forecast_days=3")
     fun weather(@Query("latitude") latitude: Double, @Query("longitude") longitude: Double): Observable<PanahonModelGrid>
 }
 
@@ -35,11 +37,13 @@ internal data class PanahonModelGrid(
     val latitude: Double,
     val longitude: Double,
     val hourly: PanahonModelHours,
+    @SerialName("hourly_units") val hourlyUnits: Map<String, String> = emptyMap(),
 )
 
 @Serializable
 internal data class PanahonModelHours(
     val time: List<Long>,
+    @SerialName("pressure_msl") val pressure: List<Double?> = emptyList(),
     @SerialName("relative_humidity_2m") val humidity: List<Double?> = emptyList(),
     @SerialName("dew_point_2m") val dewPoint: List<Double?> = emptyList(),
     @SerialName("wind_speed_10m") val speed: List<Double?> = emptyList(),
@@ -53,6 +57,7 @@ internal data class AtmosphereReading(
     val humidity: Ratio?,
     val dewPoint: Temperature?,
     val station: String? = null,
+    val pressure: Pressure? = null,
 ) {
     fun attribution(): String = windHumidityAttribution(time, station)
 }
@@ -72,8 +77,11 @@ internal fun PanahonModelGrid.hourlyReadings(location: Location): Map<Date, Atmo
         }
         val humidity = hourly.humidity.getOrNull(i)?.takeIf { it in 0.0..100.0 }?.percent
         val dew = hourly.dewPoint.getOrNull(i)?.celsius
-        if (wind == null && humidity == null && dew == null) return@mapIndexedNotNull null
-        time to AtmosphereReading(time, wind, humidity, dew)
+        val pressure = hourly.pressure.getOrNull(i)?.takeIf {
+            hourlyUnits["pressure_msl"] == "hPa" && it in 850.0..1100.0
+        }?.hectopascals
+        if (wind == null && humidity == null && dew == null && pressure == null) return@mapIndexedNotNull null
+        time to AtmosphereReading(time, wind, humidity, dew, pressure = pressure)
     }.toMap()
 }
 

@@ -32,6 +32,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkQuery
 import dagger.hilt.android.HiltAndroidApp
 import org.breezyweather.common.activities.BreezyActivity
+import org.breezyweather.common.extensions.initialAppLanguageTag
 import org.breezyweather.common.extensions.uiModeManager
 import org.breezyweather.common.extensions.workManager
 import org.breezyweather.common.utils.AndroidSignatureFinder
@@ -131,17 +132,17 @@ class BreezyWeather : Application(), Configuration.Provider {
 
     private fun setInitialLanguage() {
         val settings = SettingsManager.getInstance(this)
-        if (settings.lastVersionCode != 0 || settings.languageUpdateLastTimestamp != 0L) return
-
-        // Respect a restored or preselected language, and only set the default on first launch.
-        if (LocaleManagerCompat.getApplicationLocales(this).isEmpty) {
+        val stored = LocaleManagerCompat.getApplicationLocales(this)
+        val firstLaunch = settings.lastVersionCode == 0 && settings.languageUpdateLastTimestamp == 0L
+        val tag = initialAppLanguageTag((0 until stored.size()).mapNotNull { stored[it] }, firstLaunch)
+        if (tag != stored.toLanguageTags()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getSystemService(LocaleManager::class.java)?.applicationLocales = LocaleList.forLanguageTags("zh-CN")
+                getSystemService(LocaleManager::class.java)?.applicationLocales = LocaleList.forLanguageTags(tag)
             } else {
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("zh-CN"))
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
             }
         }
-        settings.languageUpdateLastTimestamp = System.currentTimeMillis()
+        if (firstLaunch) settings.languageUpdateLastTimestamp = System.currentTimeMillis()
     }
 
     private fun setDayNightMode() {

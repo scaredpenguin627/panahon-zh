@@ -16,9 +16,12 @@
 
 package org.breezyweather.common.source
 
+import android.app.Activity
 import android.content.Context
+import androidx.annotation.StringRes
 import breezyweather.domain.source.SourceFeature
 import org.breezyweather.R
+import org.breezyweather.common.utils.helpers.IntentHelper
 import org.breezyweather.domain.source.resourceName
 import org.breezyweather.sources.SourceManager
 import org.breezyweather.ui.main.utils.RefreshErrorType
@@ -27,12 +30,14 @@ class RefreshError(
     val error: RefreshErrorType,
     val source: String? = null,
     val feature: SourceFeature? = null,
+    @StringRes private val operation: Int? = null,
 ) {
     fun getSourceWithOptionalFeature(context: Context, sourceManager: SourceManager): String? {
         return if (!source.isNullOrEmpty()) {
             val sourceName = sourceManager.getSource(source)?.name ?: source
-            if (feature != null) {
-                context.getString(R.string.parenthesis, sourceName, context.getString(feature.resourceName))
+            val featureName = feature?.resourceName ?: operation
+            if (featureName != null) {
+                context.getString(R.string.parenthesis, sourceName, context.getString(featureName))
             } else {
                 sourceName
             }
@@ -41,11 +46,38 @@ class RefreshError(
         }
     }
 
+    fun getDescription(context: Context, sourceManager: SourceManager): String {
+        if (error == RefreshErrorType.API_KEY_REQUIRED_MISSING && source != null) {
+            val provider = sourceManager.getSource(source)?.name ?: source
+            return context.getString(R.string.provider_key_missing, provider)
+        }
+        return context.getString(error.shortMessage)
+    }
+
+    fun actionLabel() = if (error == RefreshErrorType.API_KEY_REQUIRED_MISSING && source != null) {
+        R.string.action_settings
+    } else {
+        error.actionButtonMessage
+    }
+
+    fun openHelp(activity: Activity, sourceManager: SourceManager) {
+        val provider = source?.let { sourceManager.getSource(it) }
+        if (error == RefreshErrorType.API_KEY_REQUIRED_MISSING && provider is ConfigurableSource) {
+            if (provider is LocationSource) {
+                IntentHelper.startLocationProviderSettingsActivity(activity)
+            } else {
+                IntentHelper.startWeatherProviderSettingsActivity(activity, provider.id)
+            }
+        } else {
+            error.showDialogAction?.invoke(activity)
+        }
+    }
+
     fun getMessage(context: Context, sourceManager: SourceManager): String {
         return if (!source.isNullOrEmpty()) {
             "${getSourceWithOptionalFeature(context, sourceManager)}${context.getString(
                 R.string.colon_separator
-            )}${context.getString(error.shortMessage)}"
+            )}${getDescription(context, sourceManager)}"
         } else {
             context.getString(error.shortMessage)
         }

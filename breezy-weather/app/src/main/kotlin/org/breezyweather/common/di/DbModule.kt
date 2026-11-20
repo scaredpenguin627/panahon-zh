@@ -33,7 +33,6 @@ import breezyweather.data.DurationColumnAdapter
 import breezyweather.data.Hourlys
 import breezyweather.data.Locations
 import breezyweather.data.Minutelys
-import breezyweather.data.Normals
 import breezyweather.data.PollenConcentrationColumnAdapter
 import breezyweather.data.PollutantConcentrationColumnAdapter
 import breezyweather.data.PrecipitationColumnAdapter
@@ -248,10 +247,6 @@ class DbModule {
             alertsAdapter = Alerts.Adapter(
                 severityAdapter = AlertSeverityColumnAdapter
             ),
-            normalsAdapter = Normals.Adapter(
-                temperature_max_averageAdapter = TemperatureColumnAdapter,
-                temperature_min_averageAdapter = TemperatureColumnAdapter
-            )
         )
     }
 

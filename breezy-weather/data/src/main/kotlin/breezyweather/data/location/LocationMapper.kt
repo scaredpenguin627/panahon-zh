@@ -45,7 +45,6 @@ object LocationMapper {
         pollenSource: String?,
         minutelySource: String?,
         alertSource: String?,
-        normalsSource: String?,
         reverseGeocodingSource: String?,
         isCurrentPosition: Boolean,
         needsGeocodeRefresh: Boolean,
@@ -75,7 +74,6 @@ object LocationMapper {
         pollenSource = pollenSource,
         minutelySource = minutelySource,
         alertSource = alertSource,
-        normalsSource = normalsSource,
         reverseGeocodingSource = reverseGeocodingSource,
         isCurrentPosition = isCurrentPosition,
         needsGeocodeRefresh = needsGeocodeRefresh

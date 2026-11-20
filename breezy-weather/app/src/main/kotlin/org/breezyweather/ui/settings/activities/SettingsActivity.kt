@@ -70,6 +70,7 @@ class SettingsActivity : BreezyActivity() {
     @Inject lateinit var refreshHelper: RefreshHelper
 
     companion object {
+        const val KEY_PROVIDER_ID = "PROVIDER_ID"
         const val KEY_SETTINGS_ACTIVITY_START_DESTINATION =
             "SETTINGS_ACTIVITY_START_DESTINATION"
     }
@@ -308,7 +309,8 @@ class SettingsActivity : BreezyActivity() {
                     onNavigateBack = { onBack() },
                     worldwideSources = sourceManager
                         .getSupportedFeatureSources(SourceFeature.FORECAST, Location()),
-                    configurableSources = sourceManager.getConfigurableSources()
+                    configurableSources = sourceManager.getConfigurableSources(),
+                    providerId = intent.getStringExtra(KEY_PROVIDER_ID)
                 )
             }
             composable(SettingsScreenRouter.Debug.route) {

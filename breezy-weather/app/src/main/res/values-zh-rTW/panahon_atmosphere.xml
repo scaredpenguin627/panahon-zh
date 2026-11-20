@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wind_humidity_attribution">目前風況與濕度：%1$s</string>
+    <string name="hourly_wind_humidity_model">逐時風況、濕度與露點：Open-Meteo 模式</string>
+    <string name="current_wind_humidity_model">Open-Meteo 模式</string>
+    <string name="panahon_alert_scope">PANaHON 警報：如果氣象局未提供與此座標相符的行政區，只會顯示明確適用於全國的公告。</string>
+</resources>

@@ -16,6 +16,12 @@
 
 package org.breezyweather.ui.main.adapters.main.holder
 
+import org.breezyweather.ui.main.adapters.trend.hourly.HourlyAirQualityAdapter
+import org.breezyweather.ui.main.adapters.trend.hourly.HourlyWindAdapter
+import org.breezyweather.ui.main.adapters.trend.hourly.HourlyTemperatureAdapter
+import org.breezyweather.ui.main.adapters.trend.hourly.HourlyFeelsLikeAdapter
+import org.breezyweather.ui.main.adapters.trend.hourly.HourlyHumidityAdapter
+import org.breezyweather.sources.emb.EmbAirQualityService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,12 +69,6 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
 
         val weather = location.weather ?: return
 
-        val modelAttribution = if (location.forecastSource == "panahon" &&
-            weather.hourlyForecast.any { it.wind?.speed != null || it.relativeHumidity != null }
-        ) context.getString(R.string.hourly_wind_humidity_model) else null
-        subtitle.text = listOfNotNull(weather.current?.hourlyForecast, modelAttribution).joinToString("\n")
-        subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
-
         val trendAdapter = HourlyTrendAdapter(activity, trendRecyclerView).apply {
             bindData(location)
         }
@@ -87,6 +87,17 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
         }
 
+        fun showSubtitle(index: Int) {
+            val attribution = when (trendAdapter.adapters.getOrNull(index)) {
+                is HourlyAirQualityAdapter -> if (location.airQualitySource == EmbAirQualityService.ID) R.string.traveller_model_label else null
+                is HourlyWindAdapter, is HourlyHumidityAdapter -> if (location.forecastSource == "panahon") R.string.traveller_model_label else null
+                is HourlyTemperatureAdapter, is HourlyFeelsLikeAdapter -> if (location.forecastSource == "panahon") R.string.traveller_hourly_period else null
+                else -> null
+            }
+            subtitle.text = listOfNotNull(weather.current?.hourlyForecast, attribution?.let { context.getString(it) }).joinToString("\n")
+            subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
+        }
+        showSubtitle(trendAdapter.selectedIndex)
         if (buttonList.size < 2) {
             buttonGroup.visibility = View.GONE
         } else {
@@ -120,6 +131,7 @@ class HourlyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                         isChecked = index == trendAdapter.selectedIndex
                         setOnClickListener {
                             trendAdapter.selectedIndex = index
+                            showSubtitle(index)
                             setSelectedTab(button.name)
                             buttonGroup.children
                                 .filter { it is MaterialButton && it.tag != MaterialButtonGroup.OVERFLOW_BUTTON_TAG }

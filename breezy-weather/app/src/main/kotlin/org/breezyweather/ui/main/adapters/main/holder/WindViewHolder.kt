@@ -57,8 +57,9 @@ class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
 
         location.weather?.current?.wind?.let { wind ->
             talkBackBuilder.append(context.getString(R.string.colon_separator))
-            talkBackBuilder.append(wind.getContentDescription(context))
+            talkBackBuilder.append(wind.getContentDescription(context, withGusts = true))
 
+            windSpeedValueView.text = null
             wind.speed?.let { speed ->
                 windSpeedValueView.text = UnitUtils.formatUnitsHalfSize(
                     speed.formatMeasure(context, valueWidth = UnitWidth.NARROW)
@@ -82,19 +83,16 @@ class WindViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 windDirectionView.visibility = View.GONE
             }
 
-            windDetailView.text = if (wind.speed != null && wind.gusts != null && wind.gusts!! > wind.speed!!) {
+            val gusts = wind.gusts?.let {
                 context.getString(R.string.wind_gusts_short) +
                     context.getString(R.string.colon_separator) +
-                    wind.gusts!!.formatMeasure(context, valueWidth = UnitWidth.NARROW)
-            } else {
-                wind.getDirection(context, short = true)?.let {
-                    if (wind.degree!! in 0.0..360.0) {
-                        context.getString(R.string.wind_origin, it)
-                    } else {
-                        it
-                    }
-                } ?: ""
+                    it.formatMeasure(context, valueWidth = UnitWidth.NARROW)
             }
+            val direction = wind.getDirection(context, short = true)?.let {
+                if (wind.degree!! in 0.0..360.0) context.getString(R.string.wind_origin, it) else it
+            } ?: context.getString(R.string.traveller_wind_unknown)
+            windDetailView.text = listOfNotNull(direction, gusts).joinToString("\n")
+            if (wind.degree == null) talkBackBuilder.append(", ").append(direction)
         }
 
         val source = location.weather?.current?.windHumiditySource?.let { context.localizedWindHumiditySource(it) }

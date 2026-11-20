@@ -149,10 +149,6 @@ class FooterViewHolder(
                         append(stringResource(R.string.dot_separator))
                         withLink(moreClickableLinkAnnotation) { append(stringResource(R.string.action_more)) }
                     } ?: withLink(moreClickableLinkAnnotation) { append(stringResource(R.string.data_sources)) }
-                    if (location.alertSource == "panahon") {
-                        append("\n")
-                        append(stringResource(R.string.panahon_alert_scope))
-                    }
                     location.weather?.current?.windHumiditySource?.let {
                         append("\n")
                         append(stringResource(R.string.wind_humidity_attribution, context.localizedWindHumiditySource(it)))
@@ -178,7 +174,6 @@ class FooterViewHolder(
                 SourceFeature.POLLEN to location.pollenSource,
                 SourceFeature.MINUTELY to location.minutelySource,
                 SourceFeature.ALERT to location.alertSource,
-                SourceFeature.NORMALS to location.normalsSource,
                 SourceFeature.REVERSE_GEOCODING to location.reverseGeocodingSource
             ).filter { !it.value.isNullOrEmpty() }.mapNotNull {
                 (context as MainActivity).sourceManager.getFeatureSource(it.value!!)?.let { source ->

@@ -63,6 +63,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import org.breezyweather.R
 import org.breezyweather.common.options.appearance.CalendarHelper
+import org.breezyweather.common.extensions.appLanguageTag
 import org.breezyweather.common.options.appearance.LocaleHelper
 import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.source.SelectableSource
@@ -424,7 +425,7 @@ fun LanguagePreferenceView(
 
     val langs = remember { LocaleHelper.getLangs(context) }
     val currentLanguage by remember {
-        mutableStateOf(AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag() ?: "")
+        mutableStateOf(AppCompatDelegate.getApplicationLocales().get(0)?.appLanguageTag.orEmpty())
     }
 
     ListPreferenceViewWithCard(

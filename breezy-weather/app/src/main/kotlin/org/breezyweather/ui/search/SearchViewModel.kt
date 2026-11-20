@@ -27,6 +27,9 @@ import org.breezyweather.BreezyWeather
 import org.breezyweather.common.activities.BreezyViewModel
 import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.launchIO
+import org.breezyweather.R
+import org.breezyweather.common.source.RefreshError
+import org.breezyweather.sources.SourceManager
 import org.breezyweather.common.source.LocationSearchSource
 import org.breezyweather.common.utils.helpers.SnackbarHelper
 import org.breezyweather.ui.main.utils.RefreshErrorType
@@ -36,6 +39,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     application: Application?,
     repository: SearchActivityRepository,
+    private val sourceManager: SourceManager,
 ) : BreezyViewModel(application!!) {
     private val _listResource = MutableStateFlow<Pair<List<Location>, LoadableLocationStatus>>(
         Pair(emptyList(), LoadableLocationStatus.SUCCESS)
@@ -57,22 +61,25 @@ class SearchViewModel @Inject constructor(
 
     fun requestLocationList(str: String) {
         mRepository.cancel()
+        val provider = sourceManager.getLocationSearchSourceOrDefault(locationSearchSource.value)
         mRepository.searchLocationList(
             getApplication(),
             str.trim(),
-            locationSearchSource.value
+            provider.id
         ) { result: Pair<List<LocationAddressInfo>?, RefreshErrorType?>?, _: Boolean ->
             result?.second?.let { msg ->
-                msg.showDialogAction?.let { showDialogAction ->
+                val error = RefreshError(msg, provider.id, operation = R.string.location_search_source)
+                val message = error.getMessage(getApplication(), sourceManager)
+                msg.showDialogAction?.let {
                     SnackbarHelper.showSnackbar(
-                        content = (getApplication() as Application).getString(msg.shortMessage),
-                        action = (getApplication() as Application).getString(msg.actionButtonMessage)
+                        content = message,
+                        action = (getApplication() as Application).getString(error.actionLabel())
                     ) {
                         BreezyWeather.instance.topActivity?.let { topActivity ->
-                            showDialogAction(topActivity)
+                            error.openHelp(topActivity, sourceManager)
                         }
                     }
-                } ?: SnackbarHelper.showSnackbar((getApplication() as Application).getString(msg.shortMessage))
+                } ?: SnackbarHelper.showSnackbar(message)
                 _listResource.value = Pair(emptyList(), LoadableLocationStatus.ERROR)
             } ?: run {
                 result?.first?.let {

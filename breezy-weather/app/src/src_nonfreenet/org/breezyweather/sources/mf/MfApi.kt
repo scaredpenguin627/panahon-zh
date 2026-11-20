@@ -19,7 +19,6 @@ package org.breezyweather.sources.mf
 import io.reactivex.rxjava3.core.Observable
 import org.breezyweather.sources.mf.json.MfCurrentResult
 import org.breezyweather.sources.mf.json.MfForecastResult
-import org.breezyweather.sources.mf.json.MfNormalsResult
 import org.breezyweather.sources.mf.json.MfRainResult
 import org.breezyweather.sources.mf.json.MfWarningDictionaryResult
 import org.breezyweather.sources.mf.json.MfWarningsOverseasResult
@@ -62,13 +61,6 @@ interface MfApi {
         @Query("token") token: String,
     ): Observable<MfRainResult>
 
-    @GET("v2/normals")
-    fun getNormals(
-        @Header("User-Agent") userAgent: String,
-        @Query("lat") lat: Double,
-        @Query("lon") lon: Double,
-        @Query("token") token: String,
-    ): Observable<MfNormalsResult>
 
     @GET("v3/warning/full")
     fun getWarnings(

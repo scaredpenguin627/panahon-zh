@@ -98,7 +98,6 @@ class MaterialLiveWallpaperService : WallpaperService() {
                         withHourly = false,
                         withMinutely = false,
                         withAlerts = false,
-                        withNormals = false
                     )
                 )
             }
@@ -329,7 +328,6 @@ class MaterialLiveWallpaperService : WallpaperService() {
                         hourlyForecast = emptyList(),
                         minutelyForecast = emptyList(),
                         alertList = emptyList(),
-                        normals = emptyMap()
                     )
                 )
             )

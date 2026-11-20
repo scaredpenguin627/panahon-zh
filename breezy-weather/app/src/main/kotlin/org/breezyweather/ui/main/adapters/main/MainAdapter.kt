@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import breezyweather.domain.location.model.Location
 import org.breezyweather.BuildConfig
+import org.breezyweather.common.extensions.getBlocksPerRow
+import org.breezyweather.common.extensions.density
 import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.options.appearance.CardDisplay
 import org.breezyweather.domain.settings.SettingsManager
@@ -145,9 +147,6 @@ class MainAdapter(
                     if (weather.validAirQuality != null && !location.airQualitySource.isNullOrEmpty()) {
                         mViewTypeList.add(ViewType.AIR_QUALITY)
                     }
-                    if (BuildConfig.FLAVOR == "basic" && location.airQualitySource == EmbAirQualityService.ID) {
-                        mViewTypeList.add(ViewType.EMB)
-                    }
                     continue
                 }
                 if (c === CardDisplay.CARD_POLLEN &&
@@ -178,6 +177,23 @@ class MainAdapter(
                     continue
                 }
                 mViewTypeList.add(getViewType(c))
+            }
+            if (CardDisplay.CARD_AIR_QUALITY in cardDisplayList && BuildConfig.FLAVOR == "basic" &&
+                location.airQualitySource == EmbAirQualityService.ID
+            ) {
+                val aqi = mViewTypeList.indexOf(ViewType.AIR_QUALITY)
+                if (aqi < 0) {
+                    mViewTypeList.add(ViewType.EMB)
+                } else {
+                    val columns = if (host.width > 0) activity.getBlocksPerRow(host.width / activity.density)
+                        else activity.getBlocksPerRow()
+                    val firstTile = mViewTypeList.subList(0, aqi).indexOfLast { ViewType.isHalfSizeableBlock(it) != true } + 1
+                    var end = aqi + 1
+                    while (end < mViewTypeList.size && (end - firstTile) % columns != 0 &&
+                        ViewType.isHalfSizeableBlock(mViewTypeList[end]) == true
+                    ) end++
+                    mViewTypeList.add(end, ViewType.EMB)
+                }
             }
             mViewTypeList.add(ViewType.FOOTER)
         }

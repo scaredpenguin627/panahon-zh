@@ -1,2 +1,0 @@
-Útgáfubreytingar má sjá á GitHub:
-https://github.com/breezy-weather/breezy-weather/releases

@@ -65,13 +65,6 @@
     <string name="temperature_degree_day_cooling_explanation">Difference between the outside temperature and a reference comfortable temperature used to estimate cooling energy requirements</string>
     <!-- It’s actually a median, but the word “Average” is probably easier to understand -->
     <string name="temperature_average_short">Avg</string>
-    <string name="temperature_normal_short">Normal</string>
-    <string name="temperature_normals">Temperature normals</string>
-    <string name="temperature_normals_deviation">Deviation</string>
-    <!-- %s = July -->
-    <string name="temperature_normals_deviation_explanation_maximum">Deviation from %s average maximum temperature for this location</string>
-    <!-- %s = July -->
-    <string name="temperature_normals_deviation_explanation_minimum">Deviation from %s average minimum temperature for this location</string>
     <!-- Precipitation -->
     <string name="precipitation">Precipitation</string>
     <!-- Translate while taking into account it is a text spread on 2 lines (3 may overlap) of about 12 characters each -->
@@ -398,6 +391,7 @@
     <string name="weather_api_limit_reached_content">To workaround the limit, add your own API key.</string>
     <string name="weather_api_unauthorized_title">API access unauthorized</string>
     <string name="weather_api_unauthorized_content">On some weather data sources, you need to provide your own API key. If you already provided one, please double-check the API key you provided.</string>
+    <string name="provider_key_missing">Enter your %1$s API key in Settings.</string>
     <string name="weather_api_key_required_missing_title">Required API key missing</string>
     <string name="weather_api_key_required_missing_content">To use this source, you need to provide an API key.</string>
     <string name="weather_source_recommended">Recommended</string>

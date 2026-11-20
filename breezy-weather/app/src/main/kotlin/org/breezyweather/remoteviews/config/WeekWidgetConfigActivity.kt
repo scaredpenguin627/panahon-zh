@@ -49,7 +49,6 @@ class WeekWidgetConfigActivity : AbstractWidgetConfigActivity() {
                 withHourly = false,
                 withMinutely = false,
                 withAlerts = false,
-                withNormals = false
             )
         )
     }

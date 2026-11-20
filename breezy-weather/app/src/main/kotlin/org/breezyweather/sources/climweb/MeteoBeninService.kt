@@ -52,7 +52,5 @@ class MeteoBeninService @Inject constructor(
     override val instancePreference = R.string.settings_weather_source_meteo_benin_instance
 
     override val alertAttribution = weatherAttribution
-    override val normalsAttribution = weatherAttribution
 
-    override val cityClimatePageId = "105"
 }

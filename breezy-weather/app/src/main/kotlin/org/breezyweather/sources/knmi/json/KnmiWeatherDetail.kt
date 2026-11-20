@@ -26,7 +26,6 @@ data class KnmiWeatherDetail(
     val precipitationChance: KnmiPrecipitationChance? = null,
     val sunshine: KnmiSunshine? = null,
     val wind: KnmiWind? = null,
-    val climate: KnmiClimate? = null,
     val sun: KnmiSunData? = null,
     val uvIndex: KnmiUvIndex? = null,
 )

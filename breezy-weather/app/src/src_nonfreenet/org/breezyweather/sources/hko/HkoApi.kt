@@ -19,7 +19,6 @@ package org.breezyweather.sources.hko
 import io.reactivex.rxjava3.core.Observable
 import org.breezyweather.sources.hko.json.HkoCurrentResult
 import org.breezyweather.sources.hko.json.HkoLocationsResult
-import org.breezyweather.sources.hko.json.HkoNormalsResult
 import org.breezyweather.sources.hko.json.HkoOneJsonResult
 import org.breezyweather.sources.hko.json.HkoWarningResult
 import org.breezyweather.sources.hko.json.HkoWarningSummaryResult
@@ -32,16 +31,6 @@ interface HkoApi {
     fun getCurrentWeather(
         @Path("grid") grid: String = "",
     ): Observable<HkoCurrentResult>
-
-    // The output is in JSON despite the file extension in the URL
-    @GET("cis/individual_month/monthlyElement.xml")
-    fun getHkoNormals(): Observable<HkoNormalsResult>
-
-    // The output is in JSON despite the file extension in the URL
-    @GET("cis/aws/individual_month/monthly_{station}.xml")
-    fun getNormals(
-        @Path("station") station: String,
-    ): Observable<HkoNormalsResult>
 
     @GET("{path}json/DYN_DAT_WARNSUM.json")
     fun getWarningSummary(

@@ -91,7 +91,6 @@ abstract class CwaServiceStub(context: Context) :
         SourceFeature.CURRENT to weatherAttribution,
         SourceFeature.AIR_QUALITY to airQualityAttribution,
         SourceFeature.ALERT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution,
         SourceFeature.REVERSE_GEOCODING to weatherAttribution
     )
 

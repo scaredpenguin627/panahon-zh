@@ -31,7 +31,5 @@ data class Base(
     val pollenUpdateTime: Date? = null,
     val minutelyUpdateTime: Date? = null,
     val alertsUpdateTime: Date? = null,
-    val normalsUpdateTime: Date? = null,
-    val normalsUpdateLatitude: Double = 0.0,
-    val normalsUpdateLongitude: Double = 0.0,
+    val alertScope: String? = null,
 ) : Serializable

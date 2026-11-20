@@ -48,7 +48,6 @@ interface WeatherSource : FeatureSource {
      *     pollenSource = id,
      *     minutelySource = id,
      *     alertSource = id,
-     *     normalsSource = id
      * )
      *
      * Can be an emptyList(), although we recommend adding at least one

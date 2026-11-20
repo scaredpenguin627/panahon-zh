@@ -22,7 +22,6 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
@@ -41,7 +40,6 @@ import org.breezyweather.R
 import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.extensions.code
 import org.breezyweather.common.extensions.currentLocale
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.common.extensions.toDate
 import org.breezyweather.common.extensions.toTimezoneSpecificHour
 import org.breezyweather.common.preference.EditTextPreference
@@ -51,7 +49,6 @@ import org.breezyweather.sources.eccc.json.EcccAlert
 import org.breezyweather.sources.eccc.json.EcccDailyFcst
 import org.breezyweather.sources.eccc.json.EcccHourly
 import org.breezyweather.sources.eccc.json.EcccObservation
-import org.breezyweather.sources.eccc.json.EcccRegionalNormalsMetric
 import org.breezyweather.sources.eccc.json.EcccResult
 import org.breezyweather.sources.eccc.json.EcccUnit
 import org.breezyweather.sources.getWindDegree
@@ -62,7 +59,6 @@ import org.breezyweather.unit.speed.Speed.Companion.kilometersPerHour
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
 import retrofit2.Retrofit
 import java.util.Calendar
-import java.util.Date
 import java.util.Objects
 import javax.inject.Inject
 import javax.inject.Named
@@ -137,15 +133,6 @@ class EcccService @Inject constructor(
                 } else {
                     null
                 },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(it[0].dailyFcst?.regionalNormals?.metric)?.let { normals ->
-                        mapOf(
-                            Date().getCalendarMonth(location) to normals
-                        )
-                    }
-                } else {
-                    null
-                }
             )
         }
     }
@@ -312,17 +299,6 @@ class EcccService @Inject constructor(
                     ?: Alert.colorFromSeverity(severity)
             )
         }
-    }
-
-    /**
-     * Returns normals
-     */
-    private fun getNormals(normals: EcccRegionalNormalsMetric?): Normals? {
-        if (normals?.highTemp == null || normals.lowTemp == null) return null
-        return Normals(
-            daytimeTemperature = normals.highTemp.celsius,
-            nighttimeTemperature = normals.lowTemp.celsius
-        )
     }
 
     private fun getNonEmptyMetric(ecccUnit: EcccUnit?): Double? {

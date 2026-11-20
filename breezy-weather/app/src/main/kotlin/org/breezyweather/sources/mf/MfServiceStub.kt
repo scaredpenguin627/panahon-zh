@@ -59,7 +59,6 @@ abstract class MfServiceStub(context: Context) :
         SourceFeature.CURRENT to weatherAttribution,
         SourceFeature.MINUTELY to weatherAttribution,
         SourceFeature.ALERT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution,
         SourceFeature.REVERSE_GEOCODING to weatherAttribution
     )
 
@@ -75,9 +74,6 @@ abstract class MfServiceStub(context: Context) :
             SourceFeature.ALERT -> !location.countryCode.isNullOrEmpty() &&
                 arrayOf("FR", "AD", "BL", "GF", "GP", "MF", "MQ", "NC", "PF", "PM", "RE", "WF", "YT")
                     .any { location.countryCode.equals(it, ignoreCase = true) }
-            SourceFeature.NORMALS -> !location.countryCode.isNullOrEmpty() &&
-                arrayOf("FR", "AD", "MC", "BL", "GF", "GP", "MF", "MQ", "NC", "PF", "PM", "RE", "WF", "YT")
-                    .any { location.countryCode.equals(it, ignoreCase = true) }
             SourceFeature.FORECAST, SourceFeature.REVERSE_GEOCODING -> true // Main source available worldwide
             else -> false
         }
@@ -87,18 +83,12 @@ abstract class MfServiceStub(context: Context) :
         location: Location,
         feature: SourceFeature,
     ): Int {
-        return when {
-            isFeatureSupportedForLocation(
-                location,
-                // Since forecast and reverse geocoding are available worldwide, use the same criteria as normals
-                if (feature in arrayOf(SourceFeature.FORECAST, SourceFeature.REVERSE_GEOCODING)) {
-                    SourceFeature.NORMALS
-                } else {
-                    feature
-                }
-            ) -> PRIORITY_HIGHEST
-            else -> PRIORITY_NONE
+        val preferred = if (feature == SourceFeature.FORECAST || feature == SourceFeature.REVERSE_GEOCODING) {
+            location.countryCode?.uppercase() in setOf("FR", "AD", "MC", "BL", "GF", "GP", "MF", "MQ", "NC", "PF", "PM", "RE", "WF", "YT")
+        } else {
+            isFeatureSupportedForLocation(location, feature)
         }
+        return if (preferred) PRIORITY_HIGHEST else PRIORITY_NONE
     }
 
     /**

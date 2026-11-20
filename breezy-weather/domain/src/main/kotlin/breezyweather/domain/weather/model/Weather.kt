@@ -16,7 +16,6 @@
 
 package breezyweather.domain.weather.model
 
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.wrappers.AirQualityWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
 import breezyweather.domain.weather.wrappers.HourlyWrapper
@@ -37,7 +36,6 @@ data class Weather(
     val hourlyForecast: List<Hourly> = emptyList(),
     val minutelyForecast: List<Minutely> = emptyList(),
     val alertList: List<Alert> = emptyList(),
-    val normals: Map<Month, Normals> = emptyMap(),
 ) : Serializable {
 
     // Only hourly in the future, starting from current hour until the next 24 hours
@@ -136,7 +134,6 @@ data class Weather(
         hourlyForecast = this.hourlyForecast.map { it.toHourlyWrapper() },
         minutelyForecast = this.minutelyForecast,
         alertList = this.alertList,
-        normals = this.normals
     )
 
     fun toDailyWrapperList(startDate: Date): List<DailyWrapper> {

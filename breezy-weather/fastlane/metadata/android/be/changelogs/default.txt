@@ -1,2 +1,0 @@
-Спіс змен для розных версій даступны на GitHub:
-https://github.com/breezy-weather/breezy-weather/releases

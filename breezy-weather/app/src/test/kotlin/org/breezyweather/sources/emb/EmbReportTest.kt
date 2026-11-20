@@ -109,6 +109,10 @@ class EmbReportTest {
     @Test
     fun staleUsesReportClockRatherThanDownloadTime() {
         val now = Instant.parse("2026-11-20T05:00:00Z").toEpochMilli()
+        assertNull(reportAgeMillis("2026-11-19 56:00", now))
+        assertNull(reportAgeMillis("2026-11-18 12:00extra", now))
+        assertNull(reportAgeMillis("2026-11-22 12:00", now))
+        assertEquals(23L, reportAgeMillis("2026-10-28", now)?.div(86_400_000L))
         assertTrue(isOldReport("2026-11-18 12:00", now))
         assertFalse(isOldReport("2026-11-20 12:00", now))
     }

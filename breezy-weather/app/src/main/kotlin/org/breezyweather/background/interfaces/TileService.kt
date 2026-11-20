@@ -97,7 +97,6 @@ class TileService : TileService(), CoroutineScope {
                     withHourly = false,
                     withMinutely = false,
                     withAlerts = false,
-                    withNormals = false
                 )
             )
             locationRefreshed.weather?.current?.let { current ->

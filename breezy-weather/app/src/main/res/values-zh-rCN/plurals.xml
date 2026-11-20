@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="notification_update_error">
+        <item quantity="other">%1$d 项更新失败</item>
+    </plurals>
 </resources>

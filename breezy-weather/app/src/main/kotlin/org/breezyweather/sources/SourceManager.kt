@@ -109,7 +109,6 @@ import org.breezyweather.sources.mgm.MgmService
 import org.breezyweather.sources.namem.NamemService
 import org.breezyweather.sources.naturalearth.NaturalEarthService
 import org.breezyweather.sources.ncdr.NcdrService
-import org.breezyweather.sources.ncei.NceiService
 import org.breezyweather.sources.nlsc.NlscService
 import org.breezyweather.sources.nominatim.NominatimService
 import org.breezyweather.sources.nws.NwsService
@@ -193,7 +192,6 @@ class SourceManager @Inject constructor(
     namemService: NamemService,
     naturalEarthService: NaturalEarthService,
     ncdrService: NcdrService,
-    nceiService: NceiService,
     nlscService: NlscService,
     nominatimService: NominatimService,
     nwsService: NwsService,
@@ -239,7 +237,6 @@ class SourceManager @Inject constructor(
         fpasService,
         infoplazaService,
         metNoService,
-        nceiService,
         openWeatherService,
         pirateWeatherService,
         wmoSevereWeatherService
@@ -428,7 +425,6 @@ class SourceManager @Inject constructor(
                 Pair(pollenSource, SourceFeature.POLLEN),
                 Pair(minutelySource, SourceFeature.MINUTELY),
                 Pair(alertSource, SourceFeature.ALERT),
-                Pair(normalsSource, SourceFeature.NORMALS)
             ).forEach {
                 val source = getWeatherSource(it.first ?: location.forecastSource)
                 if (source is PreferencesParametersSource &&
@@ -500,8 +496,6 @@ class SourceManager @Inject constructor(
      * - AccuWeather in USA/Canada
      * - None in other countries
      * For alerts, default source is AccuWeather (may be FPAS or WMO SWIC in the future)
-     * For normals, default source is AccuWeather (may be NCEI in the future), unless:
-     * - In China: no normals source, due to firewall
      * For other cases, default source is Open-Meteo
      */
     fun getDefaultSourceForFeature(
@@ -524,17 +518,9 @@ class SourceManager @Inject constructor(
             }
 
             SourceFeature.ALERT -> if (BuildConfig.FLAVOR != "freenet") getWeatherSource("accu") else null
-            SourceFeature.NORMALS -> if (!location.countryCode.equals("CN", ignoreCase = true) &&
-                BuildConfig.FLAVOR != "freenet"
-            ) {
-                getWeatherSource("accu")
-            } else {
-                null
-            }
-
             SourceFeature.REVERSE_GEOCODING -> getReverseGeocodingSource("nominatim")
             else -> getWeatherSource("openmeteo")
-        }
+        }?.takeIf { it !is ConfigurableSource || (it.isConfigured && !it.isRestricted) }
     }
 
     fun getBestSourceForFeatureOrDefault(

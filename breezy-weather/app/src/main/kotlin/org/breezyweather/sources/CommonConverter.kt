@@ -404,7 +404,9 @@ internal fun completeDailyListFromHourlyList(
 
         daily.copy(
             day = newDay,
-            night = newNight,
+            night = if (location.forecastSource == "panahon") {
+                newNight?.copy(weatherCode = null, weatherText = null, weatherSummary = null)
+            } else newNight,
             degreeDay = if (daily.degreeDay?.cooling == null || daily.degreeDay!!.heating == null) {
                 getDegreeDay(
                     minTemp = newDay?.temperature?.temperature,

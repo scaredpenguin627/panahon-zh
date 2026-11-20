@@ -1,2 +1,0 @@
-Uuendusemärkmed on saadaval GitHubis:
-https://github.com/breezy-weather/breezy-weather/releases

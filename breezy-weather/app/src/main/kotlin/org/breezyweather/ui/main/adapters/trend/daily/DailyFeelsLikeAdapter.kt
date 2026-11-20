@@ -69,7 +69,7 @@ class DailyFeelsLikeAdapter(
             val daily = location.weather!!.dailyForecast[position]
             daily.day?.let { day ->
                 talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
-                    .append(activity.getString(R.string.daytime))
+                    .append(activity.getString(if (location.forecastSource == "panahon") R.string.traveller_daily_high else R.string.daytime))
                     .append(activity.getString(R.string.colon_separator))
                 day.temperature?.feelsLikeTemperature?.let {
                     talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
@@ -88,12 +88,12 @@ class DailyFeelsLikeAdapter(
             }
             daily.night?.let { night ->
                 talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
-                    .append(activity.getString(R.string.nighttime))
+                    .append(activity.getString(if (location.forecastSource == "panahon") R.string.traveller_daily_low else R.string.nighttime))
                     .append(activity.getString(R.string.colon_separator))
                 night.temperature?.feelsLikeTemperature?.let {
                     talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
                 }
-                if (!night.weatherText.isNullOrEmpty()) {
+                if (location.forecastSource != "panahon" && !night.weatherText.isNullOrEmpty()) {
                     talkBackBuilder.append(night.weatherText)
                 }
                 if (showPrecipitationProbability) {
@@ -163,7 +163,7 @@ class DailyFeelsLikeAdapter(
             )
             mPolylineAndHistogramView.setHistogramAlpha(if (lightTheme) 0.2f else 0.5f)
             dailyItem.setNightIconDrawable(
-                daily.night?.weatherCode?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, false) },
+                daily.night?.weatherCode?.takeUnless { location.forecastSource == "panahon" }?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, false) },
                 missingIconVisibility = View.INVISIBLE
             )
             dailyItem.contentDescription = talkBackBuilder.toString()

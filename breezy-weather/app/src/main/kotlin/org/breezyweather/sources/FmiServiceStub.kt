@@ -60,7 +60,6 @@ abstract class FmiServiceStub(context: Context) :
         SourceFeature.CURRENT to weatherAttribution,
         SourceFeature.AIR_QUALITY to weatherAttribution,
         SourceFeature.ALERT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution
     )
 
     override fun isFeatureSupportedForLocation(location: Location, feature: SourceFeature): Boolean {

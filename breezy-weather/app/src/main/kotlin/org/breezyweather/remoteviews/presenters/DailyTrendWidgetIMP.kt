@@ -35,7 +35,6 @@ import org.breezyweather.R
 import org.breezyweather.background.receiver.widget.WidgetTrendDailyProvider
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.formatPercent
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.common.extensions.getFormattedShortDayAndMonth
 import org.breezyweather.common.extensions.getTabletListAdaptiveWidth
 import org.breezyweather.common.utils.helpers.AsyncHelper
@@ -44,14 +43,12 @@ import org.breezyweather.domain.settings.SettingsManager
 import org.breezyweather.domain.weather.model.getWeek
 import org.breezyweather.domain.weather.model.isToday
 import org.breezyweather.remoteviews.Widgets
-import org.breezyweather.remoteviews.trend.TrendLinearLayout
 import org.breezyweather.remoteviews.trend.WidgetItemView
 import org.breezyweather.ui.theme.ThemeManager
 import org.breezyweather.ui.theme.resource.ResourceHelper
 import org.breezyweather.ui.theme.resource.ResourcesProviderFactory
 import org.breezyweather.ui.theme.weatherView.WeatherViewController
 import org.breezyweather.unit.formatting.UnitWidth
-import java.util.Date
 import kotlin.math.max
 import kotlin.math.min
 
@@ -148,11 +145,6 @@ object DailyTrendWidgetIMP : AbstractRemoteViewsPresenter() {
             }
         }
 
-        weather.normals.getOrElse(Date().getCalendarMonth(location)) { null }?.let { normals ->
-            highestTemperature = normals.daytimeTemperature?.value?.toFloat()
-            lowestTemperature = normals.nighttimeTemperature?.value?.toFloat()
-        }
-
         for (i in 0 until itemCount) {
             weather.dailyForecast[i].day?.temperature?.temperature?.value?.let {
                 if (highestTemperature == null || it > highestTemperature) {
@@ -168,28 +160,6 @@ object DailyTrendWidgetIMP : AbstractRemoteViewsPresenter() {
 
         val drawableView = LayoutInflater.from(context)
             .inflate(R.layout.widget_trend_daily, null, false)
-        weather.normals.getOrElse(Date().getCalendarMonth(location)) { null }?.let { normals ->
-            if (normals.daytimeTemperature != null &&
-                normals.nighttimeTemperature != null &&
-                highestTemperature != null &&
-                lowestTemperature != null
-            ) {
-                val trendParent = drawableView.findViewById<TrendLinearLayout>(R.id.widget_trend_daily)
-                trendParent.setData(
-                    arrayOf(
-                        normals.daytimeTemperature!!.value.toFloat(),
-                        normals.nighttimeTemperature!!.value.toFloat()
-                    ),
-                    highestTemperature,
-                    lowestTemperature,
-                    temperatureUnit,
-                    true
-                )
-                trendParent.setColor(lightTheme)
-                trendParent.setKeyLineVisibility(SettingsManager.getInstance(context).isTrendHorizontalLinesEnabled)
-            }
-        }
-
         val colors = ThemeManager.getInstance(context).weatherThemeDelegate.getThemeColors(
             context,
             WeatherViewController.getWeatherKind(location),

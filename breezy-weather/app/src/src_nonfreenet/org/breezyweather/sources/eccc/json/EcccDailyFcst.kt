@@ -22,5 +22,4 @@ import kotlinx.serialization.Serializable
 data class EcccDailyFcst(
     val daily: List<EcccDaily>?,
     val dailyIssuedTimeEpoch: String?,
-    val regionalNormals: EcccRegionalNormals?,
 )

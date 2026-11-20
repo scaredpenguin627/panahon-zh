@@ -23,9 +23,27 @@ import java.util.Locale
 
 val Context.currentLocale: Locale
     get() {
-        return AppCompatDelegate.getApplicationLocales().get(0)
-            ?: resources.configuration.locales[0]
+        val selected = AppCompatDelegate.getApplicationLocales().get(0)?.supportedAppLocale
+        if (selected != null) return selected
+        val locales = resources.configuration.locales
+        return (0 until locales.size()).firstNotNullOfOrNull { locales[it].supportedAppLocale } ?: Locale.ENGLISH
     }
+
+internal val Locale.supportedAppLocale: Locale?
+    get() = when (language) {
+        "en" -> this
+        "zh" -> if (isTraditionalChinese) Locale.TRADITIONAL_CHINESE else Locale.SIMPLIFIED_CHINESE
+        else -> null
+    }
+
+internal val Locale.appLanguageTag: String?
+    get() = if (language == "en") "en" else supportedAppLocale?.toLanguageTag()
+
+internal fun initialAppLanguageTag(stored: List<Locale>, firstLaunch: Boolean): String {
+    if (stored.isEmpty() && firstLaunch) return "zh-CN"
+    // Use the first supported preference, or let Android follow the system languages.
+    return stored.firstNotNullOfOrNull { it.appLanguageTag }.orEmpty()
+}
 
 // TODO: Review this use vs toLanguageTag()
 val Locale.code: String
@@ -33,7 +51,7 @@ val Locale.code: String
         val language = language
         val country = country
         return if (isTraditionalChinese) {
-            language.lowercase() + "-" + country.lowercase()
+            "zh-" + country.ifEmpty { "TW" }.lowercase()
         } else {
             language.lowercase()
         }
@@ -74,17 +92,19 @@ val Locale.codeForNaturalEarth: String
 val Locale.isChinese: Boolean
     get() = language.equals("zh", ignoreCase = true)
 
-// There is no way to access the script used, so assume Taiwan, Hong Kong and Macao
 val Locale.isTraditionalChinese: Boolean
-    get() = isChinese &&
-        arrayOf("TW", "HK", "MO").any { country.equals(it, ignoreCase = true) }
+    get() = isChinese && when (script) {
+        "Hant" -> true
+        "Hans" -> false
+        else -> country == "TW" || country == "HK" || country == "MO"
+    }
 
 fun Locale.getCountryName(countryCode: String): String {
     return Locale.Builder()
         .setLanguage(language)
         .setRegion(countryCode)
         .build()
-        .displayCountry
+        .getDisplayCountry(this)
 }
 
 /**

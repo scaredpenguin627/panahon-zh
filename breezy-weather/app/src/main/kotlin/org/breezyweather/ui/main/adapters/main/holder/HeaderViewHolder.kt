@@ -16,6 +16,10 @@
 
 package org.breezyweather.ui.main.adapters.main.holder
 
+import android.content.Intent
+import android.content.ActivityNotFoundException
+import androidx.core.net.toUri
+import org.breezyweather.sources.panahon.alertScopeText
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -80,6 +84,24 @@ class HeaderViewHolder(parent: ViewGroup) : AbstractMainViewHolder(
             refreshTimeText.visibility = View.GONE
         }
 
+        itemView.findViewById<TextView>(R.id.panahon_alert_scope).apply {
+            visibility = if (location.alertSource == "panahon") View.VISIBLE else View.GONE
+            text = if (visibility == View.VISIBLE) context.alertScopeText(location) else null
+        }
+        itemView.findViewById<View>(R.id.panahon_bulletins).apply {
+            visibility = if (location.alertSource == "panahon") View.VISIBLE else View.GONE
+            setOnClickListener {
+                // Give the Boracay tourist location a direct link; the general PAGASA weather page lists every region.
+                val page = if (location.latitude in 11.93..12.04 && location.longitude in 121.89..121.97) {
+                    "https://www.pagasa.dost.gov.ph/regional-forecast/visprsd"
+                } else "https://www.pagasa.dost.gov.ph/weather"
+                try {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, page.toUri()))
+                } catch (_: ActivityNotFoundException) {
+                    android.widget.Toast.makeText(context, page, android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        }
         val temperatureUnit = SettingsManager.getInstance(context).getTemperatureUnit(context)
         location.weather?.current?.let { current ->
             if (!current.weatherText.isNullOrEmpty()) {

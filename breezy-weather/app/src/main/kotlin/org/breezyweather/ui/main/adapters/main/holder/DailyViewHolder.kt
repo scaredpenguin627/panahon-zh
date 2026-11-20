@@ -17,6 +17,11 @@
 package org.breezyweather.ui.main.adapters.main.holder
 
 import android.annotation.SuppressLint
+import org.breezyweather.ui.main.adapters.trend.daily.DailyAirQualityAdapter
+import org.breezyweather.ui.main.adapters.trend.daily.DailyWindAdapter
+import org.breezyweather.ui.main.adapters.trend.daily.DailyTemperatureAdapter
+import org.breezyweather.ui.main.adapters.trend.daily.DailyFeelsLikeAdapter
+import org.breezyweather.sources.emb.EmbAirQualityService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -65,13 +70,6 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
 
         val weather = location.weather ?: return
 
-        if (weather.current?.dailyForecast.isNullOrEmpty()) {
-            subtitle.visibility = View.GONE
-        } else {
-            subtitle.visibility = View.VISIBLE
-            subtitle.text = weather.current?.dailyForecast
-        }
-
         val trendAdapter = DailyTrendAdapter(activity, trendRecyclerView).apply {
             bindData(location)
         }
@@ -90,6 +88,17 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
             }
         }
 
+        fun showSubtitle(index: Int) {
+            val attribution = when (trendAdapter.adapters.getOrNull(index)) {
+                is DailyAirQualityAdapter -> if (location.airQualitySource == EmbAirQualityService.ID) R.string.traveller_model_label else null
+                is DailyWindAdapter -> if (location.forecastSource == "panahon") R.string.traveller_model_label else null
+                is DailyTemperatureAdapter, is DailyFeelsLikeAdapter -> if (location.forecastSource == "panahon") R.string.traveller_daily_period else null
+                else -> null
+            }
+            subtitle.text = listOfNotNull(weather.current?.dailyForecast, attribution?.let { context.getString(it) }).joinToString("\n")
+            subtitle.visibility = if (subtitle.text.isEmpty()) View.GONE else View.VISIBLE
+        }
+        showSubtitle(trendAdapter.selectedIndex)
         if (buttonList.size < 2) {
             buttonGroup.visibility = View.GONE
         } else {
@@ -123,6 +132,7 @@ class DailyViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                         isChecked = index == trendAdapter.selectedIndex
                         setOnClickListener {
                             trendAdapter.selectedIndex = index
+                            showSubtitle(index)
                             setSelectedTab(button.name)
                             buttonGroup.children
                                 .filter { it is MaterialButton && it.tag != MaterialButtonGroup.OVERFLOW_BUTTON_TAG }

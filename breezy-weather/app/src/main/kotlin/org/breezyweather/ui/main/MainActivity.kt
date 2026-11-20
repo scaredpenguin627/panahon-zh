@@ -92,6 +92,7 @@ import org.breezyweather.ui.main.dialogs.LicenseComplianceDialog
 import org.breezyweather.ui.main.fragments.HomeFragment
 import org.breezyweather.ui.main.fragments.ManagementFragment
 import org.breezyweather.ui.main.fragments.PushedManagementFragment
+import org.breezyweather.ui.main.utils.RefreshErrorType
 import org.breezyweather.ui.search.SearchActivity
 import org.breezyweather.ui.theme.ThemeManager
 import org.breezyweather.ui.theme.compose.BreezyWeatherTheme
@@ -416,7 +417,9 @@ class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment
         viewModel.snackbarError.observe(this) { errors ->
             if (errors.size > 1) {
                 SnackbarHelper.showSnackbar(
-                    content = getString(R.string.message_multiple_refresh_errors),
+                    content = errors.firstOrNull { it.error == RefreshErrorType.API_KEY_REQUIRED_MISSING }
+                        ?.getMessage(this, sourceManager)
+                        ?: getString(R.string.message_multiple_refresh_errors),
                     action = getString(R.string.action_show)
                 ) {
                     // Inefficient workaround to apply the correct theme while taking the location-based theme setting
@@ -431,12 +434,12 @@ class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment
             } else {
                 errors.firstOrNull()?.let { error ->
                     val shortMessage = error.getMessage(this, sourceManager)
-                    error.error.showDialogAction?.let { showDialogAction ->
+                    error.error.showDialogAction?.let {
                         SnackbarHelper.showSnackbar(
                             content = shortMessage,
-                            action = getString(error.error.actionButtonMessage)
+                            action = getString(error.actionLabel())
                         ) {
-                            showDialogAction(this)
+                            error.openHelp(this, sourceManager)
                         }
                     } ?: SnackbarHelper.showSnackbar(shortMessage)
                 }
@@ -629,7 +632,7 @@ class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment
                     LazyColumn {
                         items(viewModel.snackbarError.value!!) {
                             val source = it.getSourceWithOptionalFeature(this@MainActivity, sourceManager)
-                            val message = this@MainActivity.getString(it.error.shortMessage)
+                            val message = it.getDescription(this@MainActivity, sourceManager)
 
                             ListItem(
                                 colors = ListItemDefaults.colors(
@@ -637,7 +640,7 @@ class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment
                                 ),
                                 modifier = Modifier
                                     .conditional(it.error.showDialogAction != null, {
-                                        clickable { it.error.showDialogAction!!(this@MainActivity) }
+                                        clickable { it.openHelp(this@MainActivity, sourceManager) }
                                     })
                                     .padding(vertical = dimensionResource(R.dimen.small_margin)),
                                 headlineContent = {

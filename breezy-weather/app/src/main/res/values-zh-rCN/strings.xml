@@ -337,6 +337,7 @@
     <string name="weather_source_accu_preference_days_1">1 天</string>
     <string name="action_more">查看更多</string>
     <string name="message_network_unavailable">网络不可用</string>
+    <string name="provider_key_missing">请在设置中填写 %1$s 的 API 密钥。</string>
     <string name="weather_api_key_required_missing_title">缺少必要的 API 密钥</string>
     <string name="settings_background_updates_summary">刷新频率，故障排除</string>
     <string name="settings_appearance_summary">语言、暗色模式、图标包、计量单位</string>
@@ -476,8 +477,6 @@
     <string name="about_contribution_designer">Logo 设计者</string>
     <string name="settings_main_threshold_lines_on_charts">图表中的阈值线</string>
     <string name="temperature_average_short">平均</string>
-    <string name="temperature_normals">温度常态</string>
-    <string name="temperature_normal_short">标准值</string>
     <string name="settings_modules_broadcast_send_data_title">发送天气数据到 %s</string>
     <string name="settings_color_app">跟随应用设置</string>
     <string name="settings_debug_dump_crash_logs_saved">已保存崩溃日志</string>
@@ -814,9 +813,6 @@
     <string name="precipitation_snow_total_night">夜间降雪量</string>
     <string name="daytime_short">白天</string>
     <string name="nighttime_short">晚间</string>
-    <string name="temperature_normals_deviation">偏差</string>
-    <string name="temperature_normals_deviation_explanation_maximum">该地点与%s平均最高温度的偏差值</string>
-    <string name="temperature_normals_deviation_explanation_minimum">当前温度与%s平均最低温度的差异</string>
     <string name="widget_custom_subtitle_help_content_description">显示自定义小标题关键词帮助</string>
     <string name="widget_custom_subtitle_alert_box_title">自定义小标题帮助</string>
     <string name="action_share_no_app">未找到分享应用</string>

@@ -57,3 +57,17 @@ internal fun Context.localizedWindHumiditySource(source: String): String =
     } else {
         source
     }
+
+// Current-location rows can move between updates. Reuse a scope only at its original coordinates.
+internal fun encodeAlertScope(location: Location, names: String): String =
+    location.latitude.toString() + "|" + location.longitude.toString() + "|" + names
+
+internal fun Context.alertScopeText(location: Location): String {
+    val prefix = encodeAlertScope(location, "")
+    val scope = location.weather?.base?.alertScope?.takeIf { it.startsWith(prefix) }?.removePrefix(prefix)
+    return when {
+        scope == null -> getString(R.string.traveller_scope_unverified)
+        scope.isEmpty() -> getString(R.string.traveller_scope_national)
+        else -> getString(R.string.traveller_scope_names, scope)
+    }
+}

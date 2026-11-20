@@ -1,0 +1,5 @@
+-- SQLite versions predating DROP COLUMN keep the retired fields at their defaults.
+-- Active queries omit them, including when restoring locations from older backups.
+UPDATE locations SET normals_source = NULL;
+UPDATE weathers SET normals_update_time = NULL, normals_update_latitude = 0.0, normals_update_longitude = 0.0;
+DROP TABLE normals;

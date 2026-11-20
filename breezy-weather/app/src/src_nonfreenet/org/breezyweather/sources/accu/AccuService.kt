@@ -26,7 +26,6 @@ import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.Alert
 import breezyweather.domain.weather.model.DegreeDay
 import breezyweather.domain.weather.model.Minutely
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Pollen
 import breezyweather.domain.weather.model.Precipitation
 import breezyweather.domain.weather.model.PrecipitationDuration
@@ -34,7 +33,6 @@ import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.AirQualityWrapper
 import breezyweather.domain.weather.wrappers.CurrentWrapper
@@ -52,7 +50,6 @@ import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.extensions.code
 import org.breezyweather.common.extensions.codeWithCountry
 import org.breezyweather.common.extensions.currentLocale
-import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.extensions.toDate
 import org.breezyweather.common.extensions.toTimezoneSpecificHour
 import org.breezyweather.common.preference.EditTextPreference
@@ -63,7 +60,6 @@ import org.breezyweather.domain.settings.SourceConfigStore
 import org.breezyweather.sources.accu.json.AccuAirQualityData
 import org.breezyweather.sources.accu.json.AccuAirQualityResult
 import org.breezyweather.sources.accu.json.AccuAlertResult
-import org.breezyweather.sources.accu.json.AccuClimoSummaryResult
 import org.breezyweather.sources.accu.json.AccuCurrentResult
 import org.breezyweather.sources.accu.json.AccuForecastAirAndPollen
 import org.breezyweather.sources.accu.json.AccuForecastDailyForecast
@@ -96,7 +92,6 @@ import org.breezyweather.unit.temperature.Temperature
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
 import org.breezyweather.unit.temperature.Temperature.Companion.fahrenheit
 import retrofit2.Retrofit
-import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
 import javax.inject.Inject
@@ -149,7 +144,6 @@ class AccuService @Inject constructor(
                     SourceFeature.CURRENT in requestedFeatures ||
                     SourceFeature.AIR_QUALITY in requestedFeatures ||
                     SourceFeature.POLLEN in requestedFeatures ||
-                    SourceFeature.NORMALS in requestedFeatures ||
                     (SourceFeature.ALERT in requestedFeatures && mApi is AccuEnterpriseApi)
                 ) &&
             locationKey.isNullOrEmpty()
@@ -275,25 +269,6 @@ class AccuService @Inject constructor(
         } else {
             Observable.just(AccuAirQualityResult())
         }
-        val cal = Date().toCalendarWithTimeZone(location.timeZone)
-        val climoSummary = if (
-            SourceFeature.NORMALS in requestedFeatures &&
-            mApi is AccuEnterpriseApi
-        ) {
-            mApi.getClimoSummary(
-                cal[Calendar.YEAR],
-                cal[Calendar.MONTH] + 1,
-                locationKey!!,
-                apiKey,
-                languageCode,
-                details = false
-            ).onErrorResumeNext {
-                failedFeatures[SourceFeature.NORMALS] = it
-                Observable.just(AccuClimoSummaryResult())
-            }
-        } else {
-            Observable.just(AccuClimoSummaryResult())
-        }
         return Observable.zip(
             current,
             daily,
@@ -301,7 +276,6 @@ class AccuService @Inject constructor(
             minute,
             alert,
             airQuality,
-            climoSummary
         ) {
                 accuRealtimeResults: List<AccuCurrentResult>,
                 accuDailyResult: AccuForecastDailyResult,
@@ -309,7 +283,6 @@ class AccuService @Inject constructor(
                 accuMinutelyResult: AccuMinutelyResult,
                 accuAlertResults: List<AccuAlertResult>,
                 accuAirQualityResult: AccuAirQualityResult,
-                accuClimoResult: AccuClimoSummaryResult,
             ->
             WeatherWrapper(
                 /*base = Base(
@@ -347,18 +320,6 @@ class AccuService @Inject constructor(
                 },
                 alertList = if (SourceFeature.ALERT in requestedFeatures) {
                     getAlertList(accuAlertResults)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures &&
-                    accuClimoResult.Normals?.Temperatures != null
-                ) {
-                    mapOf(
-                        Month.fromCalendarMonth(cal[Calendar.MONTH]) to Normals(
-                            daytimeTemperature = accuClimoResult.Normals.Temperatures.Maximum.Metric?.Value?.celsius,
-                            nighttimeTemperature = accuClimoResult.Normals.Temperatures.Minimum.Metric?.Value?.celsius
-                        )
-                    )
                 } else {
                     null
                 },
@@ -947,7 +908,6 @@ class AccuService @Inject constructor(
             SourceFeature.CURRENT in features ||
             SourceFeature.AIR_QUALITY in features ||
             SourceFeature.POLLEN in features ||
-            SourceFeature.NORMALS in features ||
             SourceFeature.ALERT in features
         ) {
             val currentLocationKey = location.parameters.getOrElse(id) { null }?.getOrElse("locationKey") { null }
@@ -997,7 +957,6 @@ class AccuService @Inject constructor(
             pollenSource = id,
             minutelySource = id,
             alertSource = id,
-            normalsSource = id
         )
     )
 

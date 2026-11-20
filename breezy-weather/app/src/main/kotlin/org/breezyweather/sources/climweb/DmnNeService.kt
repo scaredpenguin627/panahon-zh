@@ -45,7 +45,5 @@ class DmnNeService @Inject constructor(
     override val instancePreference = R.string.settings_weather_source_dmn_ne_instance
 
     override val alertAttribution = weatherAttribution
-    override val normalsAttribution = weatherAttribution
 
-    override val cityClimatePageId = "51"
 }

@@ -54,7 +54,6 @@ class TextWidgetConfigActivity : AbstractWidgetConfigActivity() {
                 withHourly = false,
                 withMinutely = false,
                 withAlerts = true, // Custom subtitle
-                withNormals = false
             )
         )
     }

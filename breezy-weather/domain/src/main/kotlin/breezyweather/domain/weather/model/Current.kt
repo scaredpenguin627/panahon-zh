@@ -47,6 +47,7 @@ data class Current(
     // Is actually a description of the nowcast
     val hourlyForecast: String? = null,
     val windHumiditySource: String? = null,
+    val pressureSource: String? = null,
 ) : Serializable {
 
     fun toCurrentWrapper() = CurrentWrapper(
@@ -63,6 +64,7 @@ data class Current(
         ceiling = this.ceiling,
         dailyForecast = this.dailyForecast,
         hourlyForecast = this.hourlyForecast,
-        windHumiditySource = this.windHumiditySource
+        windHumiditySource = this.windHumiditySource,
+        pressureSource = this.pressureSource
     )
 }

@@ -1,1 +1,0 @@
-Wetter-App mit vielen Funktionen, schönem Design und zahlreichen Wetterquellen.

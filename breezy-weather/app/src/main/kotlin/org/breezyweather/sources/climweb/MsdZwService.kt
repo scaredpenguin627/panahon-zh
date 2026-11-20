@@ -45,7 +45,5 @@ class MsdZwService @Inject constructor(
     override val instancePreference = R.string.settings_weather_source_msd_zw_instance
 
     override val alertAttribution = weatherAttribution
-    override val normalsAttribution = weatherAttribution
 
-    override val cityClimatePageId = null
 }

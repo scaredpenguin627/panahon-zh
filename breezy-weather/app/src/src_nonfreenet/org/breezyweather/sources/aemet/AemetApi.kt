@@ -21,7 +21,6 @@ import org.breezyweather.sources.aemet.json.AemetApiResult
 import org.breezyweather.sources.aemet.json.AemetCurrentResult
 import org.breezyweather.sources.aemet.json.AemetDailyResult
 import org.breezyweather.sources.aemet.json.AemetHourlyResult
-import org.breezyweather.sources.aemet.json.AemetNormalsResult
 import org.breezyweather.sources.aemet.json.AemetStationsResult
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -70,15 +69,4 @@ interface AemetApi {
         @Path("path", encoded = true) path: String,
     ): Observable<List<AemetCurrentResult>>
 
-    @GET("api/valores/climatologicos/normales/estacion/{estacion}")
-    fun getNormalsUrl(
-        @Header("api_key") apiKey: String,
-        @Path("estacion") estacion: String,
-    ): Observable<AemetApiResult>
-
-    @GET("{path}")
-    fun getNormals(
-        @Header("api_key") apiKey: String,
-        @Path("path", encoded = true) path: String,
-    ): Observable<List<AemetNormalsResult>>
 }

@@ -1,2 +1,0 @@
-As notas de liberación están dispoñibles no GitHub:
-https://github.com/breezy-weather/breezy-weather/releases

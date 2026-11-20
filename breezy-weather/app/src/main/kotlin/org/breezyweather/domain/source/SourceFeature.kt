@@ -27,6 +27,5 @@ val SourceFeature.resourceName: Int
         SourceFeature.POLLEN -> R.string.pollen
         SourceFeature.MINUTELY -> R.string.precipitation_nowcasting
         SourceFeature.ALERT -> R.string.alerts
-        SourceFeature.NORMALS -> R.string.temperature_normals
         SourceFeature.REVERSE_GEOCODING -> R.string.location_reverse_geocoding
     }

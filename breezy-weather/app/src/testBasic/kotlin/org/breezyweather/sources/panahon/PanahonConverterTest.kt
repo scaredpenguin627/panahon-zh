@@ -29,6 +29,25 @@ class PanahonConverterTest {
     }
 
     @Test
+    fun dailyOutlookIsNotASecondNightForecast() {
+        val day = forecast.copy(dc = listOf(PanahonPeriod(dt = "12/31", desc = "Cloudy skies", tmax = "31", tmin = "23")))
+            .toForecast(now).second.single()
+        assertEquals(WeatherCode.CLOUDY, day.day?.weatherCode)
+        assertEquals(31.0, day.day?.temperature?.temperature?.inCelsius)
+        assertEquals(23.0, day.night?.temperature?.temperature?.inCelsius)
+        assertEquals(null, day.night?.weatherCode)
+        assertEquals(null, day.night?.weatherText)
+    }
+
+    @Test
+    fun displayedAlertAreasUseExactlyTheNamesPermittedForMatching() {
+        val sameName = PanahonArea(municipality = "Rizal", province = "Palawan", region = "MIMAROPA")
+        assertEquals(listOf("Palawan", "MIMAROPA"), sameName.alertAreas())
+        assertTrue(PanahonArea().alertAreas().isEmpty())
+        assertEquals(listOf("Manila"), PanahonArea(municipality = "Manila", province = "MANILA").alertAreas())
+    }
+
+    @Test
     fun dashboardWithYesterdaysLastHourAtMidnight() {
         val afterMidnight = Instant.parse("2026-12-31T16:10:00Z").toEpochMilli()
         val rolled = forecast.copy(dc = listOf(PanahonPeriod(dt = "01/01")))

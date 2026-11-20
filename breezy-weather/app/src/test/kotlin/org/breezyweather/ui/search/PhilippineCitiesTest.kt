@@ -32,6 +32,7 @@ class PhilippineCitiesTest {
             result.longitude shouldBe 121.91932
             result.countryCode shouldBe "PH"
             result.timeZone.id shouldBe "Asia/Manila"
+            findOfflinePhilippineCities(query, Locale.forLanguageTag("zh-HK")).single().city shouldBe "長灘島"
         }
     }
 

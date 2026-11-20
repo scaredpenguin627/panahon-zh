@@ -91,7 +91,6 @@ Given different features have different caching delay, you may end up with a mix
 | Allergen        | 5 min                                                | 1 hour                                                |
 | Minutely        | 1 min if minutely list is not empty, 5 min otherwise | 5 min if minutely list is not empty, 15 min otherwise |
 | Alerts          | 1 min if alert list is not empty, 5 min otherwise    | 5 min if alert list is not empty, 1 hour otherwise    |
-| Normals         | Only if this month is missing                        | Only if this month is missing                         |
 
 Caching is ignored if coordinates changed from more than 5 kilometers, compared to previous known coordinates.
 

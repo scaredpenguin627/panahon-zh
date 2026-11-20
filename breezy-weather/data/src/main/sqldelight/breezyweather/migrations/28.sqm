@@ -1,0 +1,5 @@
+ALTER TABLE weathers ADD COLUMN pressure_source TEXT;
+ALTER TABLE weathers ADD COLUMN alert_scope TEXT;
+
+UPDATE dailys SET nighttime_weather_text = NULL, nighttime_weather_summary = NULL, nighttime_weather_code = NULL
+WHERE location_formatted_id IN (SELECT formatted_id FROM locations WHERE weather_source = 'panahon');

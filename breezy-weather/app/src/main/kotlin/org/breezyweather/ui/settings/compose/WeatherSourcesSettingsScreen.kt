@@ -75,14 +75,16 @@ fun WeatherSourcesSettingsScreen(
     worldwideSources: ImmutableList<FeatureSource>,
     configurableSources: ImmutableList<ConfigurableSource>,
     modifier: Modifier = Modifier,
+    providerId: String? = null,
 ) {
     val scrollBehavior = generateCollapsedScrollBehavior()
+    val selectedSource = configurableSources.find { it.id == providerId && it !is LocationSource }
 
     Material3Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             FitStatusBarTopAppBar(
-                title = stringResource(R.string.settings_weather_sources),
+                title = selectedSource?.name ?: stringResource(R.string.settings_weather_sources),
                 onBackPressed = onNavigateBack,
                 actions = { AboutActivityIconButton(context) },
                 scrollBehavior = scrollBehavior
@@ -92,7 +94,7 @@ fun WeatherSourcesSettingsScreen(
         PreferenceScreen(
             paddingValues = paddings.plus(PaddingValues(horizontal = dimensionResource(R.dimen.normal_margin)))
         ) {
-            if (BuildConfig.FLAVOR == "freenet") {
+            if (selectedSource == null && BuildConfig.FLAVOR == "freenet") {
                 clickablePreferenceItem(R.string.settings_weather_source_freenet_disclaimer) { id ->
                     val dialogLinkOpenState = remember { mutableStateOf(false) }
 
@@ -145,41 +147,43 @@ fun WeatherSourcesSettingsScreen(
                 largeSeparatorItem()
             }
 
-            sectionHeaderItem(R.string.settings_weather_sources_section_general)
-            listPreferenceItem(R.string.settings_weather_sources_default_source) { id ->
-                val worldwideSourcesAssociated = worldwideSources.associate { it.id to it.name }
-                val defaultWeatherSource = SettingsManager.getInstance(context).defaultForecastSource
-                SourceView(
-                    title = stringResource(id),
-                    selectedKey = if (worldwideSourcesAssociated.contains(defaultWeatherSource)) {
-                        defaultWeatherSource
-                    } else {
-                        "auto"
-                    },
-                    sourceList = buildList {
-                        add(Triple("auto", stringResource(R.string.settings_automatic), true))
-                        addAll(
-                            worldwideSources.map {
-                                Triple(
-                                    it.id,
-                                    it.getName(context),
-                                    it !is RemovedSource &&
-                                        (it !is ConfigurableSource || it.isConfigured) &&
-                                        (BuildConfig.FLAVOR != "freenet" || it !is NonFreeNetSource)
-                                )
-                            }
-                        )
-                    }.toImmutableList(),
-                    card = true,
-                    isFirst = true,
-                    isLast = true
-                ) { defaultSource ->
-                    SettingsManager.getInstance(context).defaultForecastSource = defaultSource
+            if (selectedSource == null) {
+                sectionHeaderItem(R.string.settings_weather_sources_section_general)
+                listPreferenceItem(R.string.settings_weather_sources_default_source) { id ->
+                    val worldwideSourcesAssociated = worldwideSources.associate { it.id to it.name }
+                    val defaultWeatherSource = SettingsManager.getInstance(context).defaultForecastSource
+                    SourceView(
+                        title = stringResource(id),
+                        selectedKey = if (worldwideSourcesAssociated.contains(defaultWeatherSource)) {
+                            defaultWeatherSource
+                        } else {
+                            "auto"
+                        },
+                        sourceList = buildList {
+                            add(Triple("auto", stringResource(R.string.settings_automatic), true))
+                            addAll(
+                                worldwideSources.map {
+                                    Triple(
+                                        it.id,
+                                        it.getName(context),
+                                        it !is RemovedSource &&
+                                            (it !is ConfigurableSource || it.isConfigured) &&
+                                            (BuildConfig.FLAVOR != "freenet" || it !is NonFreeNetSource)
+                                    )
+                                }
+                            )
+                        }.toImmutableList(),
+                        card = true,
+                        isFirst = true,
+                        isLast = true
+                    ) { defaultSource ->
+                        SettingsManager.getInstance(context).defaultForecastSource = defaultSource
+                    }
                 }
+                sectionFooterItem(R.string.settings_weather_sources_section_general)
             }
-            sectionFooterItem(R.string.settings_weather_sources_section_general)
 
-            configurableSources
+            (selectedSource?.let { listOf(it) } ?: configurableSources)
                 .filter {
                     // Exclude location sources configured in their own screen
                     it !is LocationSource && it.getPreferences(context).isNotEmpty()

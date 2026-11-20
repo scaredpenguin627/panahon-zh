@@ -27,7 +27,6 @@ import org.breezyweather.R
 import org.breezyweather.common.activities.BreezyActivity
 import org.breezyweather.common.extensions.formatMeasure
 import org.breezyweather.common.extensions.formatPercent
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.common.extensions.getThemeColor
 import org.breezyweather.common.options.appearance.DetailScreen
 import org.breezyweather.ui.common.widgets.trend.TrendRecyclerView
@@ -38,7 +37,6 @@ import org.breezyweather.ui.theme.resource.providers.ResourceProvider
 import org.breezyweather.ui.theme.weatherView.WeatherViewController
 import org.breezyweather.unit.formatting.UnitWidth
 import org.breezyweather.unit.temperature.TemperatureUnit
-import java.util.Date
 import kotlin.math.max
 
 /**
@@ -71,7 +69,7 @@ class DailyTemperatureAdapter(
             val daily = location.weather!!.dailyForecast[position]
             daily.day?.let { day ->
                 talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
-                    .append(activity.getString(R.string.daytime))
+                    .append(activity.getString(if (location.forecastSource == "panahon") R.string.traveller_daily_high else R.string.daytime))
                     .append(activity.getString(R.string.colon_separator))
                 day.temperature?.temperature?.let {
                     talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
@@ -91,13 +89,13 @@ class DailyTemperatureAdapter(
             }
             daily.night?.let { night ->
                 talkBackBuilder.append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
-                    .append(activity.getString(R.string.nighttime))
+                    .append(activity.getString(if (location.forecastSource == "panahon") R.string.traveller_daily_low else R.string.nighttime))
                     .append(activity.getString(R.string.colon_separator))
                 night.temperature?.temperature?.let {
                     talkBackBuilder.append(it.formatMeasure(activity, temperatureUnit, unitWidth = UnitWidth.LONG))
                         .append(activity.getString(org.breezyweather.unit.R.string.locale_separator))
                 }
-                if (!night.weatherText.isNullOrEmpty()) {
+                if (location.forecastSource != "panahon" && !night.weatherText.isNullOrEmpty()) {
                     talkBackBuilder.append(night.weatherText)
                 }
                 if (showPrecipitationProbability) {
@@ -165,7 +163,7 @@ class DailyTemperatureAdapter(
             )
             mPolylineAndHistogramView.setHistogramAlpha(if (lightTheme) 0.2f else 0.5f)
             dailyItem.setNightIconDrawable(
-                daily.night?.weatherCode?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, false) },
+                daily.night?.weatherCode?.takeUnless { location.forecastSource == "panahon" }?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, false) },
                 missingIconVisibility = View.INVISIBLE
             )
             dailyItem.contentDescription = talkBackBuilder.toString()
@@ -235,10 +233,6 @@ class DailyTemperatureAdapter(
                 i += 2
             }
         }
-        weather.normals.getOrElse(Date().getCalendarMonth(location)) { null }?.let { normals ->
-            mHighestTemperature = normals.daytimeTemperature?.value?.toFloat()
-            mLowestTemperature = normals.nighttimeTemperature?.value?.toFloat()
-        }
         weather.dailyForecast.forEach { daily ->
             daily.day?.temperature?.temperature?.value?.let {
                 if (mHighestTemperature == null || it > mHighestTemperature!!) {
@@ -276,38 +270,6 @@ class DailyTemperatureAdapter(
     override fun getDisplayName(context: Context) = context.getString(R.string.tag_temperature)
 
     override fun bindBackgroundForHost(host: TrendRecyclerView) {
-        val normals = location.weather?.normals?.getOrElse(Date().getCalendarMonth(location)) { null }
-        if (normals?.daytimeTemperature == null || normals.nighttimeTemperature == null) {
-            host.setData(null, 0f, 0f)
-        } else {
-            val keyLineList = mutableListOf<TrendRecyclerView.KeyLine>()
-            keyLineList.add(
-                TrendRecyclerView.KeyLine(
-                    normals.daytimeTemperature!!.value.toFloat(),
-                    normals.daytimeTemperature!!.formatMeasure(
-                        activity,
-                        temperatureUnit,
-                        valueWidth = UnitWidth.NARROW,
-                        unitWidth = UnitWidth.NARROW
-                    ),
-                    activity.getString(R.string.temperature_normal_short),
-                    TrendRecyclerView.KeyLine.ContentPosition.ABOVE_LINE
-                )
-            )
-            keyLineList.add(
-                TrendRecyclerView.KeyLine(
-                    normals.nighttimeTemperature!!.value.toFloat(),
-                    normals.nighttimeTemperature!!.formatMeasure(
-                        activity,
-                        temperatureUnit,
-                        valueWidth = UnitWidth.NARROW,
-                        unitWidth = UnitWidth.NARROW
-                    ),
-                    activity.getString(R.string.temperature_normal_short),
-                    TrendRecyclerView.KeyLine.ContentPosition.BELOW_LINE
-                )
-            )
-            host.setData(keyLineList, mHighestTemperature!!, mLowestTemperature!!)
-        }
+        host.setData(null, 0f, 0f)
     }
 }

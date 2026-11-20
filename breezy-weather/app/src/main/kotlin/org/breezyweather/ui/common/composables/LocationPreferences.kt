@@ -256,7 +256,6 @@ fun LocationPreference(
                                                     pollenUpdateTime = null,
                                                     minutelyUpdateTime = null,
                                                     alertsUpdateTime = null,
-                                                    normalsUpdateTime = null
                                                 )
                                             )
                                         }
@@ -377,7 +376,6 @@ fun SecondarySourcesPreference(
     val pollenSource = remember { mutableStateOf(location.pollenSource ?: "") }
     val minutelySource = remember { mutableStateOf(location.minutelySource ?: "") }
     val alertSource = remember { mutableStateOf(location.alertSource ?: "") }
-    val normalsSource = remember { mutableStateOf(location.normalsSource ?: "") }
     val reverseGeocodingSource = remember { mutableStateOf(location.reverseGeocodingSource ?: "") }
 
     val compatibleForecastSources = getCompatibleSources(
@@ -423,14 +421,6 @@ fun SecondarySourcesPreference(
         alertSource.value,
         SourceFeature.ALERT
     )
-    val compatibleNormalsSources = getCompatibleSources(
-        sourceManager,
-        context,
-        location,
-        normalsSource.value,
-        SourceFeature.NORMALS
-    )
-
     val compatibleReverseGeocodingSources = if (location.isCurrentPosition || location.needsGeocodeRefresh) {
         getCompatibleSources(
             sourceManager,
@@ -778,47 +768,6 @@ fun SecondarySourcesPreference(
                     alertSource.value = sourceId
                     hasChangedASource.value = true
                 }
-                SourceViewWithContinents(
-                    title = stringResource(SourceFeature.NORMALS.resourceName),
-                    selectedKey = normalsSource.value,
-                    sourceList = buildMap {
-                        put(
-                            null,
-                            buildList {
-                                if (normalsSource.value.isNotEmpty() &&
-                                    !compatibleNormalsSources.values.any { l ->
-                                        l.any { it.id == normalsSource.value }
-                                    }
-                                ) {
-                                    add(
-                                        SelectableSource(
-                                            normalsSource.value,
-                                            stringResource(
-                                                R.string.settings_weather_source_unavailable,
-                                                normalsSource.value
-                                            ),
-                                            false,
-                                            null
-                                        )
-                                    )
-                                }
-                                add(
-                                    SelectableSource(
-                                        "",
-                                        stringResource(R.string.settings_weather_source_none),
-                                        true,
-                                        null
-                                    )
-                                )
-                            }.toImmutableList()
-                        )
-                        putAll(compatibleNormalsSources)
-                    }.toImmutableMap(),
-                    withState = false
-                ) { sourceId ->
-                    normalsSource.value = sourceId
-                    hasChangedASource.value = true
-                }
                 if (location.isCurrentPosition || location.needsGeocodeRefresh) {
                     SourceViewWithContinents(
                         title = stringResource(SourceFeature.REVERSE_GEOCODING.resourceName),
@@ -878,7 +827,6 @@ fun SecondarySourcesPreference(
                             pollenSource = pollenSource.value,
                             minutelySource = minutelySource.value,
                             alertSource = alertSource.value,
-                            normalsSource = normalsSource.value,
                             reverseGeocodingSource = reverseGeocodingSource.value,
                             needsGeocodeRefresh = (!location.isCurrentPosition && location.needsGeocodeRefresh) ||
                                 (hasChangedReverseGeocodingSource.value && location.isCurrentPosition),
@@ -902,7 +850,6 @@ fun SecondarySourcesPreference(
                                         pollenUpdateTime = null,
                                         minutelyUpdateTime = null,
                                         alertsUpdateTime = null,
-                                        normalsUpdateTime = null
                                     )
                                 )
                             }

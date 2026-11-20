@@ -45,7 +45,5 @@ class AnametService @Inject constructor(
     override val instancePreference = R.string.settings_weather_source_anamet_instance
 
     override val alertAttribution = weatherAttribution
-    override val normalsAttribution = weatherAttribution
 
-    override val cityClimatePageId = null
 }

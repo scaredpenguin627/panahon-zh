@@ -60,16 +60,23 @@ class PanahonService @Inject constructor(@Named("JsonClient") client: Retrofit.B
                 bulletins.getOrThrow()!!.toAlerts(area, now)
             }
             val modelHours = model.getOrNull().orEmpty()
+            val modelNow = modelHours[Date(now - now % 3_600_000L)]
             val air = stationReports.getOrNull()?.let { nearbyObservation(location, it, now) }
-                ?: modelHours[Date(now - now % 3_600_000L)]
+                ?: modelNow
             WeatherWrapper(
                 hourlyForecast = outlook?.first?.withAtmosphere(modelHours),
                 dailyForecast = outlook?.second,
                 current = if (air == null) observed else observed?.copy(
                     wind = air.wind, relativeHumidity = air.humidity, dewPoint = air.dewPoint,
-                    windHumiditySource = air.attribution()
+                    windHumiditySource = air.attribution().takeIf { air.wind != null || air.humidity != null || air.dewPoint != null },
+                    pressure = modelNow?.pressure,
+                    pressureSource = modelNow?.takeIf { it.pressure != null }?.attribution()
                 ),
                 alertList = warnings,
+                alertScope = warnings?.let {
+                    val areas = dashboard.getOrThrow()!!.meta!!.alertAreas().joinToString(", ")
+                    encodeAlertScope(location, areas)
+                },
                 failedFeatures = failures
             )
         }

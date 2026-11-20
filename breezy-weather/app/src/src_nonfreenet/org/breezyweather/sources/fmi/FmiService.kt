@@ -5,12 +5,10 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.Alert
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Precipitation
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.AirQualityWrapper
 import breezyweather.domain.weather.wrappers.CurrentWrapper
@@ -95,7 +93,7 @@ class FmiService @Inject constructor(
         requestedFeatures: List<SourceFeature>,
     ): Observable<WeatherWrapper> {
         val currentStation = location.parameters.getOrElse(id) { null }?.getOrElse("currentStation") { null }
-        if (arrayOf(SourceFeature.CURRENT, SourceFeature.NORMALS).any { it in requestedFeatures } &&
+        if (SourceFeature.CURRENT in requestedFeatures &&
             currentStation.isNullOrEmpty()
         ) {
             return Observable.error(InvalidLocationException())
@@ -165,19 +163,6 @@ class FmiService @Inject constructor(
             FmiSimpleResult()
         }
 
-        val normals = if (SourceFeature.NORMALS in requestedFeatures) {
-            val result = mApi.getNormals(
-                fmisid = currentStation!!
-            ).execute().body()
-            if (result == null) {
-                failedFeatures[SourceFeature.NORMALS] = WeatherException()
-                FmiSimpleResult()
-            } else {
-                result
-            }
-        } else {
-            FmiSimpleResult()
-        }
 
         var someAlertsFailed = false
         val alerts = if (SourceFeature.ALERT in requestedFeatures) {
@@ -216,8 +201,7 @@ class FmiService @Inject constructor(
                 hourlyForecast = getHourlyForecast(context, forecast),
                 airQuality = getAirQuality(airQuality),
                 alertList = getAlertList(context, location, alerts),
-                normals = getNormals(normals),
-                failedFeatures = failedFeatures
+                    failedFeatures = failedFeatures
             )
         )
     }
@@ -331,26 +315,6 @@ class FmiService @Inject constructor(
         )
     }
 
-    private fun getNormals(
-        normalsResult: FmiSimpleResult,
-    ): Map<Month, Normals> {
-        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
-        formatter.timeZone = TimeZone.getTimeZone("Etc/UTC")
-        return Month.entries.associateWith { month ->
-            val datePattern = Regex("""^\d{4}-${"%02d".format(month.value)}-01T00:00:00Z$""")
-            val monthlyRecords = normalsResult.members?.filter {
-                datePattern.matches(formatter.format(it.bsWfsElement?.time?.value!!))
-            }
-            if (!monthlyRecords.isNullOrEmpty()) {
-                Normals(
-                    daytimeTemperature = extract(monthlyRecords, "TAMAXP1M")?.celsius,
-                    nighttimeTemperature = extract(monthlyRecords, "TAMINP1M")?.celsius
-                )
-            } else {
-                Normals()
-            }
-        }
-    }
 
     private fun getAlertList(
         context: Context,

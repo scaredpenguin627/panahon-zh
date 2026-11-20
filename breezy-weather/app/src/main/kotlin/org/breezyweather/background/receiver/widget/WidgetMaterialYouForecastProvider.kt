@@ -57,7 +57,6 @@ class WidgetMaterialYouForecastProvider : AppWidgetProvider() {
                             withHourly = true,
                             withMinutely = false,
                             withAlerts = false,
-                            withNormals = false
                         )
                     )
                 )

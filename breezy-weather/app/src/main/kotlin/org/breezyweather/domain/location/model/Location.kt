@@ -66,7 +66,6 @@ fun Location.applyDefaultPreset(sourceManager: SourceManager): Location {
         pollenSource = sourceManager.getBestSourceForFeatureOrDefault(this, SourceFeature.POLLEN)?.id,
         minutelySource = sourceManager.getBestSourceForFeatureOrDefault(this, SourceFeature.MINUTELY)?.id,
         alertSource = sourceManager.getBestSourceForFeatureOrDefault(this, SourceFeature.ALERT)?.id,
-        normalsSource = sourceManager.getBestSourceForFeatureOrDefault(this, SourceFeature.NORMALS)?.id,
         reverseGeocodingSource = sourceManager
             .getBestSourceForFeatureOrDefault(this, SourceFeature.REVERSE_GEOCODING)?.id
     )

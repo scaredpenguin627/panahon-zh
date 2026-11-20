@@ -24,13 +24,11 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceContinent
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Precipitation
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
@@ -98,7 +96,6 @@ class KnmiService @Inject constructor(
         SourceFeature.FORECAST to name,
         SourceFeature.CURRENT to name,
         SourceFeature.ALERT to name,
-        SourceFeature.NORMALS to name
     )
 
     override fun isFeatureSupportedForLocation(
@@ -167,7 +164,7 @@ class KnmiService @Inject constructor(
             Observable.just(KnmiWeather())
         }
 
-        val weatherDetail = if (SourceFeature.NORMALS in requestedFeatures) {
+        val weatherDetail = if (SourceFeature.FORECAST in requestedFeatures) {
             mApi.getWeatherDetail(
                 location = locationCode,
                 region = null,
@@ -220,7 +217,6 @@ class KnmiService @Inject constructor(
                         weather.daily,
                         fourteenDayForecast.daily,
                         weather.uvIndex,
-                        // Only available with normals, not worth an additional call otherwise
                         weatherDetail.sunshine
                     )
                 } else {
@@ -238,11 +234,6 @@ class KnmiService @Inject constructor(
                 },
                 alertList = if (SourceFeature.ALERT in requestedFeatures && currentRegion != null) {
                     getAlertList(alerts, currentRegion)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(weatherDetail)
                 } else {
                     null
                 },
@@ -570,18 +561,6 @@ class KnmiService @Inject constructor(
         }
     }
 
-    private fun getNormals(
-        weatherDetail: KnmiWeatherDetail?,
-    ): Map<Month, Normals>? {
-        if (weatherDetail?.climate?.month == null) return null
-        return mapOf(
-            Month.of(weatherDetail.climate.month) to Normals(
-                daytimeTemperature = weatherDetail.climate.averageTemperatureRange?.max?.celsius,
-                // this is monthly, so nighttime temp is the minimum
-                nighttimeTemperature = weatherDetail.climate.averageTemperatureRange?.min?.celsius
-            )
-        )
-    }
 
     // CONFIG
     private val config = SourceConfigStore(context, id)

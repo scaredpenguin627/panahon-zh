@@ -24,7 +24,6 @@ import org.breezyweather.sources.cwa.json.CwaAssistantResult
 import org.breezyweather.sources.cwa.json.CwaCurrentResult
 import org.breezyweather.sources.cwa.json.CwaForecastResult
 import org.breezyweather.sources.cwa.json.CwaLocationResult
-import org.breezyweather.sources.cwa.json.CwaNormalsResult
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -45,14 +44,6 @@ interface CwaApi {
         @Body body: RequestBody,
     ): Observable<CwaLocationResult>
 
-    @GET("api/v1/rest/datastore/C-B0027-001")
-    fun getNormals(
-        @Query("Authorization") apiKey: String,
-        @Query("format") format: String = "json",
-        @Query("StationID") stationId: String,
-        @Query("weatherElement") weatherElement: String = "AirTemperature",
-        @Query("Month") month: String,
-    ): Observable<CwaNormalsResult>
 
     @GET("api/v1/rest/datastore/O-A0001-001")
     fun getCurrent(

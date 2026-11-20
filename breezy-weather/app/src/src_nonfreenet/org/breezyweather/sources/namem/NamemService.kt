@@ -21,7 +21,6 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.AirQuality
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Precipitation
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.Wind
@@ -40,13 +39,11 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.breezyweather.R
 import org.breezyweather.common.exceptions.InvalidLocationException
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.domain.weather.index.PollutantIndex
 import org.breezyweather.sources.namem.json.NamemAirQualityResult
 import org.breezyweather.sources.namem.json.NamemCurrentResult
 import org.breezyweather.sources.namem.json.NamemDailyResult
 import org.breezyweather.sources.namem.json.NamemHourlyResult
-import org.breezyweather.sources.namem.json.NamemNormalsResult
 import org.breezyweather.sources.namem.json.NamemStation
 import org.breezyweather.unit.pollutant.PollutantConcentration.Companion.microgramsPerCubicMeter
 import org.breezyweather.unit.pollutant.PollutantConcentration.Companion.milligramsPerCubicMeter
@@ -122,16 +119,6 @@ class NamemService @Inject constructor(
             Observable.just(NamemDailyResult())
         }
 
-        val normals = if (SourceFeature.NORMALS in requestedFeatures) {
-            mApi.getNormals(
-                body = body.toRequestBody("application/json".toMediaTypeOrNull())
-            ).onErrorResumeNext {
-                failedFeatures[SourceFeature.NORMALS] = it
-                Observable.just(NamemNormalsResult())
-            }
-        } else {
-            Observable.just(NamemNormalsResult())
-        }
 
         val airQuality = if (SourceFeature.AIR_QUALITY in requestedFeatures) {
             mApi.getAirQuality().onErrorResumeNext {
@@ -142,11 +129,10 @@ class NamemService @Inject constructor(
             Observable.just(NamemAirQualityResult())
         }
 
-        return Observable.zip(current, daily, hourly, normals, airQuality) {
+        return Observable.zip(current, daily, hourly, airQuality) {
                 currentResult: NamemCurrentResult,
                 dailyResult: NamemDailyResult,
                 hourlyResult: NamemHourlyResult,
-                normalsResult: NamemNormalsResult,
                 airQualityResult: NamemAirQualityResult,
             ->
             WeatherWrapper(
@@ -169,15 +155,6 @@ class NamemService @Inject constructor(
                     AirQualityWrapper(
                         current = getAirQuality(location, airQualityResult)
                     )
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(normalsResult)?.let {
-                        mapOf(
-                            Date().getCalendarMonth(location) to it
-                        )
-                    }
                 } else {
                     null
                 },
@@ -247,16 +224,6 @@ class NamemService @Inject constructor(
         )
     }
 
-    private fun getNormals(
-        normalsResult: NamemNormalsResult,
-    ): Normals? {
-        return normalsResult.foreMonthly?.lastOrNull { it.obsDate != null && it.obsDate < Date() }?.let {
-            Normals(
-                daytimeTemperature = it.ttMaxAve?.celsius,
-                nighttimeTemperature = it.ttMinAve?.celsius
-            )
-        }
-    }
 
     private fun getDailyForecast(
         context: Context,

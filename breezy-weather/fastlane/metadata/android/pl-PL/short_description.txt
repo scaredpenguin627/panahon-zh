@@ -1,1 +1,0 @@
-Rozbudowana aplikacja pogodowa z wizualizacjami i wieloma źródłami danych.

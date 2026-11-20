@@ -50,7 +50,6 @@ class MultiCityWidgetConfigActivity : AbstractWidgetConfigActivity() {
                     withHourly = false,
                     withMinutely = false,
                     withAlerts = false,
-                    withNormals = false
                 )
             )
         }

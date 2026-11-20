@@ -56,7 +56,6 @@ abstract class AccuServiceStub :
         SourceFeature.POLLEN to weatherAttribution,
         SourceFeature.MINUTELY to weatherAttribution,
         SourceFeature.ALERT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution,
         SourceFeature.REVERSE_GEOCODING to weatherAttribution
     )
 

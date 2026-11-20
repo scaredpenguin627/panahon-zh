@@ -22,7 +22,6 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
@@ -49,7 +48,6 @@ import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.exceptions.WeatherException
 import org.breezyweather.common.extensions.code
 import org.breezyweather.common.extensions.currentLocale
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.sources.jma.json.JmaAlertResult
 import org.breezyweather.sources.jma.json.JmaAmedasResult
 import org.breezyweather.sources.jma.json.JmaAreasResult
@@ -230,15 +228,6 @@ class JmaService @Inject constructor(
                 },
                 alertList = if (SourceFeature.ALERT in requestedFeatures) {
                     getAlertList(context, alertResult, class20s)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(dailyResult, weekAreaAmedas)?.let { normals ->
-                        mapOf(
-                            Date().getCalendarMonth(location) to normals
-                        )
-                    }
                 } else {
                     null
                 },
@@ -486,20 +475,6 @@ class JmaService @Inject constructor(
         }
     }
 
-    private fun getNormals(
-        dailyResult: List<JmaDailyResult>,
-        weekAreaAmedas: String,
-    ): Normals? {
-        dailyResult.getOrNull(1)?.tempAverage?.areas?.forEach { area ->
-            if (area.area.code == weekAreaAmedas) {
-                return Normals(
-                    daytimeTemperature = area.max?.toDoubleOrNull()?.celsius,
-                    nighttimeTemperature = area.min?.toDoubleOrNull()?.celsius
-                )
-            }
-        }
-        return null
-    }
 
     private fun getAlertList(
         context: Context,

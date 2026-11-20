@@ -48,6 +48,7 @@ data class CurrentWrapper(
     // Is actually a description of the nowcast
     val hourlyForecast: String? = null,
     val windHumiditySource: String? = null,
+    val pressureSource: String? = null,
 ) {
     fun toCurrent(
         uV: UV? = null,
@@ -65,6 +66,7 @@ data class CurrentWrapper(
         ceiling = this.ceiling,
         dailyForecast = this.dailyForecast,
         hourlyForecast = this.hourlyForecast,
-        windHumiditySource = this.windHumiditySource
+        windHumiditySource = this.windHumiditySource,
+        pressureSource = this.pressureSource
     )
 }

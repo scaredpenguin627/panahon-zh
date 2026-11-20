@@ -62,7 +62,6 @@ abstract class JmaServiceStub(context: Context) :
         SourceFeature.FORECAST to weatherAttribution,
         SourceFeature.CURRENT to weatherAttribution,
         SourceFeature.ALERT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution,
         SourceFeature.REVERSE_GEOCODING to weatherAttribution
     )
 

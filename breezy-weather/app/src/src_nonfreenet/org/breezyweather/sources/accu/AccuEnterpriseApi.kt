@@ -19,7 +19,6 @@ package org.breezyweather.sources.accu
 import io.reactivex.rxjava3.core.Observable
 import org.breezyweather.sources.accu.json.AccuAirQualityResult
 import org.breezyweather.sources.accu.json.AccuAlertResult
-import org.breezyweather.sources.accu.json.AccuClimoSummaryResult
 import org.breezyweather.sources.accu.json.AccuMinutelyResult
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -55,13 +54,4 @@ interface AccuEnterpriseApi : AccuDeveloperApi {
         @Query("language") language: String,
     ): Observable<AccuAirQualityResult>
 
-    @GET("climo/v1/summary/{year}/{month}/{city_key}")
-    fun getClimoSummary(
-        @Path("year") year: Int,
-        @Path("month") month: Int,
-        @Path("city_key") cityKey: String,
-        @Query("apikey") apikey: String,
-        @Query("language") language: String,
-        @Query("details") details: Boolean,
-    ): Observable<AccuClimoSummaryResult>
 }

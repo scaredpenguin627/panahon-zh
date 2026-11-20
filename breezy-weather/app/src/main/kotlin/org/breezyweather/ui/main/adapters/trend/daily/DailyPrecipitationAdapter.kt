@@ -113,7 +113,7 @@ class DailyPrecipitationAdapter(
             )
             mDoubleHistogramView.setHistogramAlphas(1f, 0.5f)
             dailyItem.setNightIconDrawable(
-                daily.night?.weatherCode?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, false) },
+                daily.night?.weatherCode?.takeUnless { location.forecastSource == "panahon" }?.let { ResourceHelper.getWeatherIcon(mResourceProvider, it, false) },
                 missingIconVisibility = View.INVISIBLE
             )
             dailyItem.contentDescription = talkBackBuilder.toString()

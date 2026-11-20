@@ -37,7 +37,6 @@ abstract class InfoplazaServiceStub :
         SourceFeature.FORECAST to name,
         SourceFeature.CURRENT to name,
         SourceFeature.MINUTELY to name,
-        SourceFeature.NORMALS to name
     )
 
     override val isRestricted = false

@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import breezyweather.domain.location.model.Location
@@ -48,6 +49,7 @@ import kotlin.math.roundToInt
 class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.container_main_air_quality, parent, false)
 ) {
+    private val source: TextView = itemView.findViewById(R.id.aqi_source)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val aqiValueView: TextView = itemView.findViewById(R.id.aqi_value)
     private val aqiLevelView: TextView = itemView.findViewById(R.id.aqi_level)
@@ -65,8 +67,11 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
         itemAnimationEnabled: Boolean,
     ) {
         super.onBindView(activity, location, provider, listAnimationEnabled, itemAnimationEnabled)
+        val model = location.airQualitySource == EmbAirQualityService.ID
+        source.isVisible = model
+        source.setText(R.string.traveller_model_label)
         title.setText(
-            if (location.airQualitySource == EmbAirQualityService.ID) R.string.emb_model_title else R.string.air_quality_short
+            if (model) R.string.traveller_model_aqi else R.string.air_quality_short
         )
 
         val talkBackBuilder = StringBuilder()
@@ -102,6 +107,7 @@ class AirQualityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 .append(context.getString(org.breezyweather.unit.R.string.locale_separator))
                 .append(airQuality.getName(context))
         }
+        if (model) talkBackBuilder.append(", ").append(source.text)
         itemView.contentDescription = talkBackBuilder.toString()
         itemView.setOnClickListener {
             IntentHelper.startDailyWeatherActivity(

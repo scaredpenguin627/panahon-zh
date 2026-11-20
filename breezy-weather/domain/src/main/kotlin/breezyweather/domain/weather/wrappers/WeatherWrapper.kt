@@ -19,7 +19,6 @@ package breezyweather.domain.weather.wrappers
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
 import breezyweather.domain.weather.model.Minutely
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.reference.Month
 
 /**
@@ -38,6 +37,6 @@ data class WeatherWrapper(
      * You can get the month with Month.of(month)
      * where month is a value between 1 and 12
      */
-    val normals: Map<Month, Normals>? = null,
     val failedFeatures: Map<SourceFeature, Throwable>? = null,
+    val alertScope: String? = null,
 )

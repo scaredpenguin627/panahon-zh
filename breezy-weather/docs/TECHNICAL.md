@@ -141,7 +141,6 @@ Future additional endpoints/improvements for existing endpoints:
 - Reverse geocoding, see [open-meteo/geocoding-api#6](https://github.com/open-meteo/geocoding-api/issues/6)
 - Alerts, see [open-meteo/open-meteo#351](https://github.com/open-meteo/open-meteo/issues/351)
 - Moon rise, set and phases, see [open-meteo/open-meteo#87](https://github.com/open-meteo/open-meteo/issues/87)
-- Normals, see [open-meteo/open-meteo#361](https://github.com/open-meteo/open-meteo/issues/361)
 
 
 ## AccuWeather

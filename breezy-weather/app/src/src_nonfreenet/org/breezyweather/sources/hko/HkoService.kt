@@ -23,12 +23,10 @@ import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceContinent
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
@@ -59,7 +57,6 @@ import org.breezyweather.sources.hko.json.HkoCurrentResult
 import org.breezyweather.sources.hko.json.HkoDailyForecast
 import org.breezyweather.sources.hko.json.HkoForecastResult
 import org.breezyweather.sources.hko.json.HkoHourlyWeatherForecast
-import org.breezyweather.sources.hko.json.HkoNormalsResult
 import org.breezyweather.sources.hko.json.HkoOneJsonResult
 import org.breezyweather.sources.hko.json.HkoWarningResult
 import org.breezyweather.unit.pressure.Pressure.Companion.hectopascals
@@ -126,7 +123,6 @@ class HkoService @Inject constructor(
         SourceFeature.FORECAST to weatherAttribution,
         SourceFeature.CURRENT to weatherAttribution,
         SourceFeature.ALERT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution,
         SourceFeature.REVERSE_GEOCODING to weatherAttribution
     )
     override val attributionLinks = mapOf(
@@ -157,12 +153,11 @@ class HkoService @Inject constructor(
     ): Observable<WeatherWrapper> {
         val languageCode = context.currentLocale.code
 
-        // Make sure we have current grid ID, forecast grid ID, and default weather station.
+        // Make sure we have current and forecast grid IDs.
         // We need these to call the APIs.
         val currentGrid = location.parameters.getOrElse(id) { null }?.getOrElse("currentGrid") { null }
-        val currentStation = location.parameters.getOrElse(id) { null }?.getOrElse("currentStation") { null }
         val forecastGrid = location.parameters.getOrElse(id) { null }?.getOrElse("forecastGrid") { null }
-        if (currentGrid.isNullOrEmpty() || currentStation.isNullOrEmpty() || forecastGrid.isNullOrEmpty()) {
+        if (currentGrid.isNullOrEmpty() || forecastGrid.isNullOrEmpty()) {
             return Observable.error(InvalidLocationException())
         }
 
@@ -261,27 +256,10 @@ class HkoService @Inject constructor(
             Observable.just(mutableMapOf())
         }
 
-        // NORMALS
-        // HKO has its own normals endpoint from all the other stations.
-        val normals = if (SourceFeature.NORMALS in requestedFeatures) {
-            when (currentStation) {
-                "HKO" -> mApi.getHkoNormals().onErrorResumeNext {
-                    failedFeatures[SourceFeature.NORMALS] = it
-                    Observable.just(HkoNormalsResult())
-                }
-                else -> mApi.getNormals(currentStation).onErrorResumeNext {
-                    failedFeatures[SourceFeature.NORMALS] = it
-                    Observable.just(HkoNormalsResult())
-                }
-            }
-        } else {
-            Observable.just(HkoNormalsResult())
-        }
 
-        return Observable.zip(current, forecast, normals, oneJson, warningDetails) {
+        return Observable.zip(current, forecast, oneJson, warningDetails) {
                 currentResult: HkoCurrentResult,
                 forecastResult: HkoForecastResult,
-                normalsResult: HkoNormalsResult,
                 oneJsonResult: HkoOneJsonResult,
                 warningDetailsResult: MutableMap<String, HkoWarningResult>,
             ->
@@ -307,11 +285,6 @@ class HkoService @Inject constructor(
                 },
                 alertList = if (SourceFeature.ALERT in requestedFeatures) {
                     getAlertList(context, warningDetailsResult)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(normalsResult)
                 } else {
                     null
                 },
@@ -347,40 +320,6 @@ class HkoService @Inject constructor(
         )
     }
 
-    private fun getNormals(
-        normalsResult: HkoNormalsResult,
-    ): Map<Month, Normals> {
-        val maxTemps = mutableListOf<Double>()
-        val minTemps = mutableListOf<Double>()
-        var value: Double?
-
-        // TODO: Limit the list to only the most recent 30 years?
-        // TODO: Include values like " 25.4#" (incomplete months)? - need to trim space and hash sign
-        return Month.entries.associateWith { month ->
-            normalsResult.stn?.data?.forEach {
-                if (it.code == "MEAN_MAX") {
-                    it.monData?.forEach { mon ->
-                        value = mon?.getOrElse(month.value) { null }?.toDoubleOrNull()
-                        if (value != null) {
-                            maxTemps.add(value!!)
-                        }
-                    }
-                }
-                if (it.code == "MEAN_MIN") {
-                    it.monData?.forEach { mon ->
-                        value = mon?.getOrElse(month.value) { null }?.toDoubleOrNull()
-                        if (value != null) {
-                            minTemps.add(value!!)
-                        }
-                    }
-                }
-            }
-            Normals(
-                daytimeTemperature = maxTemps.takeIf { it.isNotEmpty() }?.average()?.celsius,
-                nighttimeTemperature = minTemps.takeIf { it.isNotEmpty() }?.average()?.celsius
-            )
-        }
-    }
 
     private fun getDailyForecast(
         context: Context,
@@ -1030,12 +969,10 @@ class HkoService @Inject constructor(
         if (coordinatesChanged) return true
 
         // IDs for current observation grid and forecast grid are different.
-        // Also need to make sure we have a valid station for normals.
         val currentGrid = location.parameters.getOrElse(id) { null }?.getOrElse("currentGrid") { null }
-        val currentStation = location.parameters.getOrElse(id) { null }?.getOrElse("currentStation") { null }
         val forecastGrid = location.parameters.getOrElse(id) { null }?.getOrElse("forecastGrid") { null }
 
-        return currentGrid.isNullOrEmpty() || currentStation.isNullOrEmpty() || forecastGrid.isNullOrEmpty()
+        return currentGrid.isNullOrEmpty() || forecastGrid.isNullOrEmpty()
     }
 
     override fun requestLocationParameters(
@@ -1055,15 +992,6 @@ class HkoService @Inject constructor(
         }
         val currentGrid = getCurrentGrid(location.latitude, location.longitude)
 
-        // Obtain the default weather station for temperature normals
-        val station = mApi.getCurrentWeather(currentGrid).onErrorResumeNext {
-            // TODO: Log warning
-            Observable.just(HkoCurrentResult())
-        }.blockingFirst().RegionalWeather?.Temp?.DefaultStation
-        if (station == null) {
-            throw InvalidLocationException()
-        }
-
         // Identify grid ID for Forecast.
         // It is in a 16 E-W × 15-N-S configuration, numbered from 1 to 240.
         // Each block is 0.1° latitude and 0.1° longitude in size.
@@ -1074,7 +1002,6 @@ class HkoService @Inject constructor(
         return Observable.just(
             mapOf(
                 "currentGrid" to currentGrid,
-                "currentStation" to station,
                 "forecastGrid" to forecastGrid
             )
         )

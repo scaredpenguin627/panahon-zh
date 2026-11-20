@@ -93,11 +93,15 @@ internal fun PanahonForecast.toForecast(now: Long, describe: (String) -> String 
     val daily = dc.mapNotNull { item ->
         val date = nearestDay(item.dt, now) ?: return@mapNotNull null
         val code = weatherCode(item.desc)
-        fun half(temp: String?) = HalfDayWrapper(
-            weatherCode = code, weatherText = item.desc?.let(describe),
-            temperature = TemperatureWrapper(temp.number()?.celsius)
+        // The bulletin contains one all-day outlook and a pair of extrema.
+        DailyWrapper(
+            date = date,
+            day = HalfDayWrapper(
+                weatherCode = code, weatherText = item.desc?.let(describe),
+                temperature = TemperatureWrapper(item.tmax.number()?.celsius)
+            ),
+            night = HalfDayWrapper(temperature = TemperatureWrapper(item.tmin.number()?.celsius))
         )
-        DailyWrapper(date = date, day = half(item.tmax), night = half(item.tmin))
     }
 
     val clock = formatter("h:mm a")
@@ -127,12 +131,15 @@ internal fun PanahonForecast.toForecast(now: Long, describe: (String) -> String 
     return hourly to daily
 }
 
-internal fun PanahonAlerts.toAlerts(area: PanahonArea, now: Long): List<Alert> {
+internal fun PanahonArea.alertAreas(): List<String> {
     // The coordinates endpoint returns national bulletins. Use official English area names from the dashboard.
     // An unqualified town (e.g. Rizal) can share a name with a distant province.
-    val city = area.municipality?.takeIf { it.endsWith(" City", ignoreCase = true) || it.equals("Manila", ignoreCase = true) }
-    val areas = listOfNotNull(area.province, area.region, city)
-        .map { it.trim().lowercase(Locale.ROOT) }.filter { it.isNotEmpty() }.toSet()
+    val city = municipality?.takeIf { it.endsWith(" City", ignoreCase = true) || it.equals("Manila", ignoreCase = true) }
+    return listOfNotNull(city, province, region).map { it.trim() }.filter { it.isNotEmpty() }.distinctBy { it.lowercase(Locale.ROOT) }
+}
+
+internal fun PanahonAlerts.toAlerts(area: PanahonArea, now: Long): List<Alert> {
+    val areas = area.alertAreas().map { it.lowercase(Locale.ROOT) }
     // Some offshore coordinates have verified dashboard coordinates but no named
     // province or region. Only explicitly nationwide bulletins can be matched there.
     val nationwide = setOf("all", "nationwide", "philippines", "entire philippines")

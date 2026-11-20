@@ -85,6 +85,25 @@ class PanahonAtmosphereTest {
     }
 
     @Test
+    fun pressureRequiresSameGridHourAndExplicitSeaLevelUnits() {
+        val hour = now / 3_600_000L * 3_600
+        val time = Date(hour * 1000)
+        val grid = PanahonModelGrid(
+            latitude = boracay.latitude, longitude = boracay.longitude,
+            hourly = PanahonModelHours(time = listOf(hour, hour + 3600), pressure = listOf(1009.5, null)),
+            hourlyUnits = mapOf("pressure_msl" to "hPa")
+        )
+        assertEquals(1009.5, grid.hourlyReadings(boracay)[time]?.pressure?.inHectopascals)
+        assertNull(grid.hourlyReadings(boracay)[Date(time.time + 3_600_000)]?.pressure)
+        assertTrue(grid.hourlyReadings(manila).isEmpty())
+        for (units in listOf(emptyMap(), mapOf("pressure_msl" to "Pa"))) {
+            assertTrue(grid.copy(hourlyUnits = units).hourlyReadings(boracay).isEmpty())
+        }
+        val invalid = grid.copy(hourly = grid.hourly.copy(pressure = listOf(0.0, Double.NaN)))
+        assertTrue(invalid.hourlyReadings(boracay).isEmpty())
+    }
+
+    @Test
     fun hourlyDerivedCurrentKeepsModelDewPointAndCreditsOnlyTheFieldsActuallyUsed() {
         val ph = boracay.copy(forecastSource = "panahon")
         val hour = Hourly(

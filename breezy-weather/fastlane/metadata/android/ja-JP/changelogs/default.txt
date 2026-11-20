@@ -1,2 +1,0 @@
-リリースノートは以下のリンクからGitHubにてご覧ください：
-https://github.com/breezy-weather/breezy-weather/releases

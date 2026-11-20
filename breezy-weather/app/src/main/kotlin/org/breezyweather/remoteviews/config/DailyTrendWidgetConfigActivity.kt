@@ -49,7 +49,6 @@ class DailyTrendWidgetConfigActivity : AbstractWidgetConfigActivity() {
                 withHourly = false,
                 withMinutely = false,
                 withAlerts = false,
-                withNormals = true // Threshold lines
             )
         )
     }

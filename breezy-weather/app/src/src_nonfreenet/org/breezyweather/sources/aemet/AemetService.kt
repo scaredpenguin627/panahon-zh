@@ -20,12 +20,10 @@ import android.content.Context
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.DailyRelativeHumidity
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Precipitation
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
@@ -49,7 +47,6 @@ import org.breezyweather.domain.settings.SourceConfigStore
 import org.breezyweather.sources.aemet.json.AemetCurrentResult
 import org.breezyweather.sources.aemet.json.AemetDailyResult
 import org.breezyweather.sources.aemet.json.AemetHourlyResult
-import org.breezyweather.sources.aemet.json.AemetNormalsResult
 import org.breezyweather.sources.aemet.json.AemetStationsResult
 import org.breezyweather.sources.getWindDegree
 import org.breezyweather.unit.distance.Distance.Companion.meters
@@ -124,30 +121,6 @@ class AemetService @Inject constructor(
             Observable.just(emptyList())
         }
 
-        val normals = if (SourceFeature.NORMALS in requestedFeatures) {
-            mApi.getNormalsUrl(
-                apiKey = apiKey,
-                estacion = estacion
-            ).map {
-                val path = it.datos?.substringAfter(AEMET_BASE_URL)
-                if (!path.isNullOrEmpty()) {
-                    mApi.getNormals(
-                        apiKey = apiKey,
-                        path = path
-                    ).onErrorResumeNext {
-                        failedFeatures[SourceFeature.NORMALS] = it
-                        Observable.just(emptyList())
-                    }.blockingFirst()
-                } else {
-                    emptyList()
-                }
-            }.onErrorResumeNext {
-                failedFeatures[SourceFeature.NORMALS] = it
-                Observable.just(emptyList())
-            }
-        } else {
-            Observable.just(emptyList())
-        }
 
         val daily = if (SourceFeature.FORECAST in requestedFeatures) {
             mApi.getForecastUrl(
@@ -195,11 +168,10 @@ class AemetService @Inject constructor(
             Observable.just(emptyList())
         }
 
-        return Observable.zip(current, daily, hourly, normals) {
+        return Observable.zip(current, daily, hourly) {
                 currentResult: List<AemetCurrentResult>,
                 dailyResult: List<AemetDailyResult>,
                 hourlyResult: List<AemetHourlyResult>,
-                normalsResult: List<AemetNormalsResult>,
             ->
             WeatherWrapper(
                 dailyForecast = if (SourceFeature.FORECAST in requestedFeatures) {
@@ -214,11 +186,6 @@ class AemetService @Inject constructor(
                 },
                 current = if (SourceFeature.CURRENT in requestedFeatures) {
                     getCurrent(currentResult)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(normalsResult)
                 } else {
                     null
                 },
@@ -250,18 +217,6 @@ class AemetService @Inject constructor(
         }
     }
 
-    private fun getNormals(
-        normalsResult: List<AemetNormalsResult>,
-    ): Map<Month, Normals> {
-        return normalsResult
-            .filter { it.mes?.toIntOrNull() != null && it.mes.toInt() in 1..12 }
-            .associate {
-                Month.of(it.mes!!.toInt()) to Normals(
-                    daytimeTemperature = it.max?.toDoubleOrNull()?.celsius,
-                    nighttimeTemperature = it.min?.toDoubleOrNull()?.celsius
-                )
-            }
-    }
 
     private fun getDailyForecast(
         context: Context,

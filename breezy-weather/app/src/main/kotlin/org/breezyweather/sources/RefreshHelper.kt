@@ -32,7 +32,6 @@ import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Base
 import breezyweather.domain.weather.model.Weather
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.WeatherWrapper
 import com.google.maps.android.SphericalUtil
@@ -46,6 +45,7 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.breezyweather.BreezyWeather
 import org.breezyweather.BuildConfig
+import org.breezyweather.R
 import org.breezyweather.common.exceptions.ApiKeyMissingException
 import org.breezyweather.common.exceptions.LocationException
 import org.breezyweather.common.exceptions.NoNetworkException
@@ -60,7 +60,6 @@ import org.breezyweather.common.extensions.locationManager
 import org.breezyweather.common.extensions.roundDecimals
 import org.breezyweather.common.extensions.shortcutManager
 import org.breezyweather.common.extensions.sizeInBytes
-import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.extensions.toDateNoHour
 import org.breezyweather.common.source.AddressSource
 import org.breezyweather.common.source.BroadcastSource
@@ -175,7 +174,8 @@ class RefreshHelper @Inject constructor(
             listOf(
                 RefreshError(
                     RefreshErrorType.getTypeFromThrowable(context, e, RefreshErrorType.LOCATION_FAILED),
-                    locationService.name
+                    locationService.id,
+                    operation = R.string.settings_location_service
                 )
             )
         }
@@ -260,7 +260,7 @@ class RefreshHelper @Inject constructor(
                         currentErrors.add(
                             RefreshError(
                                 RefreshErrorType.REVERSE_GEOCODING_FAILED,
-                                reverseGeocodingService.name,
+                                reverseGeocodingService.id,
                                 SourceFeature.REVERSE_GEOCODING
                             )
                         )
@@ -279,7 +279,7 @@ class RefreshHelper @Inject constructor(
                         currentErrors.add(
                             RefreshError(
                                 RefreshErrorType.REVERSE_GEOCODING_FAILED,
-                                reverseGeocodingService.name,
+                                reverseGeocodingService.id,
                                 SourceFeature.REVERSE_GEOCODING
                             )
                         )
@@ -301,7 +301,7 @@ class RefreshHelper @Inject constructor(
                             e,
                             RefreshErrorType.REVERSE_GEOCODING_FAILED
                         ),
-                        reverseGeocodingService.name,
+                        reverseGeocodingService.id,
                         SourceFeature.REVERSE_GEOCODING
                     )
                 )
@@ -541,7 +541,6 @@ class RefreshHelper @Inject constructor(
                     Pair(pollenSource, SourceFeature.POLLEN),
                     Pair(minutelySource, SourceFeature.MINUTELY),
                     Pair(alertSource, SourceFeature.ALERT),
-                    Pair(normalsSource, SourceFeature.NORMALS)
                 ).forEach {
                     if (!it.first.isNullOrEmpty()) {
                         if (featuresBySources.containsKey(it.first)) {
@@ -574,9 +573,7 @@ class RefreshHelper @Inject constructor(
             var pollenUpdateTime = base.pollenUpdateTime
             var minutelyUpdateTime = base.minutelyUpdateTime
             var alertsUpdateTime = base.alertsUpdateTime
-            var normalsUpdateTime = base.normalsUpdateTime
-            var normalsUpdateLatitude = base.normalsUpdateLatitude
-            var normalsUpdateLongitude = base.normalsUpdateLongitude
+            var alertScope = base.alertScope.takeIf { location.alertSource == "panahon" }
 
             // TODO: Debug source is not online, don't use this check in that case
             // Can't return from inside `async`
@@ -627,7 +624,8 @@ class RefreshHelper @Inject constructor(
                                                     errors.add(
                                                         RefreshError(
                                                             RefreshErrorType.API_KEY_REQUIRED_MISSING,
-                                                            entry.key
+                                                            entry.key,
+                                                            it
                                                         )
                                                     )
                                                     false
@@ -876,32 +874,13 @@ class RefreshHelper @Inject constructor(
                         } else {
                             sourceCalls.getOrElse(location.alertSource!!) { null }?.alertList?.let {
                                 alertsUpdateTime = Date()
+                                alertScope = sourceCalls[location.alertSource!!]?.alertScope
                                 it
                             }
                         } ?: location.weather?.toAlertsWrapper()
                     } else {
                         null
                     },
-                    normals = if (!location.normalsSource.isNullOrEmpty()) {
-                        if (errors.any {
-                                it.feature == SourceFeature.NORMALS &&
-                                    it.source == location.normalsSource!!
-                            }
-                        ) {
-                            null
-                        } else {
-                            // Combine with previous stored months if not current location
-                            sourceCalls.getOrElse(location.normalsSource!!) { null }?.normals?.let {
-                                normalsUpdateTime = Date()
-                                normalsUpdateLatitude = location.latitude
-                                normalsUpdateLongitude = location.longitude
-                                ((if (!location.isCurrentPosition) location.weather?.normals else null) ?: emptyMap()) +
-                                    it
-                            }
-                        } ?: location.weather?.normals
-                    } else {
-                        null
-                    }
                 )
             } else {
                 return WeatherResult(
@@ -979,9 +958,7 @@ class RefreshHelper @Inject constructor(
                     pollenUpdateTime = pollenUpdateTime,
                     minutelyUpdateTime = minutelyUpdateTime,
                     alertsUpdateTime = alertsUpdateTime,
-                    normalsUpdateTime = normalsUpdateTime,
-                    normalsUpdateLatitude = normalsUpdateLatitude,
-                    normalsUpdateLongitude = normalsUpdateLongitude
+                    alertScope = alertScope,
                 ),
                 current = completeCurrentFromHourlyData(
                     weatherWrapperCompleted.current
@@ -1010,7 +987,6 @@ class RefreshHelper @Inject constructor(
                     ?.mapNotNull { it.toValidOrNull() }
                     ?: emptyList(),
                 alertList = weatherWrapperCompleted.alertList ?: emptyList(),
-                normals = weatherWrapperCompleted.normals ?: emptyMap()
             )
             locationRepository.insertParameters(location.formattedId, locationParameters)
             weatherRepository.insert(location, weather)
@@ -1127,7 +1103,6 @@ class RefreshHelper @Inject constructor(
                         withHourly = i == 0, // Not needed in multi city
                         withMinutely = false,
                         withAlerts = i == 0, // Not needed in multi city
-                        withNormals = false
                     )
                 )
             }
@@ -1152,7 +1127,6 @@ class RefreshHelper @Inject constructor(
                         withHourly = i == 0, // Not needed in multi city
                         withMinutely = false,
                         withAlerts = i == 0, // Not needed in multi city
-                        withNormals = false
                     )
                 )
             }
@@ -1352,7 +1326,7 @@ class RefreshHelper @Inject constructor(
      * For a given location, will tell if data is still valid or needs a refresh
      * @param feature if null, will tell for main weather
      * @param isRestricted some sources will prefer a longer wait, make it true if that’s the case
-     * @param minimumTime if the last update was before this minimum time, it will be forced refreshed (except for normals)
+     * @param minimumTime if the last update was before this minimum time, it will be forced refreshed
      */
     private fun isWeatherDataStillValid(
         location: Location,
@@ -1408,31 +1382,6 @@ class RefreshHelper @Inject constructor(
                     },
                     minimumTime
                 )
-            }
-            SourceFeature.NORMALS -> {
-                val base = location.weather!!.base
-                if ((base.normalsUpdateTime ?: 0) == 0 ||
-                    base.normalsUpdateLongitude == 0.0 ||
-                    base.normalsUpdateLatitude == 0.0
-                ) {
-                    return false
-                }
-
-                if (location.isCurrentPosition) {
-                    val distance = SphericalUtil.computeDistanceBetween(
-                        LatLng(base.normalsUpdateLatitude, base.normalsUpdateLongitude),
-                        LatLng(location.latitude, location.longitude)
-                    )
-                    return distance <= CACHING_DISTANCE_LIMIT
-                } else {
-                    if (location.weather!!.normals.isEmpty()) return false
-                    val cal = Date().toCalendarWithTimeZone(location.timeZone)
-                    return location.weather!!.normals
-                        .getOrElse(Month.fromCalendarMonth(cal[Calendar.MONTH])) { null }
-                        ?.let {
-                            if (it.daytimeTemperature != null || it.nighttimeTemperature != null) it else null
-                        } != null
-                }
             }
             else -> {
                 return isUpdateStillValid(

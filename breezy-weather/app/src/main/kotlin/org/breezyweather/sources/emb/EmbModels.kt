@@ -90,16 +90,19 @@ internal data class EmbLocalReport(
 internal fun EmbSnapshot.forStations(stations: Set<String>): EmbSnapshot =
     copy(stations = this.stations.filter { it.name in stations })
 
-internal fun isOldReport(clock: String?, now: Long): Boolean {
-    if (clock == null) return false
+internal fun reportAgeMillis(clock: String?, now: Long): Long? {
+    if (clock == null) return null
     val format = SimpleDateFormat(if (clock.length == 10) "yyyy-MM-dd" else "yyyy-MM-dd HH:mm", Locale.US).apply {
         isLenient = false
         timeZone = TimeZone.getTimeZone("Asia/Manila")
     }
-    val time = runCatching { format.parse(clock)?.time }.getOrNull() ?: return false
-    return now - time > 24 * 60 * 60_000L
+    val position = java.text.ParsePosition(0)
+    val time = format.parse(clock, position) ?: return null
+    return (now - time.time).takeIf { position.index == clock.length && it >= 0 }
 }
 
+internal fun isOldReport(clock: String?, now: Long): Boolean =
+    reportAgeMillis(clock, now)?.let { it > 86_400_000L } == true
 
 // The last successful readings are stored under the feed and matched station IDs, so switching
 // locations cannot expose cached readings from another municipality.
@@ -120,6 +123,6 @@ internal fun EmbLocalReport.hasRecentMonitoring(now: Long): Boolean {
     if (feed.kind != "station") return false
     return snapshot?.stations?.any {
         val clock = it.observed ?: snapshot.reported
-        clock != null && !isOldReport(clock, now)
+        reportAgeMillis(clock, now)?.let { age -> age <= 86_400_000L } == true
     } == true
 }

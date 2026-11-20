@@ -37,13 +37,11 @@ import breezyweather.domain.weather.model.Daily
 import breezyweather.domain.weather.model.HalfDay
 import breezyweather.domain.weather.model.Hourly
 import breezyweather.domain.weather.model.Minutely
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Pollen
 import breezyweather.domain.weather.model.PrecipitationDuration
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
-import breezyweather.domain.weather.reference.Month
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -70,7 +68,6 @@ import org.breezyweather.datasharing.json.BreezyDegreeDay
 import org.breezyweather.datasharing.json.BreezyHalfDay
 import org.breezyweather.datasharing.json.BreezyHourly
 import org.breezyweather.datasharing.json.BreezyMinutely
-import org.breezyweather.datasharing.json.BreezyNormals
 import org.breezyweather.datasharing.json.BreezyPollen
 import org.breezyweather.datasharing.json.BreezyPollenLevel
 import org.breezyweather.datasharing.json.BreezyPollutant
@@ -194,7 +191,6 @@ class WeatherContentProvider : ContentProvider() {
                 withHourlyQuery = uri.getQueryParameter("withHourly"),
                 withMinutelyQuery = uri.getQueryParameter("withMinutely"),
                 withAlertsQuery = uri.getQueryParameter("withAlerts"),
-                withNormalsQuery = uri.getQueryParameter("withNormals"),
                 temperatureUnitQuery = uri.getQueryParameter("temperatureUnit"),
                 precipitationUnitQuery = uri.getQueryParameter("precipitationUnit"),
                 speedUnitQuery = uri.getQueryParameter("speedUnit"),
@@ -288,7 +284,6 @@ class WeatherContentProvider : ContentProvider() {
         withHourlyQuery: String?,
         withMinutelyQuery: String?,
         withAlertsQuery: String?,
-        withNormalsQuery: String?,
         temperatureUnitQuery: String?,
         precipitationUnitQuery: String?,
         speedUnitQuery: String?,
@@ -343,7 +338,6 @@ class WeatherContentProvider : ContentProvider() {
                             withHourly = !withHourlyQuery.equals("false", ignoreCase = true),
                             withMinutely = !withMinutelyQuery.equals("false", ignoreCase = true),
                             withAlerts = !withAlertsQuery.equals("false", ignoreCase = true),
-                            withNormals = !withNormalsQuery.equals("false", ignoreCase = true)
                         )
                 )
         }
@@ -452,10 +446,6 @@ class WeatherContentProvider : ContentProvider() {
                 ),
                 alerts = getAlerts(
                     weather.alertList
-                ),
-                normals = getNormals(
-                    weather.normals,
-                    temperatureUnit
                 ),
                 sources = getSources(location),
                 pollenLevels = pollenIndexSource?.let { pis ->
@@ -635,18 +625,6 @@ class WeatherContentProvider : ContentProvider() {
         }
     }
 
-    private fun getNormals(
-        normals: Map<Month, Normals>?,
-        temperatureUnit: TemperatureUnit,
-    ): Map<Int, BreezyNormals>? {
-        return normals?.entries?.associate {
-            it.key.value to BreezyNormals(
-                daytimeTemperature = getTemperatureUnit(it.value.daytimeTemperature, temperatureUnit),
-                nighttimeTemperature = getTemperatureUnit(it.value.nighttimeTemperature, temperatureUnit)
-            )
-        }
-    }
-
     private fun getSources(
         location: Location,
     ): Map<String, BreezySource>? {
@@ -657,7 +635,6 @@ class WeatherContentProvider : ContentProvider() {
             SourceFeature.POLLEN to location.pollenSource,
             SourceFeature.MINUTELY to location.minutelySource,
             SourceFeature.ALERT to location.alertSource,
-            SourceFeature.NORMALS to location.normalsSource,
             SourceFeature.REVERSE_GEOCODING to location.reverseGeocodingSource
         ).filter { !it.value.isNullOrEmpty() }.mapNotNull {
             getSourceManager(context!!).getFeatureSource(it.value!!)?.let { source ->

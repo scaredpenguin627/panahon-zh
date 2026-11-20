@@ -23,12 +23,10 @@ import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.Alert
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.AirQualityWrapper
 import breezyweather.domain.weather.wrappers.CurrentWrapper
@@ -37,7 +35,6 @@ import breezyweather.domain.weather.wrappers.HalfDayWrapper
 import breezyweather.domain.weather.wrappers.HourlyWrapper
 import breezyweather.domain.weather.wrappers.TemperatureWrapper
 import breezyweather.domain.weather.wrappers.WeatherWrapper
-import com.google.maps.android.model.LatLng
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -47,7 +44,6 @@ import org.breezyweather.R
 import org.breezyweather.common.exceptions.InvalidLocationException
 import org.breezyweather.common.extensions.code
 import org.breezyweather.common.extensions.currentLocale
-import org.breezyweather.common.extensions.toCalendarWithTimeZone
 import org.breezyweather.common.preference.EditTextPreference
 import org.breezyweather.common.preference.Preference
 import org.breezyweather.domain.settings.SourceConfigStore
@@ -58,7 +54,6 @@ import org.breezyweather.sources.cwa.json.CwaAssistantResult
 import org.breezyweather.sources.cwa.json.CwaCurrentResult
 import org.breezyweather.sources.cwa.json.CwaForecastResult
 import org.breezyweather.sources.cwa.json.CwaLocationTown
-import org.breezyweather.sources.cwa.json.CwaNormalsResult
 import org.breezyweather.unit.computing.computeMeanSeaLevelPressure
 import org.breezyweather.unit.computing.computePollutantInUgm3FromPpb
 import org.breezyweather.unit.pollutant.PollutantConcentration.Companion.microgramsPerCubicMeter
@@ -72,7 +67,6 @@ import org.breezyweather.unit.temperature.Temperature
 import org.breezyweather.unit.temperature.Temperature.Companion.celsius
 import retrofit2.Retrofit
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -215,24 +209,6 @@ class CwaService @Inject constructor(
             Observable.just(CwaAirQualityResult())
         }
 
-        // Temperature normals are only available at 27 stations (out of 700+),
-        // and not available in the main weather API call.
-        // Therefore we will call a different endpoint,
-        // but we must specify the station ID rather than using lat/lon.
-        val currentMonth = Date().toCalendarWithTimeZone(location.timeZone)[Calendar.MONTH] + 1
-        val station = LatLng(location.latitude, location.longitude).getNearestLocation(CWA_NORMALS_STATIONS)
-        val normals = if (SourceFeature.NORMALS in requestedFeatures && station != null) {
-            mApi.getNormals(
-                apiKey = apiKey,
-                stationId = station,
-                month = currentMonth.toString()
-            ).onErrorResumeNext {
-                failedFeatures[SourceFeature.NORMALS] = it
-                Observable.just(CwaNormalsResult())
-            }
-        } else {
-            Observable.just(CwaNormalsResult())
-        }
 
         val alerts = if (SourceFeature.ALERT in requestedFeatures) {
             mApi.getAlerts(
@@ -245,12 +221,11 @@ class CwaService @Inject constructor(
             Observable.just(CwaAlertResult())
         }
 
-        return Observable.zip(current, airQuality, daily, hourly, normals, alerts, assistant) {
+        return Observable.zip(current, airQuality, daily, hourly, alerts, assistant) {
                 currentResult: CwaCurrentResult,
                 airQualityResult: CwaAirQualityResult,
                 dailyResult: CwaForecastResult,
                 hourlyResult: CwaForecastResult,
-                normalsResult: CwaNormalsResult,
                 alertResult: CwaAlertResult,
                 assistantResult: CwaAssistantResult,
             ->
@@ -288,11 +263,6 @@ class CwaService @Inject constructor(
                 },
                 alertList = if (SourceFeature.ALERT in requestedFeatures) {
                     getAlertList(alertResult, location)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(normalsResult)
                 } else {
                     null
                 },
@@ -395,19 +365,6 @@ class CwaService @Inject constructor(
         )
     }
 
-    private fun getNormals(
-        normalsResult: CwaNormalsResult,
-    ): Map<Month, Normals>? {
-        return normalsResult.records?.data?.surfaceObs?.location?.getOrNull(0)
-            ?.stationObsStatistics?.AirTemperature?.monthly
-            ?.filter { it.Month?.toIntOrNull() != null && it.Month.toInt() in 1..12 }
-            ?.associate {
-                Month.of(it.Month!!.toInt()) to Normals(
-                    daytimeTemperature = it.Maximum?.toDoubleOrNull()?.celsius,
-                    nighttimeTemperature = it.Minimum?.toDoubleOrNull()?.celsius
-                )
-            }
-    }
 
     // Concentrations of SO₂, NO₂, O₃ are given in ppb (and in ppm for CO).
     // We need to convert these figures to µg/m³ (and mg/m³ for CO).

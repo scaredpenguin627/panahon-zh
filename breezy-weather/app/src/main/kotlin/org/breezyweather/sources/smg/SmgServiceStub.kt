@@ -66,7 +66,6 @@ abstract class SmgServiceStub(context: Context) :
         SourceFeature.CURRENT to weatherAttribution,
         SourceFeature.AIR_QUALITY to weatherAttribution,
         SourceFeature.ALERT to weatherAttribution,
-        SourceFeature.NORMALS to weatherAttribution
     )
 
     override fun isFeatureSupportedForLocation(

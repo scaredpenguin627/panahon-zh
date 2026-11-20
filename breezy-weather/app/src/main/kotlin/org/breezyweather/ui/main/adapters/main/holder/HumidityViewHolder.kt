@@ -78,12 +78,10 @@ class HumidityViewHolder(parent: ViewGroup) : AbstractMainCardViewHolder(
                 SettingsManager.getInstance(context).getTemperatureUnit(context),
                 valueWidth = UnitWidth.NARROW,
                 unitWidth = UnitWidth.NARROW
-            )
+            )?.let { context.getString(R.string.dew_point) + context.getString(R.string.colon_separator) + it }
 
             current.dewPoint?.let {
                 talkBackBuilder.append(context.getString(org.breezyweather.unit.R.string.locale_separator))
-                talkBackBuilder.append(context.getString(R.string.dew_point))
-                talkBackBuilder.append(context.getString(R.string.colon_separator))
                 talkBackBuilder.append(dewPointValueView.text)
             }
         }

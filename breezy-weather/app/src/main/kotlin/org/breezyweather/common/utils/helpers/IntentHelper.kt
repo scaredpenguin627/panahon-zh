@@ -168,13 +168,14 @@ object IntentHelper {
         )
     }
 
-    fun startWeatherProviderSettingsActivity(activity: Activity) {
+    fun startWeatherProviderSettingsActivity(activity: Activity, sourceId: String? = null) {
         activity.startActivity(
             Intent(activity, SettingsActivity::class.java).apply {
                 putExtra(
                     SettingsActivity.KEY_SETTINGS_ACTIVITY_START_DESTINATION,
                     SettingsScreenRouter.WeatherProviders.route
                 )
+                putExtra(SettingsActivity.KEY_PROVIDER_ID, sourceId)
             }
         )
     }

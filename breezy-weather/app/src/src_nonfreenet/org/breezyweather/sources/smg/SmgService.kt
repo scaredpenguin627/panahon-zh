@@ -23,11 +23,9 @@ import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.AirQuality
 import breezyweather.domain.weather.model.Alert
 import breezyweather.domain.weather.model.DailyRelativeHumidity
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.AirQualityWrapper
 import breezyweather.domain.weather.wrappers.CurrentWrapper
@@ -247,11 +245,6 @@ class SmgService @Inject constructor(
                 },
                 alertList = if (SourceFeature.ALERT in requestedFeatures) {
                     getAlertList(context, warningsResult)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals()
                 } else {
                     null
                 },
@@ -600,22 +593,6 @@ class SmgService @Inject constructor(
     // Hard-coded since Macao has a land area of just 32.9km²,
     // and there are only records for SMG's main office in Taipa Grande.
     // Source: https://www.smg.gov.mo/en/subpage/348/page/252
-    private fun getNormals(): Map<Month, Normals> {
-        return mapOf(
-            Month.JANUARY to Normals(18.6.celsius, 12.7.celsius),
-            Month.FEBRUARY to Normals(19.2.celsius, 13.9.celsius),
-            Month.MARCH to Normals(21.4.celsius, 16.5.celsius),
-            Month.APRIL to Normals(25.1.celsius, 20.3.celsius),
-            Month.MAY to Normals(28.7.celsius, 23.7.celsius),
-            Month.JUNE to Normals(30.5.celsius, 25.7.celsius),
-            Month.JULY to Normals(31.4.celsius, 26.1.celsius),
-            Month.AUGUST to Normals(31.5.celsius, 25.9.celsius),
-            Month.SEPTEMBER to Normals(30.8.celsius, 25.1.celsius),
-            Month.OCTOBER to Normals(28.5.celsius, 22.7.celsius),
-            Month.NOVEMBER to Normals(24.7.celsius, 18.8.celsius),
-            Month.DECEMBER to Normals(20.3.celsius, 14.3.celsius)
-        )
-    }
 
     // Source: mostly from https://www.smg.gov.mo/en/subpage/232/page/268
     // Can check with https://cms.smg.gov.mo/uploads/image/introduction/ww-e01.png (replace 01 with the code below)

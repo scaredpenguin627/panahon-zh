@@ -17,7 +17,6 @@
 package org.breezyweather.sources.infoplaza
 
 import io.reactivex.rxjava3.core.Observable
-import org.breezyweather.sources.infoplaza.json.InfoplazaClimateResult
 import org.breezyweather.sources.infoplaza.json.InfoplazaForecastResult
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -30,10 +29,4 @@ interface InfoplazaApi {
         @Query("token") token: String,
     ): Observable<InfoplazaForecastResult>
 
-    @GET("climate")
-    fun getClimate(
-        @Query("latitude") lat: Double,
-        @Query("longitude") lon: Double,
-        @Query("token") token: String,
-    ): Observable<InfoplazaClimateResult>
 }

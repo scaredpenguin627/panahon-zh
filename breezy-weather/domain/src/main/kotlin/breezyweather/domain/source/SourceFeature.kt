@@ -25,7 +25,6 @@ enum class SourceFeature(
     POLLEN("pollen"),
     MINUTELY("minutely"),
     ALERT("alert"),
-    NORMALS("normals"),
     REVERSE_GEOCODING("reverseGeocoding"),
     ;
 

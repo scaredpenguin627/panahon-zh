@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,7 +31,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Icon
@@ -70,7 +68,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import breezyweather.domain.location.model.Location
 import breezyweather.domain.weather.model.Daily
 import breezyweather.domain.weather.model.Hourly
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.reference.WeatherCode
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
@@ -85,9 +82,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.launch
 import org.breezyweather.R
-import org.breezyweather.common.extensions.currentLocale
 import org.breezyweather.common.extensions.formatMeasure
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.common.extensions.getFormattedTime
 import org.breezyweather.common.extensions.is12Hour
 import org.breezyweather.common.extensions.isLandscape
@@ -118,7 +113,6 @@ fun DetailsConditions(
     location: Location,
     hourlyList: ImmutableList<Hourly>,
     daily: Daily,
-    normals: Normals?,
     selectedChart: DetailScreen,
     setShowRealTemp: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -208,7 +202,6 @@ fun DetailsConditions(
                 daily,
                 activeItem,
                 selectedChart != DetailScreen.TAG_FEELS_LIKE,
-                normals,
                 temperatureUnit
             )
         }
@@ -221,7 +214,6 @@ fun DetailsConditions(
                     location,
                     mappedValues,
                     selectedChart != DetailScreen.TAG_FEELS_LIKE,
-                    normals,
                     daily,
                     temperatureUnit,
                     markerVisibilityListener
@@ -413,7 +405,6 @@ fun TemperatureHeader(
     daily: Daily,
     activeItem: Pair<Date, Hourly>?,
     showRealTemp: Boolean,
-    normals: Normals?,
     temperatureUnit: TemperatureUnit,
 ) {
     val context = LocalContext.current
@@ -432,16 +423,12 @@ fun TemperatureHeader(
             weatherText = it.second.weatherText,
             isDaytime = it.second.isDaylight,
             animated = false, // Doesn't redraw otherwise
-            normals = null,
-            monthFormatted = "",
-            keepSpaceForSubtext = normals?.daytimeTemperature != null || normals?.nighttimeTemperature != null,
             temperatureUnit = temperatureUnit
         )
     } ?: WeatherConditionSummary(
+        location.forecastSource == "panahon",
         daily,
         showRealTemp,
-        normals,
-        daily.date.getCalendarMonth(location).getDisplayName(context.currentLocale),
         temperatureUnit
     )
 }
@@ -489,10 +476,9 @@ private fun TemperatureSwitcher(
 
 @Composable
 private fun WeatherConditionSummary(
+    allDay: Boolean,
     daily: Daily,
     showRealTemp: Boolean,
-    normals: Normals?,
-    monthFormatted: String,
     temperatureUnit: TemperatureUnit,
 ) {
     Row(
@@ -508,16 +494,13 @@ private fun WeatherConditionSummary(
         ) {
             daily.day?.let { day ->
                 WeatherConditionItem(
-                    header = { DaytimeLabel() },
+                    header = { if (allDay) Text(stringResource(R.string.traveller_daily_high)) else DaytimeLabel() },
                     showRealTemp = showRealTemp,
                     temperature = day.temperature,
                     weatherCode = day.weatherCode,
                     weatherText = day.weatherText,
                     isDaytime = true,
                     animated = true,
-                    normals = normals,
-                    monthFormatted = monthFormatted,
-                    keepSpaceForSubtext = normals?.daytimeTemperature != null || normals?.nighttimeTemperature != null,
                     temperatureUnit = temperatureUnit
                 )
             }
@@ -530,16 +513,13 @@ private fun WeatherConditionSummary(
         ) {
             daily.night?.let { night ->
                 WeatherConditionItem(
-                    header = { NighttimeLabelWithInfo() },
+                    header = { if (allDay) Text(stringResource(R.string.traveller_daily_low)) else NighttimeLabelWithInfo() },
                     showRealTemp = showRealTemp,
                     temperature = night.temperature,
-                    weatherCode = night.weatherCode,
-                    weatherText = night.weatherText,
+                    weatherCode = night.weatherCode.takeUnless { allDay },
+                    weatherText = night.weatherText.takeUnless { allDay },
                     isDaytime = false,
                     animated = true,
-                    normals = normals,
-                    monthFormatted = monthFormatted,
-                    keepSpaceForSubtext = normals?.daytimeTemperature != null || normals?.nighttimeTemperature != null,
                     temperatureUnit = temperatureUnit
                 )
             }
@@ -556,9 +536,6 @@ private fun WeatherConditionItem(
     weatherText: String?,
     isDaytime: Boolean,
     animated: Boolean,
-    normals: Normals?,
-    monthFormatted: String,
-    keepSpaceForSubtext: Boolean,
     temperatureUnit: TemperatureUnit,
     modifier: Modifier = Modifier,
 ) {
@@ -608,15 +585,6 @@ private fun WeatherConditionItem(
                                 }
                             }
                     )
-                } else {
-                    NormalsDepartureLabel(
-                        temperature?.temperature,
-                        normals,
-                        monthFormatted,
-                        isDaytime,
-                        keepSpaceForSubtext,
-                        temperatureUnit
-                    )
                 }
             }
             if (context.isLandscape) {
@@ -628,86 +596,6 @@ private fun WeatherConditionItem(
             Spacer(Modifier.height(dimensionResource(R.dimen.small_margin)))
             WeatherCondition(weatherCode, weatherText, isDaytime = isDaytime, animated = animated)
         }
-    }
-}
-
-@Composable
-fun NormalsDepartureLabel(
-    halfDayTemperature: Temperature?,
-    normals: Normals?,
-    monthFormatted: String,
-    isDaytime: Boolean,
-    keepSpaceForSubtext: Boolean,
-    temperatureUnit: TemperatureUnit,
-    modifier: Modifier = Modifier,
-) {
-    val normal = if (isDaytime) normals?.daytimeTemperature else normals?.nighttimeTemperature
-
-    if (halfDayTemperature != null && normal != null) {
-        val context = LocalContext.current
-        val tooltipState = rememberTooltipState(isPersistent = true)
-        val coroutineScope = rememberCoroutineScope()
-        val departure = remember(halfDayTemperature, normal) {
-            halfDayTemperature.toDouble(temperatureUnit) - normal.toDouble(temperatureUnit)
-        }
-
-        TooltipBox(
-            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Below),
-            tooltip = {
-                PlainTooltip {
-                    Text(
-                        stringResource(
-                            if (isDaytime) {
-                                R.string.temperature_normals_deviation_explanation_maximum
-                            } else {
-                                R.string.temperature_normals_deviation_explanation_minimum
-                            },
-                            monthFormatted
-                        )
-                    )
-                }
-            },
-            state = tooltipState
-        ) {
-            Row(
-                modifier = modifier
-                    .clickable {
-                        coroutineScope.launch {
-                            tooltipState.show()
-                        }
-                    }
-                    .height(
-                        with(LocalDensity.current) {
-                            MaterialTheme.typography.labelLarge.lineHeight.toDp()
-                        }
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_margin)),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.temperature_normals_deviation) +
-                        stringResource(R.string.colon_separator) +
-                        "" +
-                        departure.toTemperature(temperatureUnit).formatMeasure(
-                            context,
-                            temperatureUnit,
-                            unitWidth = UnitWidth.NARROW,
-                            showSign = true
-                        ),
-                    style = MaterialTheme.typography.labelLarge,
-                    maxLines = 1
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
-                    // TooltipBox already takes care of adding the info that there is a tooltip:
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                )
-            }
-        }
-    } else if (keepSpaceForSubtext) {
-        TextFixedHeight(text = "", style = MaterialTheme.typography.labelLarge)
     }
 }
 
@@ -787,7 +675,6 @@ private fun TemperatureChart(
     location: Location,
     mappedValues: ImmutableMap<Long, Hourly>,
     showRealTemp: Boolean,
-    normals: Normals?,
     daily: Daily,
     temperatureUnit: TemperatureUnit,
     markerVisibilityListener: CartesianMarkerVisibilityListener,
@@ -796,7 +683,7 @@ private fun TemperatureChart(
 
     val provider = ResourcesProviderFactory.newInstance
     val step = temperatureUnit.chartStep
-    val minY = remember(mappedValues, showRealTemp, normals) {
+    val minY = remember(mappedValues, showRealTemp) {
         if (showRealTemp) {
             mappedValues.values.minOf { it.temperature!!.temperature!!.inDeciCelsius }
         } else {
@@ -804,13 +691,9 @@ private fun TemperatureChart(
                 mappedValues.values.minOf { it.temperature!!.temperature!!.inDeciCelsius },
                 mappedValues.values.minOf { it.temperature!!.feelsLikeTemperature!!.inDeciCelsius }
             )
-        }.let {
-            normals?.nighttimeTemperature?.let { normal ->
-                if (normal.inDeciCelsius < it) normal.inDeciCelsius else it
-            } ?: it
         }.deciCelsius.toDouble(temperatureUnit).roundDownToNearestMultiplier(step)
     }
-    val maxY = remember(mappedValues, showRealTemp, normals) {
+    val maxY = remember(mappedValues, showRealTemp) {
         if (showRealTemp) {
             mappedValues.values.maxOf { it.temperature!!.temperature!!.inDeciCelsius }
         } else {
@@ -818,10 +701,6 @@ private fun TemperatureChart(
                 mappedValues.values.maxOf { it.temperature!!.temperature!!.inDeciCelsius },
                 mappedValues.values.maxOf { it.temperature!!.feelsLikeTemperature!!.inDeciCelsius }
             )
-        }.let {
-            normals?.daytimeTemperature?.let { normal ->
-                if (normal.inDeciCelsius > it) normal.inDeciCelsius else it
-            } ?: it
         }.deciCelsius.toDouble(temperatureUnit).roundUpToNearestMultiplier(step)
     }
 
@@ -897,22 +776,6 @@ private fun TemperatureChart(
                 )
             )
         },
-        trendHorizontalLines = buildMap {
-            normals?.let {
-                it.daytimeTemperature?.let { normal ->
-                    put(
-                        normal.toDouble(temperatureUnit),
-                        context.getString(R.string.temperature_normal_short)
-                    )
-                }
-                it.nighttimeTemperature?.let { normal ->
-                    put(
-                        normal.toDouble(temperatureUnit),
-                        context.getString(R.string.temperature_normal_short)
-                    )
-                }
-            }
-        }.toImmutableMap(),
         minY = minY,
         endAxisItemPlacer = remember { VerticalAxis.ItemPlacer.step({ step }) },
         markerVisibilityListener = markerVisibilityListener

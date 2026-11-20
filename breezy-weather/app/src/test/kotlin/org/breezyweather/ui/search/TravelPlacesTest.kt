@@ -17,13 +17,15 @@ class TravelPlacesTest {
         val ids = originalPhilippinePlaces.map { it.location(Locale.CHINA, "菲律宾").cityId }.toMutableSet()
         for (region in regions) {
             val lines = region.readLines(Charsets.UTF_8).filter { it.isNotBlank() }
-            assertEquals("id\tzh\ten\tlat\tlon\taliases\tsource", lines.first().removePrefix("\uFEFF"))
+            assertEquals("id\tzh\ten\tlat\tlon\taliases\tsource\tzh-Hant", lines.first().removePrefix("\uFEFF"))
             assertTrue(lines.size > 1)
             for (line in lines.drop(1)) {
                 val cells = line.split('\t')
                 val id = "panahon-${cells[0]}"
                 assertTrue(ids.add(id), "Duplicate ID: $id")
                 assertTrue(cells[6].startsWith("https://"), id)
+                val traditional = findOfflinePhilippineCities(cells[7], Locale.TAIWAN, catalog).single { it.cityId == id }
+                assertEquals(cells[7], traditional.city, id)
                 for (name in (cells.subList(1, 3) + cells[5].split('|')).filter { it.isNotBlank() }) {
                     val hits = findOfflinePhilippineCities(name, Locale.CHINA, catalog)
                     val selected = hits.single { it.cityId == id }

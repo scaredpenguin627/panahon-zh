@@ -22,7 +22,6 @@ import breezyweather.domain.location.model.Location
 import breezyweather.domain.location.model.LocationAddressInfo
 import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
 import breezyweather.domain.weather.reference.WeatherCode
@@ -36,14 +35,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Observable
 import org.breezyweather.R
 import org.breezyweather.common.exceptions.InvalidLocationException
-import org.breezyweather.common.extensions.getCalendarMonth
 import org.breezyweather.sources.mgm.json.MgmAlertResult
 import org.breezyweather.sources.mgm.json.MgmCurrentResult
 import org.breezyweather.sources.mgm.json.MgmDailyForecastResult
 import org.breezyweather.sources.mgm.json.MgmHourlyForecast
 import org.breezyweather.sources.mgm.json.MgmHourlyForecastResult
 import org.breezyweather.sources.mgm.json.MgmLocationResult
-import org.breezyweather.sources.mgm.json.MgmNormalsResult
 import org.breezyweather.unit.pressure.Pressure.Companion.hectopascals
 import org.breezyweather.unit.ratio.Ratio.Companion.percent
 import org.breezyweather.unit.speed.Speed.Companion.kilometersPerHour
@@ -51,7 +48,6 @@ import org.breezyweather.unit.temperature.Temperature.Companion.celsius
 import retrofit2.Retrofit
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
@@ -140,26 +136,13 @@ class MgmService @Inject constructor(
         }
 
         // can pull multiple days but seems to be an overkill
-        val normals = if (SourceFeature.NORMALS in requestedFeatures) {
-            mApi.getNormals(
-                station = dailyStation,
-                month = now.get(Calendar.MONTH) + 1,
-                day = now.get(Calendar.DATE)
-            ).onErrorResumeNext {
-                failedFeatures[SourceFeature.NORMALS] = it
-                Observable.just(emptyList())
-            }
-        } else {
-            Observable.just(emptyList())
-        }
 
-        return Observable.zip(current, daily, hourly, todayAlerts, tomorrowAlerts, normals) {
+        return Observable.zip(current, daily, hourly, todayAlerts, tomorrowAlerts) {
                 currentResult: List<MgmCurrentResult>,
                 dailyForecastResult: List<MgmDailyForecastResult>,
                 hourlyForecastResult: List<MgmHourlyForecastResult>,
                 todayAlertResult: List<MgmAlertResult>,
                 tomorrowAlertResult: List<MgmAlertResult>,
-                normalsResult: List<MgmNormalsResult>,
             ->
             WeatherWrapper(
                 dailyForecast = if (SourceFeature.FORECAST in requestedFeatures) {
@@ -179,18 +162,6 @@ class MgmService @Inject constructor(
                 },
                 alertList = if (SourceFeature.ALERT in requestedFeatures) {
                     getAlertList(currentStation.toInt(), todayAlertResult, tomorrowAlertResult)
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    normalsResult.getOrNull(0)?.let { normals ->
-                        mapOf(
-                            Date().getCalendarMonth(location) to Normals(
-                                daytimeTemperature = normals.meanMax?.celsius,
-                                nighttimeTemperature = normals.meanMin?.celsius
-                            )
-                        )
-                    }
                 } else {
                     null
                 },

@@ -45,7 +45,5 @@ class IgebuService @Inject constructor(
     override val instancePreference = R.string.settings_weather_source_igebu_instance
 
     override val alertAttribution = weatherAttribution
-    override val normalsAttribution = weatherAttribution
 
-    override val cityClimatePageId = null
 }

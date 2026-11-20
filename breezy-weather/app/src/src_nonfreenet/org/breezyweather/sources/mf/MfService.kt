@@ -26,13 +26,11 @@ import breezyweather.domain.source.SourceFeature
 import breezyweather.domain.weather.model.Alert
 import breezyweather.domain.weather.model.DailyRelativeHumidity
 import breezyweather.domain.weather.model.Minutely
-import breezyweather.domain.weather.model.Normals
 import breezyweather.domain.weather.model.Precipitation
 import breezyweather.domain.weather.model.PrecipitationProbability
 import breezyweather.domain.weather.model.UV
 import breezyweather.domain.weather.model.Wind
 import breezyweather.domain.weather.reference.AlertSeverity
-import breezyweather.domain.weather.reference.Month
 import breezyweather.domain.weather.reference.WeatherCode
 import breezyweather.domain.weather.wrappers.CurrentWrapper
 import breezyweather.domain.weather.wrappers.DailyWrapper
@@ -58,7 +56,6 @@ import org.breezyweather.sources.mf.json.MfForecastDaily
 import org.breezyweather.sources.mf.json.MfForecastHourly
 import org.breezyweather.sources.mf.json.MfForecastProbability
 import org.breezyweather.sources.mf.json.MfForecastResult
-import org.breezyweather.sources.mf.json.MfNormalsResult
 import org.breezyweather.sources.mf.json.MfRainResult
 import org.breezyweather.sources.mf.json.MfWarningDictionaryResult
 import org.breezyweather.sources.mf.json.MfWarningsOverseasResult
@@ -243,19 +240,6 @@ class MfService @Inject constructor(
         }
 
         // TODO: Only call once a month, unless it’s current position
-        val normals = if (SourceFeature.NORMALS in requestedFeatures) {
-            mApi.getNormals(
-                USER_AGENT,
-                location.latitude,
-                location.longitude,
-                token
-            ).onErrorResumeNext {
-                failedFeatures[SourceFeature.NORMALS] = it
-                Observable.just(MfNormalsResult())
-            }
-        } else {
-            Observable.just(MfNormalsResult())
-        }
 
         return Observable.zip(
             current,
@@ -265,7 +249,6 @@ class MfService @Inject constructor(
             warningsJ1,
             warningsOverseasDictionary,
             warningsOverseas,
-            normals
         ) {
                 currentResult: MfCurrentResult,
                 forecastResult: MfForecastResult,
@@ -274,7 +257,6 @@ class MfService @Inject constructor(
                 warningsJ1Result: MfWarningsResult,
                 warningsDictionaryResult: MfWarningDictionaryResult,
                 warningsOverseasResult: MfWarningsOverseasResult,
-                normalsResult: MfNormalsResult,
             ->
             WeatherWrapper(
                 /*base = Base(
@@ -316,11 +298,6 @@ class MfService @Inject constructor(
                     } else {
                         null
                     }
-                } else {
-                    null
-                },
-                normals = if (SourceFeature.NORMALS in requestedFeatures) {
-                    getNormals(normalsResult)
                 } else {
                     null
                 },
@@ -748,21 +725,6 @@ class MfService @Inject constructor(
         return alertList
     }
 
-    private fun getNormals(normalsResult: MfNormalsResult): Map<Month, Normals>? {
-        val normalsStats = normalsResult.properties?.stats
-        return if (!normalsStats.isNullOrEmpty()) {
-            Month.entries.associateWith { month ->
-                normalsStats.getOrElse(month.value - 1) { null }?.let {
-                    Normals(
-                        daytimeTemperature = it.tMax?.celsius,
-                        nighttimeTemperature = it.tMin?.celsius
-                    )
-                }
-            }.filter { it.value != null } as Map<Month, Normals>
-        } else {
-            null
-        }
-    }
 
     private fun getPrecipitationIntensity(rain: Int): Double = when (rain) {
         4 -> Precipitation.PRECIPITATION_HOURLY_HEAVY

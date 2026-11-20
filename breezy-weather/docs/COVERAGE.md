@@ -6,7 +6,7 @@ In general, a weather source can be considered for inclusion in the official rel
 
 - **Geolocation availability:** A source should be able to provide data directly from geographical coordinates (latitude and longitude) directly, or return forecast locations from given coordinates. Breezy Weather is a mobile app, and is primary used for querying weather forecasts on the go. It is not enough to for a source to provide forecast from location names alone.
 - **Data format:** A source should provide its forecast data in JSON or XML format.
-- **Forecast availability:** _(for Forecast sources)_ A source should provide hourly forecast. The minimum frequency should be 6-hourly. Sources providing current observation, air pollution, pollen, alerts, or temperature normals WITHOUT hourly forecast can be implemented as a “Secondary Source.”
+- **Forecast availability:** _(for Forecast sources)_ A source should provide hourly forecast. The minimum frequency should be 6-hourly. Sources providing current observation, air pollution, pollen, or alerts WITHOUT hourly forecast can be implemented as a “Secondary Source.”
 - **Privacy requirement:** If an API key is needed to access the data, it should not ask for personally identifiable information such as credit card or telephone number.
 - **Concentration requirement:**  _(for Air Quality and Pollen sources)_ A source must provide air pollutant concentration data in µg/m³, mg/m³, ppb, or ppm. Pollen concentration must be in pollen count /m³. If the data source only provides a calculated index, it cannot be included in Breezy Weather, since every country has its own AQI standard which is often different from others.
 
@@ -21,13 +21,13 @@ In general, a weather source can be considered for inclusion in the official rel
 - [Other sources](#other-sources)
 
 ## Africa
-> [ClimWeb](https://github.com/wmo-raf/climweb) is an open source web CMS created by WMO Regional Office For Africa for use by National Meteorological and Hydrological Services in Africa. As of v0.9.4, ClimWeb offers alerts and temperature normals in JSON format, but weather forecasts are in HTML only. ClimWeb sources are implemented as Secondary Sources for Alerts and Temperature Normals from Breezy Weather v5.3.0.
+> [ClimWeb](https://github.com/wmo-raf/climweb) is an open source web CMS created by WMO Regional Office For Africa for use by National Meteorological and Hydrological Services in Africa. As of v0.9.4, ClimWeb offers alerts in JSON format, but weather forecasts are in HTML only. ClimWeb sources are implemented as Secondary Sources for Alerts from Breezy Weather v5.3.0.
 
 | Country/Territory                                 | Agency                                               | Status                           | Last Checked |
 |---------------------------------------------------|------------------------------------------------------|----------------------------------|--------------|
 | 🇩🇿 Algeria                                      | [Météo Algérie](https://www.meteo.dz/)               |                                  |              |
 | 🇦🇴 Angola                                       | [INAMET](http://inamet.gov.ao/)                      |                                  |              |
-| 🇧🇯 Benin                                        | [Météo Benin](http://www.meteobenin.bj/) (ClimWeb)   | ⚠️📊 Alerts, Normals from v5.3.0 | 2024-11-30   |
+| 🇧🇯 Benin                                        | [Météo Benin](http://www.meteobenin.bj/) (ClimWeb)   | ⚠️ Alerts from v5.3.0 | 2024-11-30   |
 | 🇧🇼 Botswana                                     | BMS                                                  | ❌ only on Facebook               |              |
 | 🇮🇴 British Indian Ocean Territory               |                                                      |                                  |              |
 | 🇧🇫 Burkina Faso                                 | [ANAM-BF](https://www.meteoburkina.bf/) (ClimWeb)    | ⚠️ Alerts from v5.3.0            | 2024-11-30   |
@@ -35,7 +35,7 @@ In general, a weather source can be considered for inclusion in the official rel
 | 🇨🇻 Cabo Verde                                   | [INMG](https://www.inmg.gov.cv/)                     |                                  |              |
 | 🇨🇲 Cameroon                                     |                                                      |                                  |              |
 | 🇨🇫 Central African Republic                     |                                                      |                                  |              |
-| 🇹🇩 Chad                                         | [Météo Tchad](https://www.meteotchad.org/) (ClimWeb) | ⚠️📊 Alerts, Normals from v5.3.0 | 2024-11-30   |
+| 🇹🇩 Chad                                         | [Météo Tchad](https://www.meteotchad.org/) (ClimWeb) | ⚠️ Alerts from v5.3.0 | 2024-11-30   |
 | 🇰🇲 Comoros                                      |                                                      |                                  |              |
 | 🇨🇬 Congo                                        | [DirMet](https://www.dirmet.cg/)                     |                                  |              |
 | 🇨🇮 Côte d’Ivoire                                | [Sodexam](https://sodexam.com/)                      |                                  |              |
@@ -57,7 +57,7 @@ In general, a weather source can be considered for inclusion in the official rel
 | 🇱🇷 Liberia                                      |                                                      |                                  |              |
 | 🇱🇾 Libya                                        | [LNMC](https://www.lnmc.ly/)                         |                                  |              |
 | 🇲🇬 Madagascar                                   | [Météo Madagascar](https://www.meteomadagascar.mg/)  |                                  |              |
-| 🇲🇼 Malawi                                       | [DCCMS](https://www.metmalawi.gov.mw/) (ClimWeb)     | ⚠️📊 Alerts, Normals from v5.3.0 | 2024-11-30   |
+| 🇲🇼 Malawi                                       | [DCCMS](https://www.metmalawi.gov.mw/) (ClimWeb)     | ⚠️ Alerts from v5.3.0 | 2024-11-30   |
 | 🇲🇱 Mali                                         | [Mali-Météo](https://malimeteo.ml/) (ClimWeb)        | ⚠️ Alerts from v5.3.0            | 2024-11-30   |
 | 🇲🇷 Mauritania                                   |                                                      |                                  |              |
 | 🇲🇺 Mauritius                                    | [MMS](http://metservice.intnet.mu/)                  |                                  |              |
@@ -65,13 +65,13 @@ In general, a weather source can be considered for inclusion in the official rel
 | 🇲🇦 Morocco                                      | [Maroc Météo](https://www.marocmeteo.ma/)            |                                  |              |
 | 🇲🇿 Mozambique                                   | [INM](https://www.inam.gov.mz/)                      |                                  |              |
 | 🇳🇦 Namibia                                      | [NMS](http://www.meteona.com/)                       |                                  |              |
-| 🇳🇪 Niger                                        | [DMN](https://www.niger-meteo.ne/) (ClimWeb)         | ⚠️📊 Alerts, Normals from v5.3.0 | 2024-11-30   |
+| 🇳🇪 Niger                                        | [DMN](https://www.niger-meteo.ne/) (ClimWeb)         | ⚠️ Alerts from v5.3.0 | 2024-11-30   |
 | 🇳🇬 Nigeria                                      | [NiMet](https://www.nimet.gov.ng/)                   |                                  |              |
 | 🇷🇪 Réunion                                      | [Météo-France](https://meteofrance.com/)             | ✅ included                       |              |
 | 🇷🇼 Rwanda                                       | [Meteo Rwanda](https://www.meteorwanda.gov.rw/)      |                                  |              |
 | 🇸🇹 Sao Tome &amp; Principe                      | [INM](https://inm.st/)                               |                                  |              |
 | 🇸🇳 Senegal                                      | [ANACIM](https://www.anacim.sn/)                     |                                  |              |
-| 🇸🇨 Seychelles                                   | [SMA](https://www.meteo.gov.sc/) (ClimWeb)           | ⚠️📊 Alerts, Normals from v5.3.0 | 2024-11-30   |
+| 🇸🇨 Seychelles                                   | [SMA](https://www.meteo.gov.sc/) (ClimWeb)           | ⚠️ Alerts from v5.3.0 | 2024-11-30   |
 | 🇸🇱 Sierra Leone                                 | [SLMet](https://slmet.gov.sl/)                       |                                  |              |
 | 🇸🇴 Somalia                                      |                                                      |                                  |              |
 | 🇿🇦 South Africa                                 | [SAWS](https://www.weathersa.co.za/)                 |                                  |              |

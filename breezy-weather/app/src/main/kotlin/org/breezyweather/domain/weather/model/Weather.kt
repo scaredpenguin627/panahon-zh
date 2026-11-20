@@ -97,6 +97,16 @@ fun Weather.getTemperatureRangeSummary(
     temperatureUnit: TemperatureUnit,
 ): Pair<String, String>? {
     if (today == null) return null
+    if (location.forecastSource == "panahon") {
+        val high = today?.day?.temperature?.temperature ?: return null
+        val low = today?.night?.temperature?.temperature ?: return null
+        fun summary(width: UnitWidth) = context.getString(
+            R.string.traveller_daily_high_low,
+            high.formatMeasure(context, temperatureUnit, valueWidth = UnitWidth.NARROW, unitWidth = width),
+            low.formatMeasure(context, temperatureUnit, valueWidth = UnitWidth.NARROW, unitWidth = width)
+        )
+        return summary(UnitWidth.NARROW) to summary(UnitWidth.LONG)
+    }
 
     val cal = Date().toCalendarWithTimeZone(location.timeZone)
     val currentHour = cal[Calendar.HOUR_OF_DAY]
