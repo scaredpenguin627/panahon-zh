@@ -61,7 +61,7 @@ internal fun Project.configureKotlin() {
                 // Kotlin 2.5.0-RC: opt in to the experimental stdlib APIs (Boolean.onTrue/onFalse/
                 // ifOrNull, CodePoint) and to companion extensions and blocks.
                 "-opt-in=kotlin.ExperimentalStdlibApi",
-                "-Xcompanion-blocks-and-extensions",
+                "-Xcompanion-blocks",
             )
 
             // Treat all Kotlin warnings as errors (disabled by default)
